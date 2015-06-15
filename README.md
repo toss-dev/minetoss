@@ -3,7 +3,7 @@
 Minecraft like engine openGL / GLFW
 -----------------------------------------------
 
-• Currently working on the rendering system:
+<u>• Currently working on the rendering system:</u>
 
 terrain are TERRAIN_SIZEX x TERRAIN_SIZEY x TERRAIN_SIZEZ array size, at a given 3d index in the world
 (first terrain is at (0;0;0), left terrain (-1;0;0))
