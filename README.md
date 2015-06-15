@@ -1,9 +1,9 @@
 # minetoss
 
-Minecraft like rendering engine openGL / GLFW
+Minecraft like engine openGL / GLFW
 -----------------------------------------------
 
-Currently working on the rendering system:
+• Currently working on the rendering system:
 
 terrain are TERRAIN_SIZEX x TERRAIN_SIZEY x TERRAIN_SIZEZ array size, at a given 3d index in the world
 (first terrain is at (0;0;0), left terrain (-1;0;0))
