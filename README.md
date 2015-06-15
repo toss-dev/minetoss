@@ -1,11 +1,7 @@
 # minetoss
 
-this | is | a | test
---------------------
-test | a | b  | c |
-
-Minecraft like rendering engine to learn openGL
-
+Minecraft like rendering engine openGL / GLFW
+-----------------------------------------------
 
 Currently working on the rendering system:
 
