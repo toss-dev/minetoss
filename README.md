@@ -18,7 +18,7 @@ Only faces in camera frustum, and close enough (CHUNK_RENDER_DISTANCE Terrains d
 
 
 
-
+--------------------------------------
 Extern library used:
 * OpenGL (modern pipeline)
 * GLFW (opengl framework)
