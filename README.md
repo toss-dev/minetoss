@@ -13,3 +13,19 @@ MESH_PER_TERRAIN meshes are built, containing every visible face from a subdivis
 TERRAIN_SIZEX x (TERRAIN_SIZEY / MESH_PER_TERRAIN) x TERRAIN_SIZEZ blocks in a mesh
 
 Only faces in camera frustum (currently 70 fov), and close enough (8 Terrains distance) are rendered (see const.h)
+
+
+
+
+Extern library used:
+
+tinycthread.c tinycthread.h
+
+lodepng.c lodepng.h
+
+modern openGL
+
+glfw
+
+glew (windows only)
+
