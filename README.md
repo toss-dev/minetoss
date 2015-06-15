@@ -16,9 +16,16 @@ Only faces in camera frustum (currently 70 fov), and close enough (8 Terrains di
 
 
 
+
 Extern library used:
+
 tinycthread.c tinycthread.h
+
 lodepng.c lodepng.h
+
 modern openGL
+
 glfw
+
 glew (windows only)
+
