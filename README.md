@@ -19,9 +19,9 @@ Only faces in camera frustum, and close enough (CHUNK_RENDER_DISTANCE Terrains d
 
 
 
-** Extern library used:
-openGL
-glfw
-glew (windows only)
-tinycthread.c tinycthread.h
-lodepng.c lodepng.h
+Extern library used:
+* OpenGL (modern pipeline)
+* GLFW (opengl framework)
+* glew (windows only)
+* tinycthread.c tinycthread.h (cross plateform multithreading)
+* lodepng.c lodepng.h (png decoder / encoder)
