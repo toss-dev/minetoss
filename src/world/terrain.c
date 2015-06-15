@@ -69,7 +69,7 @@ static void	updateTerrain(t_terrain *terrain, t_world *world)
 	}
 }
 
-static void updateChunkLoads(t_world *world, t_vec3 vec)
+static void updateTerrainLoad(t_world *world, t_vec3 vec)
 {
 	t_terrain	*terrain;
 	t_point3	index;
@@ -107,6 +107,6 @@ static void updateChunkLoads(t_world *world, t_vec3 vec)
 /** update and generate terrain at the given pos in the given world */
 void	updateTerrains(t_world *world, t_vec3 pos)
 {
-	updateChunkLoads(world, pos);
+	updateTerrainLoad(world, pos);
 	htab_iter(world->terrains, (t_iter_function)updateTerrain, world);
 }

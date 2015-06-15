@@ -112,7 +112,7 @@ static void loadSkyboxModel(t_renderer *renderer)
     {
         renderer->sky.vboID = glhGenVBO();
         glBindBuffer(GL_ARRAY_BUFFER, renderer->sky.vboID);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(skybox_vertices), skybox_vertices, GL_STATIC_DRAW);
+        glhVBOData(GL_ARRAY_BUFFER, skybox_vertices, sizeof(skybox_vertices), GL_STATIC_DRAW);
         glVertexAttribPointer(ATTR_POSITION, 3, GL_FLOAT, GL_FALSE, 0, NULL);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
