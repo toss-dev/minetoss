@@ -34,7 +34,7 @@ void	initRenderer(t_renderer *renderer)
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_BACK);
-	glfwSwapInterval(1);
+	glfwSwapInterval(0);
 	glhSetContext(&(renderer->context));
 	logger_log(LOG_FINE, "Loading renderer...");
 	{

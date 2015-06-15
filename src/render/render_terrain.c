@@ -96,9 +96,9 @@ static void renderTerrain(t_terrain *terrain, t_world_renderer *wr)
 							i * MESH_SIZEY + MESH_SIZEY / 2 + terrain->index.y * TERRAIN_SIZEY,
 							terrain->index.z * TERRAIN_SIZEZ + TERRAIN_SIZEZ / 2);
 
-		if (dist > CHUNK_RENDER_DISTANCE)
+		if (dist > TERRAIN_RENDER_DISTANCE)
 		{
-			if (meshHasState(terrain->meshes + i, MESH_MODEL_INITIALIZED))
+			if (dist > TERRAIN_KEEP_LOADED_DISTANCE && meshHasState(terrain->meshes + i, MESH_MODEL_INITIALIZED))
 			{
 				meshUnload(terrain->meshes + i);
 			}

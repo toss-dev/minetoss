@@ -117,7 +117,7 @@ void		loadCamera(t_renderer *renderer)
 	renderer->camera.vec_pos = new_vec3(0, 0, 0);
 	renderer->camera.fov = 70;
 	renderer->camera.near_dist = 0.1f;
-	renderer->camera.far_dist = (CHUNK_RENDER_DISTANCE * 2) * TERRAIN_SIZEX;
+	renderer->camera.far_dist = TERRAIN_KEEP_LOADED_DISTANCE * TERRAIN_SIZEX;
 	for (i = 0; i < PROGRAM_MAX; i++)
 	{
 		bind_projection_matrix(renderer->camera, renderer->programs[i]);

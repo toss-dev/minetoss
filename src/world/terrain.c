@@ -79,15 +79,15 @@ static void updateTerrainLoad(t_world *world, t_vec3 vec)
 	double		dist;
 
 	pos = getTerrainIndexForPos(vec);
-	for (x = -CHUNK_RENDER_DISTANCE ; x < CHUNK_RENDER_DISTANCE ; x++)
+	for (x = -TERRAIN_KEEP_LOADED_DISTANCE ; x < TERRAIN_KEEP_LOADED_DISTANCE ; x++)
 	{
-		for (z = -CHUNK_RENDER_DISTANCE ; z < CHUNK_RENDER_DISTANCE ; z++)
+		for (z = -TERRAIN_KEEP_LOADED_DISTANCE ; z < TERRAIN_KEEP_LOADED_DISTANCE ; z++)
 		{
 			index.x = pos.x + x;
 			index.y = 0;
 			index.z = pos.z + z;
 			dist = point3_dist(pos, index);
-			if (dist < CHUNK_RENDER_DISTANCE)
+			if (dist < TERRAIN_KEEP_LOADED_DISTANCE)
 			{
 				terrain = getTerrain(world, index);
 				if (terrain == NULL)
