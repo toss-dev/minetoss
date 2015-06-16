@@ -14,7 +14,7 @@
 
 static void	toggleMeshUpdate(t_terrain *terrain, unsigned meshID)
 {
-	terrain->meshes[meshID].state &= ~(MESH_DATA_UP_TO_DATE);
+	modelUnsetState(terrain->meshes + meshID, MODEL_VERTICES_UP_TO_DATE);
 }
 
 /** update chunks near to the block at `pos` (at chunk `meshID` into the given `terrain` which has just changed */
@@ -22,7 +22,8 @@ static void	updateChunksMesh(t_world *world, t_terrain *terrain, t_point3 pos, u
 {
 	t_terrain	*tmp;
 
-	terrain->meshes[meshID].state &= ~(MESH_DATA_UP_TO_DATE);
+	modelUnsetState(terrain->meshes + meshID, MODEL_VERTICES_UP_TO_DATE);
+
 	/** below chunk in the same terrain need update */
 	if (pos.y % MESH_SIZEY == 0)
 	{
@@ -100,7 +101,7 @@ void 			setBlock(t_world *world, unsigned blockID, t_vec3 vec)
 	{
 		terrain = createNewTerrain(world, getTerrainIndexForPos(vec));
 		loadTerrain(terrain);
-		logger_log(LOG_WARNING, "Created a new terrain when placing block (at %d:%d:%d)", terrain->index.x, terrain->index.y, terrain->index.z);
+		logger_log(LOG_FINE, "Created a new terrain when placing block (at %d:%d:%d)", terrain->index.x, terrain->index.y, terrain->index.z);
 	}
 	pos = getTerrainRelativePos(vec);
 	terrain->blocks[pos.x][pos.y][pos.z] = blockID;

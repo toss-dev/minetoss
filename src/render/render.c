@@ -14,7 +14,7 @@
 
 static void loadQuadRenderer(t_renderer *renderer)
 {
-	t_vertex	buffer[] = {
+	t_vertex	quad_vertex[] = {
 		{{-1, 1, 0}, {0, 1, 0}, {0, 0}},
 		{{-1, -1, 0}, {0, 1, 0}, {0, 1}},
 		{{1, -1, 0}, {0, 1, 0}, {1, 1}},
@@ -24,7 +24,7 @@ static void loadQuadRenderer(t_renderer *renderer)
 	};
 
 	renderer->quad_model = new_model(GL_STATIC_DRAW);
-	initModel(&(renderer->quad_model), buffer, sizeof(buffer) / sizeof(t_vertex));
+	setModelVertices(&renderer->quad_model, ft_memdup(quad_vertex, sizeof(quad_vertex)), 6);
 }
 
 void	initRenderer(t_renderer *renderer)
@@ -32,10 +32,9 @@ void	initRenderer(t_renderer *renderer)
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glEnable(GL_CULL_FACE);
-	glCullFace(GL_BACK);
-	glfwSwapInterval(0);
-	glhSetContext(&(renderer->context));
+//	glEnable(GL_CULL_FACE);
+//	glCullFace(GL_BACK);
+	glfwSwapInterval(1);
 	logger_log(LOG_FINE, "Loading renderer...");
 	{
 		logger_log(LOG_FINE, "Loading simple quad for UI and particles");

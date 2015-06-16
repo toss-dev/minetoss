@@ -272,20 +272,7 @@ static void getChunkNeighbor(t_world *world, t_terrain *terrain, t_terrain *neig
 
 
 /**
-**	reset mesh vbo data
-*/
-static void 	refreshMesh(t_mesh *mesh)
-{
-	if (mesh->data)
-	{
-		free(mesh->data);
-	}
-	mesh->data 			= array_list_to_buffer(g_vertex_array, ARRAY_LIST_RDWR);
-	mesh->vertex_count	= g_vertex_array.size * 6;
-}
-
-/**
-**	update the terrain mesh at given ID for this terrain, using the arrayID array list as buffer
+**	update the mesh at given ID for this terrain
 */
 void		updateTerrainMeshData(t_world *world, t_terrain *terrain, unsigned meshID)
 {
@@ -293,9 +280,38 @@ void		updateTerrainMeshData(t_world *world, t_terrain *terrain, unsigned meshID)
 
 	getChunkNeighbor(world, terrain, neighbor);
 	generateVertexArrayList(terrain, neighbor, meshID);
-	refreshMesh(terrain->meshes + meshID);
+	setModelVertices(terrain->meshes + meshID, array_list_to_buffer(g_vertex_array, ARRAY_LIST_RDWR), g_vertex_array.size * 6);
 	array_list_clear(&g_vertex_array);
 }
 
+/**
+**	update every meshes for the given terrain
+*/
+void		updateTerrainMeshesData(t_world *world, t_terrain *terrain)
+{
+	unsigned	i;
+
+	for (i = 0 ; i < MESH_PER_TERRAIN ; i++)
+	{
+		updateTerrainMeshData(world, terrain, i);
+	}
+}
+
+void 		updateNeighborTerrainsMeshes(t_world *world, t_terrain *terrain)
+{
+	return ;
+	
+	t_terrain	*neighbor[4];
+	unsigned	i;
+
+	getChunkNeighbor(world, terrain, neighbor);
+	for (i = 0 ; i < 4 ; i++)
+	{
+		if (neighbor[i])
+		{
+			updateTerrainMeshesData(world, neighbor[i]);
+		}
+	}
+}
 
 /**************************************************************************/

@@ -126,23 +126,7 @@ typedef struct 	s_renderer
 	t_array_list	particles;
 	t_texture_atlas	textures_atlases[T_ATLAS_MAX];
 	t_model			quad_model;	
-	t_glh_context	context;
 }				t_renderer;
-
-enum e_mesh_state
-{
-	MESH_DATA_UP_TO_DATE = 1,
-	MESH_MODEL_INITIALIZED = 2,
-	MESH_MODEL_UP_TO_DATE = 4
-};
-
-typedef struct	s_mesh	//16x16x16
-{
-	t_model		model;
-	void 		*data;		//mesh buffer data, has to be freed when data is bind to mesh vbo
-	unsigned	vertex_count;
-	GLubyte		state;
-}				t_mesh;
 
 /**
 **	world is made of 16*128*16 terrains at a given index (x, y, z)
@@ -158,7 +142,7 @@ enum e_terrain_state
 typedef struct 	s_terrain	//16x256x16
 {
 	char 		blocks[TERRAIN_SIZEX][TERRAIN_SIZEY][TERRAIN_SIZEZ];
-	t_mesh		meshes[MESH_PER_TERRAIN];	//the index correspond to the y chunk component
+	t_model		meshes[MESH_PER_TERRAIN];	//the index correspond to the y chunk component
 	t_point3	index;	//given x, y, z index (for hashtable)
 	int 		state;
 }				t_terrain;
@@ -300,7 +284,9 @@ void 			setBlock(t_world *world, unsigned blockID, t_vec3 pos);
 /** terrain's mesh factory */
 void 			loadTerrainMeshFactory(t_renderer *renderer);
 void			updateTerrainMeshData(t_world *world, t_terrain *terrain, unsigned chunkID);
-void			updateMesh(t_world *world, t_terrain *terrain, unsigned meshID);
+void			updateTerrainMeshesData(t_world *world, t_terrain *terrain);
+void 			updateNeighborTerrainsMeshes(t_world *world, t_terrain *terrain);
+void			updateMeshes(t_world *world, t_terrain *terrain, unsigned meshID);
 
 /** main render functions, will render the whole world to default framebuffers */
 void			render(t_world *world, t_renderer *renderer);
@@ -325,16 +311,6 @@ void			loadCamera(t_renderer *renderer);
 
 /** weather */
 void			updateWeather(t_world *world, t_renderer *renderer, t_timer *timer);
-
-/** mesh functions */
-t_mesh			new_mesh(void);
-void 			init_mesh(t_mesh *mesh);
-void 			deleteMesh(t_mesh *mesh);
-bool			isMeshEmpty(t_mesh *mesh);
-void			meshSetState(t_mesh *mesh, unsigned state);
-void			meshUnsetState(t_mesh *mesh, unsigned state);
-bool			meshHasState(t_mesh *mesh, unsigned state);
-
 
 
 /** particles */

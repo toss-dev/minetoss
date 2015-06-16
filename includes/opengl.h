@@ -25,16 +25,6 @@
 
 # include "maths.h"
 
-typedef struct 	s_glh_context
-{
-	unsigned		vaos;
-	unsigned		vaos_total;
-	unsigned        vbos;
-	unsigned        vbos_total;
-	unsigned long	memory;
-	unsigned long	memory_total;
-}				t_glh_context;
-
 typedef struct 	s_window
 {
 	GLFWwindow	*ptr;
@@ -72,18 +62,11 @@ GLuint 			glhGenVAO(void);
 void 			glhDeleteVAO(GLuint *vao);
 GLuint			glhGenVBO(void);
 void  			glhVBOData(GLenum dest, void *floats, GLsizeiptr size, GLenum gltype);
-void   			glhVBOClear(GLenum dest, unsigned size, GLenum gltype);
 void    		glhVertexAttribPointer(GLuint index, GLint vertex_size, GLuint stride, GLuint offset);
-void  		  	glhDeleteVBO(GLuint *vbo, unsigned int size);
+void  		  	glhDeleteVBO(GLuint *vbo);
 void   			glhUseProgram(t_program *program);
 void    		glhStopUseProgram(void);
 GLuint  		glhCheckError(char const *str);
-
-/** has to be call on program initialization*/
-void    glhSetContext(t_glh_context *context);
-
-/** print current context informations */
-void    glhPrintContext(char const *str);
 
 /** vertex*/
 typedef struct 	s_vertex
@@ -106,18 +89,33 @@ enum 	e_vao_attr
 	ATTR_MAX
 };
 
+enum e_model_state
+{
+	MODEL_INITIALIZED = 1,
+	MODEL_UPDATE_TO_DATE = 2,
+	MODEL_VERTICES_UP_TO_DATE = 4,
+	MODEL_VBO_UP_TO_DATE = 8,
+	MODEL_CLEARED = 16
+};
+
 typedef struct 	s_model
 {
 	GLuint	vaoID;
 	GLuint	vboID;
+	t_vertex *vertices;
 	GLuint	vertex_count;
 	GLenum	glmode;
+	char	state;	
 }				t_model;
 
 t_model			new_model(GLenum glmode);
-bool			initModel(t_model *model, t_vertex *vertices, unsigned vertex_count);
-bool 			updateModelVBO(t_model *model, t_vertex *vertices, unsigned vertex_count);
+bool 			updateModelVBO(t_model *model);
+bool			clearModelVBO(t_model *model);
 void 			renderModel(t_model *model);
 void 			modelDelete(t_model *model);
+void 			modelSetState(t_model *model, unsigned state);
+void 			modelUnsetState(t_model *model, unsigned state);
+bool 			modelHasState(t_model *model, unsigned state);
+void 			setModelVertices(t_model *model, t_vertex *vertices, unsigned vertex_count);
 
 #endif

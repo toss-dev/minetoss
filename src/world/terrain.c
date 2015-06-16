@@ -21,22 +21,25 @@
 t_terrain	*createNewTerrain(t_world *world, t_point3 index)
 {
 	char		key[64];
-	t_terrain	terrain;
+	t_terrain	buffer;
 	unsigned	i;
+	t_terrain	*terrain;
 
-	terrain.index = index;
-	terrain.state = 0;
+	buffer.index = index;
+	buffer.state = 0;
 	if (index.y != 0)
 	{
-		terrainSetState(&terrain, TERRAIN_GENERATED);
+		terrainSetState(&buffer, TERRAIN_GENERATED);
 	}
 	for (i = 0 ; i < MESH_PER_TERRAIN ; i++)
 	{
-		terrain.meshes[i] = new_mesh();
+		buffer.meshes[i] = new_model(GL_STREAM_DRAW);
 	}
 	generateTerrainKey(key, index);
-	memset(terrain.blocks, 0, sizeof(terrain.blocks));
-	return (htab_insert(world->terrains, key, &terrain, sizeof(t_terrain)));
+	memset(buffer.blocks, 0, sizeof(buffer.blocks));
+	terrain = htab_insert(world->terrains, key, &buffer, sizeof(t_terrain));
+	updateNeighborTerrainsMeshes(world, terrain);
+	return (terrain);
 }
 
 /** called on initialization */
@@ -65,7 +68,7 @@ static void	updateTerrain(t_terrain *terrain, t_world *world)
 
 	for (meshID = 0 ; meshID < MESH_PER_TERRAIN ; meshID++)
 	{
-		updateMesh(world, terrain, meshID);
+		updateMeshes(world, terrain, meshID);
 	}
 }
 

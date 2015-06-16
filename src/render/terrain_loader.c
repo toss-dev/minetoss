@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   mesh.c                                       :+:      :+:    :+:   */
+/*   terrain_mesh.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: rpereira <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -12,13 +12,7 @@
 
 #include "main.h"
 
-/** update terrain meshes */
-void	updateMeshes(t_world *world, t_terrain *terrain, unsigned meshID)
+bool	updateTerrainRenderer(t_game *game)
 {
-	if (!modelHasState(terrain->meshes + meshID, MODEL_VERTICES_UP_TO_DATE))
-	{
-		updateTerrainMeshData(world, terrain, meshID);
-		modelSetState(terrain->meshes + meshID, MODEL_VERTICES_UP_TO_DATE);
-		modelUnsetState(terrain->meshes + meshID, MODEL_VBO_UP_TO_DATE);
-	}
+	return (!glfwWindowShouldClose(game->window.ptr));
 }

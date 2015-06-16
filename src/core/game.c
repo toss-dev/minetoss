@@ -22,47 +22,6 @@ void	gameStop(t_game *game)
 	game->state = game->state & ~(GAME_STATE_RUNNING);
 }
 
-void APIENTRY DebugCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, GLvoid *userParam)
-{
-	(void)source;
-	(void)type;
-	(void)id;
-	(void)severity;
-	(void)length;
-	(void)userParam;
-	(void)source;
-	(void)source;
-    switch (type) {
-        case GL_DEBUG_TYPE_ERROR:
-            printf("error: %s\n", message);
-            break;
-        case GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR:
-            printf("deprecated: %s\n", message);
-            break;
-        case GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR:
-            printf("undefined: %s\n", message);
-            break;
-        case GL_DEBUG_TYPE_PORTABILITY:
-            printf("portability: %s\n", message);
-            break;
-        case GL_DEBUG_TYPE_PERFORMANCE:
-            printf("performance: %s\n", message);
-            break;
-        case GL_DEBUG_TYPE_OTHER:
-            printf("other: %s\n", message);
-            break;
-        case GL_DEBUG_TYPE_MARKER:
-            printf("marker: %s\n", message);
-            break;
-        case GL_DEBUG_TYPE_PUSH_GROUP:
-            printf("push_group: %s\n", message);
-            break;
-        case GL_DEBUG_TYPE_POP_GROUP:
-            printf("pop_group: %s\n", message);
-            break;
-    }
-}
-
 t_game	*gameNew(void)
 {
 	t_game	*game;
@@ -80,7 +39,5 @@ t_game	*gameNew(void)
 	initWorld(&(game->world));
 	initTimer(&(game->timer));
 	glhCheckError("Game initialization");
-
-	glDebugMessageCallbackARB((GLDEBUGPROC)DebugCallback, NULL);
 	return (game);
 }

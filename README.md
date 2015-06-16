@@ -16,6 +16,12 @@ Each meshes has a vbo which is filled with every visible face from a subdivision
 Only faces in camera frustum, and close enough (CHUNK_RENDER_DISTANCE Terrains distance) are rendered (see const.h)
 
 
+TODO:
+	- reduce main thread tasks (use for rendering)
+	- add a 3th thread for camera movement / mesh should be rendered
+	- add a 4th thread to generate terrain's mesh only (so block generation and meshing are seperates)
+	- improving meshing algorythm 
+
 
 --------------------------------------
 Extern library used:

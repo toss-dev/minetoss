@@ -18,59 +18,105 @@ t_model	new_model(GLenum glmode)
 
 	model.vaoID = 0;
 	model.vboID = 0;
+	model.vertices = NULL;
 	model.vertex_count = 0;
 	model.glmode = glmode;
+	model.state = 0;
 	return (model);
 }
-/**
-**		t_vertex	buffer[] = {
-**			{{-1, 1, 0}, {0, 1, 0}, {0, 0}},
-**			{{-1, -1, 0}, {0, 1, 0}, {0, 1}},
-**			{{1, -1, 0}, {0, 1, 0}, {1, 1}},
-**			{{-1, 1, 0}, {0, 1, 0}, {0, 0}},
-**			{{1, -1, 0}, {0, 1, 0}, {1, 1}},
-**			{{1, 1, 0}, {0, 1, 0}, {1, 0}}
-**		};
-**
-**	return false if initialization failed
-**
-*/
-bool	initModel(t_model *model, t_vertex *vertices, unsigned vertex_count)
+
+void 	setModelVertices(t_model *model, t_vertex *vertices, unsigned vertex_count)
 {
-	model->vaoID = glhGenVAO();
-	model->vboID = glhGenVBO();
-	
-	glBindVertexArray(model->vaoID);
-
-	glBindBuffer(GL_ARRAY_BUFFER, model->vboID);
-
-	glhVBOData(GL_ARRAY_BUFFER, vertices, vertex_count * sizeof(t_vertex), model->glmode);
-
-	glhVertexAttribPointer(ATTR_POSITION, 	3, 3 + 3 + 2, 0);
-	glhVertexAttribPointer(ATTR_NORMAL, 	3, 3 + 3 + 2, 3);
-	glhVertexAttribPointer(ATTR_UV, 		2, 3 + 3 + 2, 3 + 3);
-
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-	glBindVertexArray(0);
-
+	if (model->vertices)
+	{
+		free(model->vertices);
+	}
+	model->vertices = vertices;
 	model->vertex_count = vertex_count;
+	modelUnsetState(model, MODEL_VBO_UP_TO_DATE);
+}
+
+/** update model vbos depending on it data pointer and it vertex vertex_count*/
+bool	updateModelVBO(t_model *model)
+{
+	if (modelHasState(model, MODEL_VBO_UP_TO_DATE))
+	{
+		logger_log(LOG_WARNING, "Trying to update an unchanged model! canceling operation");
+		return (false);
+	}
+
+	if (!modelHasState(model, MODEL_INITIALIZED))
+	{
+		model->vaoID = glhGenVAO();
+		model->vboID = glhGenVBO();
+		
+		glBindVertexArray(model->vaoID);
+
+		glBindBuffer(GL_ARRAY_BUFFER, model->vboID);
+
+		glhVBOData(GL_ARRAY_BUFFER, model->vertices, model->vertex_count * sizeof(t_vertex), model->glmode);
+
+		glhVertexAttribPointer(ATTR_POSITION, 	3, 3 + 3 + 2, 0);
+		glhVertexAttribPointer(ATTR_NORMAL, 	3, 3 + 3 + 2, 3);
+		glhVertexAttribPointer(ATTR_UV, 		2, 3 + 3 + 2, 3 + 3);
+
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+		glBindVertexArray(0);
+
+		modelSetState(model, MODEL_INITIALIZED);
+	}
+	else
+	{
+		glBindBuffer(GL_ARRAY_BUFFER, model->vboID);
+		glhVBOData(GL_ARRAY_BUFFER, NULL, 0, model->glmode);
+		glhVBOData(GL_ARRAY_BUFFER, model->vertices, model->vertex_count * sizeof(t_vertex), model->glmode);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+	}
+	
+	modelSetState(model, MODEL_VBO_UP_TO_DATE);
+	modelUnsetState(model, MODEL_CLEARED);
 
 	return (true);
 }
 
-bool	updateModelVBO(t_model *model, t_vertex *vertices, unsigned vertex_count)
+void 	modelSetState(t_model *model, unsigned state)
 {
+	model->state = model->state | state;
+}
+
+void 	modelUnsetState(t_model *model, unsigned state)
+{
+	model->state = model->state & ~(state);
+}
+
+bool 	modelHasState(t_model *model, unsigned state)
+{
+	return (model->state & state);
+}
+
+
+bool	clearModelVBO(t_model *model)
+{
+	if (!modelHasState(model, MODEL_INITIALIZED) || modelHasState(model, MODEL_CLEARED))
+	{
+		return (false);
+	}
 	glBindBuffer(GL_ARRAY_BUFFER, model->vboID);
-	glhVBOClear(GL_ARRAY_BUFFER, model->vertex_count * sizeof(t_vertex), model->glmode);
-	model->vertex_count = vertex_count;
-	glhVBOData(GL_ARRAY_BUFFER, vertices, model->vertex_count * sizeof(t_vertex), model->glmode);
+	glhVBOData(GL_ARRAY_BUFFER, NULL, 0, model->glmode);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	modelSetState(model, MODEL_CLEARED);
+	modelUnsetState(model, MODEL_VBO_UP_TO_DATE);
 	return (true);
 }
 
 void 	renderModel(t_model *model)
 {
+	if (!modelHasState(model, MODEL_VBO_UP_TO_DATE))
+	{
+		updateModelVBO(model);
+	}
+
 	glBindVertexArray(model->vaoID);
 
 	glEnableVertexAttribArray(ATTR_POSITION);
@@ -87,7 +133,18 @@ void 	renderModel(t_model *model)
 
 void 	modelDelete(t_model *model)
 {
-	glhDeleteVAO(&(model->vaoID));
-	glhDeleteVBO(&(model->vboID), model->vertex_count * sizeof(t_vertex));
+	clearModelVBO(model);
+	if (modelHasState(model, MODEL_INITIALIZED))
+	{
+		glhDeleteVAO(&(model->vaoID));
+		glhDeleteVBO(&(model->vboID));
+	}
+
+	if (model->vertices)
+	{
+		free(model->vertices);
+		model->vertices = NULL;
+	}
 	model->vertex_count = 0;
+	model->state = 0;
 }

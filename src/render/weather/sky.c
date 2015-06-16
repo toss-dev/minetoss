@@ -26,7 +26,7 @@ void		skyDelete(t_sky *sky)
 {
 	skyboxDelete(sky);
     glhDeleteVAO(&(sky->vaoID));
-    glhDeleteVBO(&(sky->vboID), 3 * 6 * 6 * sizeof(GLfloat));
+    glhDeleteVBO(&(sky->vboID));
 }
 
 static void	loadCubemap(GLuint *id, char *identifier)

@@ -49,30 +49,6 @@ static void bindTerrainTexture(t_renderer *renderer, double dist)
 	glBindTexture(GL_TEXTURE_2D, renderer->block_atlas[id]);
 }
 
-static void renderMesh(t_mesh *mesh)
-{
-	if (!meshHasState(mesh, MESH_MODEL_INITIALIZED))
-	{
-		initModel(&(mesh->model), mesh->data, mesh->vertex_count);
-		meshSetState(mesh, MESH_MODEL_INITIALIZED);
-		meshSetState(mesh, MESH_MODEL_UP_TO_DATE);
-	}
-
-	if (!meshHasState(mesh, MESH_MODEL_UP_TO_DATE))
-	{
-		updateModelVBO(&(mesh->model), mesh->data, mesh->vertex_count);
-		meshSetState(mesh, MESH_MODEL_UP_TO_DATE);
-	}
-	renderModel(&(mesh->model));
-}
-
-static void	meshUnload(t_mesh *mesh)
-{
-	modelDelete(&(mesh->model));
-	meshUnsetState(mesh, MESH_MODEL_INITIALIZED);
-	meshUnsetState(mesh, MESH_MODEL_UP_TO_DATE);
-}
-
 static void renderTerrain(t_terrain *terrain, t_world_renderer *wr)
 {
 	double		dist;
@@ -83,7 +59,9 @@ static void renderTerrain(t_terrain *terrain, t_world_renderer *wr)
 	{
 		return ;
 	}
+
 	loadTerrainInstanceUniforms(wr->renderer, terrain);
+
 	for (i = 0 ; i < MESH_PER_TERRAIN ; i++)
 	{
 		if (terrain->meshes[i].vertex_count == 0)
@@ -98,18 +76,21 @@ static void renderTerrain(t_terrain *terrain, t_world_renderer *wr)
 
 		if (dist > TERRAIN_RENDER_DISTANCE)
 		{
-			if (dist > TERRAIN_KEEP_LOADED_DISTANCE && meshHasState(terrain->meshes + i, MESH_MODEL_INITIALIZED))
+			//this will be done in another thread which will also calculate the dist
+			/*if (dist > TERRAIN_KEEP_LOADED_DISTANCE)
 			{
-				meshUnload(terrain->meshes + i);
-			}
+				clearModelVBO(terrain->meshes + i);
+			}*/
 			continue ;
 		}
 		
+
 		if (dist <= 1 || isInCameraFrustum(&(wr->renderer->camera), mesh_pos, 40))
 		{
 			bindTerrainTexture(wr->renderer, dist);	//bind texture depending on distance (bitmapping)
-			renderMesh(terrain->meshes + i);
+			renderModel(terrain->meshes + i);
 		}
+
 	}
 }
 

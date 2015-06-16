@@ -24,7 +24,7 @@ static void deleteTerrain(t_terrain *terrain)
 
 	for (i = 0 ; i < MESH_PER_TERRAIN ; i++)
 	{
-		deleteMesh(terrain->meshes + i);
+		modelDelete(terrain->meshes + i);
 	}
 	free(terrain);
 }
@@ -42,11 +42,9 @@ void		gameClean(t_game *game)
 	{
 		thrd_join(game->threads[i], NULL);
 	}
-	glhPrintContext("On program ends");
 	cleanWindow(&(game->window));
 	cleanRenderer(&(game->renderer));
 	cleanWorld(&(game->world));
 	cleanBlocks(game->renderer.blocks);
-	glhPrintContext("Before exit");
 	exit(EXIT_SUCCESS);
 }
