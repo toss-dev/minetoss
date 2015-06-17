@@ -17,9 +17,13 @@ Only faces in camera frustum, and close enough (CHUNK_RENDER_DISTANCE Terrains d
 
 
 TODO:
+	
 	- reduce main thread tasks (use for rendering)
+
 	- add a 3th thread for camera movement / mesh should be rendered
+
 	- add a 4th thread to generate terrain's mesh only (so block generation and meshing are seperates)
+
 	- improving meshing algorythm 
 
 
