@@ -152,6 +152,7 @@ typedef struct 	s_terrain	//16x256x16
 {
 	char 		blocks[TERRAIN_SIZEX][TERRAIN_SIZEY][TERRAIN_SIZEZ];
 	t_model		meshes[MESH_PER_TERRAIN];	//the index correspond to the y chunk component
+	char		meshes_state[MESH_PER_TERRAIN];
 	t_point3	index;	//given x, y, z index (for hashtable)
 	int 		state;
 }				t_terrain;

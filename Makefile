@@ -32,30 +32,31 @@ SRC		= blocks/block.c \
 		  event/mouse.c \
 		  event/camera_control.c \
 		  event/window.c \
-		  render/render_sky.c \
-		  render/program.c \
 		  render/camera.c \
-		  render/render_uniforms.c \
-		  render/gl_helper.c \
-		  render/shader.c \
-		  render/render_terrain.c \
-		  render/mesh.c \
-		  render/terrain_mesh.c \
 		  render/render.c \
-		  render/render_particles.c \
-		  render/model.c \
-		  render/render_ui.c \
-		  render/vertex.c \
+		  render/renderer/render_terrain.c \
+		  render/renderer/render_particles.c \
+		  render/renderer/render_ui.c \
+		  render/renderer/render_sky.c \
+		  render/renderer/renderer_update.c \
 		  render/particles/particles.c \
 		  render/particles/texture.c \
 		  render/particles/particles_update.c \
 		  render/texture/png_parser.c \
 		  render/texture/bmp_parser.c \
+		  render/terrain/terrain_mesh.c \
+		  render/terrain/mesh.c \
 		  render/weather/sky.c \
 		  render/weather/skycolor.c \
 		  render/weather/weather.c \
 		  render/font/render_font.c \
 		  render/font/font.c \
+		  render/opengl/gl_helper.c \
+		  render/opengl/program.c \
+		  render/opengl/shader.c \
+		  render/opengl/vertex.c \
+		  render/opengl/model.c \
+		  render/opengl/uniforms.c \
 		  timer/timer.c \
 		  world/setblock.c \
 		  world/terrain.c \

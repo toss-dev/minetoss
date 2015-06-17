@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   terrain_mesh.c                                     :+:      :+:    :+:   */
+/*   renderer_update.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: rpereira <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -12,7 +12,7 @@
 
 #include "main.h"
 
-bool	updateTerrainRenderer(t_game *game)
+bool	updateRenderer(t_game *game)
 {
 	return (!glfwWindowShouldClose(game->window.ptr));
 }
