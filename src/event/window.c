@@ -37,6 +37,7 @@ static void	prepare_glew(void)
 
 void 	cleanWindow(t_window *window)
 {
+	glfwDestroyWindow(window->ptr);
 	(void)window;
 }
 

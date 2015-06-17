@@ -55,6 +55,7 @@ typedef struct 	s_program
 	GLuint	cubemap_night;
 	GLuint	day_ratio;
 	GLuint	day_factor;
+	GLuint	font_color;
 }				t_program;
 
 /** opengl helper functions (see gl_helper.c) */
@@ -66,6 +67,7 @@ void    		glhVertexAttribPointer(GLuint index, GLint vertex_size, GLuint stride,
 void  		  	glhDeleteVBO(GLuint *vbo);
 void   			glhUseProgram(t_program *program);
 void    		glhStopUseProgram(void);
+GLuint			glhLoadTexture(char const *file);
 GLuint  		glhCheckError(char const *str);
 
 /** vertex*/

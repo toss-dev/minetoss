@@ -16,6 +16,7 @@ static void	cleanRenderer(t_renderer *renderer)
 {
 	skyDelete(&(renderer->sky));
 	modelDelete(&(renderer->quad_model));
+	unloadFont();
 }
 
 static void deleteTerrain(t_terrain *terrain)

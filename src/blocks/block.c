@@ -173,6 +173,7 @@ static void	createTextureBlockAtlas(t_renderer *renderer, t_texture *textures)
 			memset(pixels + i * BLOCK_TEXTURE_BYTES, 0xFF, BLOCK_TEXTURE_BYTES);
 		}
 		free(textures[i].pixels);
+		textures[i].pixels = NULL;
 	}
 	glGenTextures(RESOLUTION_BLOCK_ATLAS_MAX, renderer->block_atlas);
 

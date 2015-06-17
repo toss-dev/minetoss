@@ -86,6 +86,30 @@ void    glhStopUseProgram(void)
     glUseProgram(0);
 }
 
+/** load a texture to gl uint */
+GLuint glhLoadTexture(char const *file)
+{
+    char        texture_file[256];
+    t_texture   texture;
+    GLuint      textureID;
+
+    sprintf(texture_file, "./assets/textures/%s", file);
+    logger_log(LOG_FINE, "Loading texture file: %s", texture_file);
+    glGenTextures(1, &textureID);
+    if (loadPngFile(texture_file, &texture) == -1)
+    {
+        return (0);
+    }
+    glBindTexture(GL_TEXTURE_2D, textureID);
+    glTexImage2D(GL_TEXTURE_2D, 0, texture.internalformat,
+                    texture.width, texture.height, 0,
+                    texture.format, GL_UNSIGNED_BYTE, texture.pixels);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    free(texture.pixels);
+    return (textureID);
+}
+
 
 GLuint  glhCheckError(char const *str)
 {

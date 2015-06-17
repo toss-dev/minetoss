@@ -12,27 +12,14 @@
 
 #include "main.h"
 
-static void	updateDebug(t_game *game, double prev)
+static void	updateDebug(t_game *game)
 {
-	static int fps = 0;
-	static int i = 0;
+	char	buffer[512];
 
-	if (i % 60 == 0)
-	{
-		fps = (int)(1 / (glfwGetTime() - prev));
-	}
-	else if (glfwGetTime() - prev > 1)
-	{
-		printf("took more than a seconds to execute, wtf\n");
-	}
-	char	buffer[1024];
-
-	sprintf(buffer, "FPS: %d ; x:%f | y:%f | z:%f ; x:%f | y:%f | z:%f",
-		fps,
+	sprintf(buffer, "x:%f | y:%f | z:%f ; x:%f | y:%f | z:%f",
 		game->renderer.camera.pos.x, game->renderer.camera.pos.y, game->renderer.camera.pos.z,
 		game->renderer.camera.look_vec.x, game->renderer.camera.look_vec.y, game->renderer.camera.look_vec.z);
 	glfwSetWindowTitle(game->window.ptr, buffer);
-	i++;
 }
 
 void		gameLoop(t_game *game)
@@ -51,6 +38,7 @@ void		gameLoop(t_game *game)
 		glfwSwapBuffers(game->window.ptr);
 		glfwPollEvents();
 		glhCheckError("main thread loop");
-		updateDebug(game, prev);
+		updateDebug(game);
+		game->renderer.fps = (unsigned int)(1 / (glfwGetTime() - prev));
 	}
 }

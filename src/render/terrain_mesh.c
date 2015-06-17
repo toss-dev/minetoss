@@ -149,38 +149,18 @@ static void addBlockFaces(t_terrain *terrain, t_terrain *neighbor[4], t_block *b
 {
 
 /*********************************************************************/
-	if (pos.x == 0)
-	{
-		if (neighbor[0] == NULL)
-		{
-			pushFace(BLOCK_FACE_FRONT, block, pos);
-		}
-		else if (!isBlockVisible(neighbor[0]->blocks[TERRAIN_SIZEX - 1][pos.y][pos.z]))
-		{
-			pushFace(BLOCK_FACE_FRONT, block, pos);
-		}
-	}
-	else if (!isBlockVisible(terrain->blocks[pos.x - 1][pos.y][pos.z]))
+	if ((pos.x == 0 && neighbor[0] && !isBlockVisible(neighbor[0]->blocks[TERRAIN_SIZEX - 1][pos.y][pos.z]))
+			|| (pos.x > 0 && !isBlockVisible(terrain->blocks[pos.x - 1][pos.y][pos.z])))
 	{
 		pushFace(BLOCK_FACE_FRONT, block, pos);
 	}
 
-
-	if (pos.x == TERRAIN_SIZEX - 1)
-	{
-		if (neighbor[2] == NULL)
-		{
-			pushFace(BLOCK_FACE_BACK, block, pos);
-		}
-		else if (!isBlockVisible(neighbor[2]->blocks[0][pos.y][pos.z]))
-		{
-			pushFace(BLOCK_FACE_BACK, block, pos);
-		}
-	}
-	else if (!isBlockVisible(terrain->blocks[pos.x + 1][pos.y][pos.z]))
+	if ((pos.x == TERRAIN_SIZEX - 1 && neighbor[2] && !isBlockVisible(neighbor[2]->blocks[0][pos.y][pos.z]))
+			|| (pos.x < TERRAIN_SIZEX - 1 && !isBlockVisible(terrain->blocks[pos.x + 1][pos.y][pos.z])))
 	{
 		pushFace(BLOCK_FACE_BACK, block, pos);
 	}
+
 /*********************************************************************/
 
 
@@ -198,35 +178,15 @@ static void addBlockFaces(t_terrain *terrain, t_terrain *neighbor[4], t_block *b
 /*********************************************************************/
 
 /*********************************************************************/
-	if (pos.z == 0)
-	{
-		if (neighbor[1] == NULL)
-		{
-			pushFace(BLOCK_FACE_LEFT, block, pos);
-		}
-		else if (!isBlockVisible(neighbor[1]->blocks[pos.x][pos.y][TERRAIN_SIZEZ - 1]))
-		{
-			pushFace(BLOCK_FACE_LEFT, block, pos);
-		}
-	}
-	else if (!isBlockVisible(terrain->blocks[pos.x][pos.y][pos.z - 1]))
+
+	if ((pos.z == 0 && neighbor[1] && !isBlockVisible(neighbor[1]->blocks[pos.x][pos.y][TERRAIN_SIZEZ - 1]))
+			|| (pos.z > 0 && !isBlockVisible(terrain->blocks[pos.x][pos.y][pos.z - 1])))
 	{
 		pushFace(BLOCK_FACE_LEFT, block, pos);
 	}
 
-
-	if (pos.z == TERRAIN_SIZEZ - 1)
-	{
-		if (neighbor[3] == NULL)
-		{
-			pushFace(BLOCK_FACE_RIGHT, block, pos);
-		}
-		else if (!isBlockVisible(neighbor[3]->blocks[pos.x][pos.y][0]))
-		{
-			pushFace(BLOCK_FACE_RIGHT, block, pos);
-		}
-	}
-	else if (!isBlockVisible(terrain->blocks[pos.x][pos.y][pos.z + 1]))
+	if ((pos.z == TERRAIN_SIZEZ - 1 && neighbor[3] && !isBlockVisible(neighbor[3]->blocks[pos.x][pos.y][0]))
+			|| (pos.z < TERRAIN_SIZEZ - 1 && !isBlockVisible(terrain->blocks[pos.x][pos.y][pos.z + 1])))
 	{
 		pushFace(BLOCK_FACE_RIGHT, block, pos);
 	}
@@ -287,31 +247,32 @@ void		updateTerrainMeshData(t_world *world, t_terrain *terrain, unsigned meshID)
 /**
 **	update every meshes for the given terrain
 */
-void		updateTerrainMeshesData(t_world *world, t_terrain *terrain)
+void		updateTerrainNeighborMeshesData(t_world *world, t_terrain *terrain, unsigned meshID)
 {
-	unsigned	i;
-
-	for (i = 0 ; i < MESH_PER_TERRAIN ; i++)
-	{
-		updateTerrainMeshData(world, terrain, i);
-	}
-}
-
-void 		updateNeighborTerrainsMeshes(t_world *world, t_terrain *terrain)
-{
-	return ;
-	
 	t_terrain	*neighbor[4];
-	unsigned	i;
-
+	
 	getChunkNeighbor(world, terrain, neighbor);
-	for (i = 0 ; i < 4 ; i++)
+	
+	if (neighbor[0])
 	{
-		if (neighbor[i])
-		{
-			updateTerrainMeshesData(world, neighbor[i]);
-		}
+		updateTerrainMeshData(world, neighbor[0], meshID);
+	}
+
+	if (neighbor[1])
+	{
+		updateTerrainMeshData(world, neighbor[1], meshID);
+	}
+
+	if (neighbor[2])
+	{
+		updateTerrainMeshData(world, neighbor[2], meshID);
+	}
+
+	if (neighbor[3])
+	{
+		updateTerrainMeshData(world, neighbor[3], meshID);
 	}
 }
+
 
 /**************************************************************************/

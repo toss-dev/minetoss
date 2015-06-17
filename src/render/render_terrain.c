@@ -18,10 +18,6 @@ static void loadTerrainInstanceUniforms(t_renderer *renderer, t_terrain *terrain
 
 	matrix_identity(m);
 	matrix_translate(m, new_vec3(terrain->index.x * TERRAIN_SIZEX, terrain->index.y * TERRAIN_SIZEY, terrain->index.z * TERRAIN_SIZEZ));
-	matrix_rotate(m, new_vec3(1, 0, 0), 0);
-	matrix_rotate(m, new_vec3(0, 1, 0), 0);
-	matrix_rotate(m, new_vec3(0, 0, 1), 0);
-	matrix_scale(m, new_vec3(1, 1, 1));
 	loadUniformMatrix(renderer->programs[PROGRAM_TERRAIN].transf_matrix, m);
 }
 

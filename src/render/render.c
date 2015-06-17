@@ -27,16 +27,44 @@ static void loadQuadRenderer(t_renderer *renderer)
 	setModelVertices(&renderer->quad_model, ft_memdup(quad_vertex, sizeof(quad_vertex)), 6);
 }
 
+/** enable the config */
+void rendererActiveConfig(t_renderer *renderer, unsigned config)
+{
+	renderer->config = renderer->config | config;
+}
+
+/** disable the config */
+void rendererDisableConfig(t_renderer *renderer, unsigned config)
+{
+	renderer->config = renderer->config & ~(config);
+}
+
+/** enable the config if it is disable, or disable it */
+void rendererSwitchConfig(t_renderer *renderer, unsigned config)
+{
+	renderer->config = renderer->config ^ config;
+}
+
+/** check if the given config is enable */
+bool rendererHasConfig(t_renderer *renderer, unsigned config)
+{
+	return (renderer->config & config);
+}
+
+/** called once at initialization, intialize every rendering thingies */
 void	initRenderer(t_renderer *renderer)
 {
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-//	glEnable(GL_CULL_FACE);
-//	glCullFace(GL_BACK);
+	glEnable(GL_CULL_FACE);
+	glCullFace(GL_BACK);
 	glfwSwapInterval(1);
+	renderer->config = 0;
 	logger_log(LOG_FINE, "Loading renderer...");
 	{
+		logger_log(LOG_FINE, "Loading font...");
+		loadFont();
 		logger_log(LOG_FINE, "Loading simple quad for UI and particles");
 		loadQuadRenderer(renderer);
 		logger_log(LOG_FINE, "Loading blocks...");
@@ -69,4 +97,6 @@ void		render(t_world *world, t_renderer *renderer)
 	renderTerrains(world, renderer);
 	renderParticles(world, renderer);
 	renderUI(world, renderer);
+
+	(void)world;
 }

@@ -51,6 +51,8 @@ static void	bind_uniforms(t_program *program)
 
 	program->cubemap_day = glGetUniformLocation(program->id, "cubemap_day");
 	program->cubemap_night = glGetUniformLocation(program->id, "cubemap_night");
+	
+	program->font_color = glGetUniformLocation(program->id, "font_color");
 }
 
 static t_program	load_program(char const *vertex, char const *fragment)
@@ -77,4 +79,5 @@ void			loadPrograms(t_renderer *renderer)
 	renderer->programs[PROGRAM_TERRAIN] = load_program("cube.vertex", "cube.fragment");
 	renderer->programs[PROGRAM_PARTICLE] = load_program("particle.vertex", "particle.fragment");
 	renderer->programs[PROGRAM_SKYBOX] = load_program("skybox.vertex", "skybox.fragment");
+	renderer->programs[PROGRAM_FONT] = load_program("font.vertex", "font.fragment");
 }

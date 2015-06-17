@@ -38,7 +38,7 @@ t_terrain	*createNewTerrain(t_world *world, t_point3 index)
 	generateTerrainKey(key, index);
 	memset(buffer.blocks, 0, sizeof(buffer.blocks));
 	terrain = htab_insert(world->terrains, key, &buffer, sizeof(t_terrain));
-	updateNeighborTerrainsMeshes(world, terrain);
+	updateTerrainNeighborMeshesData(world, terrain, MESH_PER_TERRAIN - 1);
 	return (terrain);
 }
 

@@ -14,7 +14,8 @@ NAME = render
 
 HEADER	= ./includes/main.h ./includes/opengl.h \
 		  ./includes/blocks.h ./includes/const.h \
-		  ./includes/timer.h ./includes/const.h
+		  ./includes/timer.h ./includes/const.h \
+		  ./includes/font.h
 
 SRC_DIR	= ./src/
 
@@ -53,6 +54,8 @@ SRC		= blocks/block.c \
 		  render/weather/sky.c \
 		  render/weather/skycolor.c \
 		  render/weather/weather.c \
+		  render/font/render_font.c \
+		  render/font/font.c \
 		  timer/timer.c \
 		  world/setblock.c \
 		  world/terrain.c \
@@ -94,7 +97,7 @@ endif
 
 LIB += $(LIBFT) $(LIBMATH)
 
-FLAGS	= -Wall -Wextra -Werror -g
+FLAGS	= -Wall -Wextra -Werror -pg
 
 FLAGS_OPTI = -Ofast
 

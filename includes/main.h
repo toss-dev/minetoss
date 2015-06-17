@@ -21,12 +21,14 @@
 # include "blocks.h"
 # include "const.h"
 # include "timer.h"
+# include "font.h"
 
 enum e_program_id
 {
 	PROGRAM_TERRAIN,
 	PROGRAM_SKYBOX,
 	PROGRAM_PARTICLE,
+	PROGRAM_FONT,
 	PROGRAM_MAX
 };
 
@@ -116,8 +118,14 @@ typedef struct	s_entity
 	float 	speed;
 }				t_entity;
 
+enum e_renderer_config
+{
+	RENDERER_CONFIG_DEBUG = 1
+};
+
 typedef struct 	s_renderer
 {
+	unsigned int 	fps;
 	t_camera		camera;
 	t_program		programs[PROGRAM_MAX];
 	t_sky			sky;
@@ -125,7 +133,8 @@ typedef struct 	s_renderer
 	GLuint			block_atlas[RESOLUTION_BLOCK_ATLAS_MAX];
 	t_array_list	particles;
 	t_texture_atlas	textures_atlases[T_ATLAS_MAX];
-	t_model			quad_model;	
+	t_model			quad_model;
+	size_t			config;
 }				t_renderer;
 
 /**
@@ -257,6 +266,11 @@ void 			loadWeather(t_weather *weather);
 t_block			*getBlockByID(unsigned id);
 void			raycast(t_vec3 origin, t_vec3 direction, float radius, int (*callback)(), void *extra);
 
+/** renderer config */
+void 			rendererActiveConfig(t_renderer *renderer, unsigned config);
+void 			rendererDisableConfig(t_renderer *renderer, unsigned config);
+bool			rendererHasConfig(t_renderer *renderer, unsigned config);
+void 			rendererSwitchConfig(t_renderer *renderer, unsigned config);
 
 /**	terrain functions
 **
@@ -284,8 +298,7 @@ void 			setBlock(t_world *world, unsigned blockID, t_vec3 pos);
 /** terrain's mesh factory */
 void 			loadTerrainMeshFactory(t_renderer *renderer);
 void			updateTerrainMeshData(t_world *world, t_terrain *terrain, unsigned chunkID);
-void			updateTerrainMeshesData(t_world *world, t_terrain *terrain);
-void 			updateNeighborTerrainsMeshes(t_world *world, t_terrain *terrain);
+void			updateTerrainNeighborMeshesData(t_world *world, t_terrain *terrain, unsigned meshID);
 void			updateMeshes(t_world *world, t_terrain *terrain, unsigned meshID);
 
 /** main render functions, will render the whole world to default framebuffers */

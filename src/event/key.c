@@ -11,45 +11,53 @@
 /* ************************************************************************** */
 
 #include "main.h"
-/*
-static void	test_explosion_particle(t_renderer *renderer)
-{
-	int i;
 
-	for (i = 0 ; i < PARTICLES_MAX ; i++)
-	{
-		t_particle p = new_particle(renderer->camera.pos,
-							new_vec3(0.5f, 0.5f, 0.5f),
-							new_vec3(0, 0, 0),
-							new_vec3(0.5f, 0, 0),
-							ParticleMoving, T_ATLAS_EXPLOSION, 40);
-		p.pos_vec.x = rand_float_in_range(-1, 1);
-		p.pos_vec.y = rand_float_in_range(-1, 1);
-		p.pos_vec.z = rand_float_in_range(-1, 1);
-		p.pos_vec = vec3_normalize(p.pos_vec);
-		addParticle(renderer, p);
-	}
+typedef struct 	s_key_callback
+{
+	int		key;
+	int		action;
+	void	(*f)(t_game *);
+}				t_key_callback;
+
+static void	keyDebugCallback(t_game *game)
+{
+	rendererSwitchConfig(&(game->renderer), RENDERER_CONFIG_DEBUG);
 }
-*/
+
+static void	keyNotifyClose(t_game *game)
+{
+	glfwSetWindowShouldClose(game->window.ptr, GL_TRUE);
+}
+
+# define KEY_CALLBACKS_MAX 2
 
 void	keyCallback(GLFWwindow *window, int key, int scancode, int action, int mods)
 {
+	static t_key_callback	callbacks[KEY_CALLBACKS_MAX] = {
+		{GLFW_KEY_R, GLFW_RELEASE, keyDebugCallback},
+		{GLFW_KEY_ESCAPE, GLFW_PRESS, keyNotifyClose}
+	};
+	unsigned	i;
+
+	for (i = 0 ; i < KEY_CALLBACKS_MAX ; i++)
+	{
+		if (callbacks[i].key == key && callbacks[i].action == action)
+		{
+			callbacks[i].f(g_game);
+			return ;
+		}
+	}
+
 	if (action == GLFW_RELEASE)
 	{
-		if (key == GLFW_KEY_R)
-		{
-			//test_explosion_particle(&(g_game->renderer));
-		}
 		cameraControlRelease(&(g_game->renderer.camera), key);
 	}
 	else if (action == GLFW_PRESS)
 	{
 		cameraControlPress(&(g_game->renderer.camera), key);
 	}
-	if (key == GLFW_KEY_ESCAPE)
-	{
-		glfwSetWindowShouldClose(window, GL_TRUE);
-	}
+
 	(void)scancode;
 	(void)mods;
+	(void)window;
 }
