@@ -25,9 +25,6 @@
 # define FONT_UV_UNIT_WIDTH (FONT_CHAR_WIDTH / (float)FONT_TEXTURE_WIDTH)
 # define FONT_UV_UNIT_HEIGHT (FONT_CHAR_HEIGHT / (float)FONT_TEXTURE_HEIGHT)
 
-# define FONT_SIZE_SMALL new_vec3(0.02f, 0.5f, 0)
-# define FONT_SIZE_STANDART new_vec3(0.04f, 0.1f, 0)
-
 typedef struct 	s_font_model
 {
 	GLuint		vaoID;
@@ -46,11 +43,13 @@ typedef struct 	s_font_vertex
 	t_vec2	uv;
 }				t_font_vertex;
 
-t_font_model	generateFontModel(char const *str, t_vec3 color,
-				t_vec3 pos, t_vec3 scale, t_vec3 rot, float step);
+t_font_model	generateFontModel(char const *str, t_vec3 color, t_vec3 pos, float step);
 void 			deleteFontModel(t_font_model *model);
 void 			loadFont(void);
 void 			unloadFont(void);
 void			renderFont(t_program *program, t_font_model *model);
+
+void 			setFontModelRotation(t_font_model *model, t_vec3 rot);
+void 			setFontModelScaling(t_font_model *model, t_vec3 scale);
 
 #endif

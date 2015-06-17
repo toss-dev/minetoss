@@ -18,7 +18,7 @@ GLuint 			g_textureID;
 void 	loadFont(void)
 {
 	g_char_buffer = array_list_new(512, sizeof(t_font_vertex) * 6);
-	g_textureID = glhLoadTexture("font.png");
+	g_textureID = glhLoadTexture("./font/font_buxton.png");
 }
 
 void 	unloadFont(void)
@@ -54,7 +54,6 @@ static void 	addCharVertices(unsigned line, unsigned col, t_vec3 index)
 	vertex[5].uv = new_vec2(FONT_UV_UNIT_WIDTH * col + FONT_UV_UNIT_WIDTH, FONT_UV_UNIT_HEIGHT * line);
 
 	array_list_add(&g_char_buffer, vertex);
-
 }
 
 static void 	generateFontBuffer(char const *str, float step)
@@ -70,7 +69,7 @@ static void 	generateFontBuffer(char const *str, float step)
 	{
 		if (str[i] == '\n')
 		{
-			index.y++;
+			index.y--;
 			index.x = 0;
 			continue ;
 		}
@@ -84,7 +83,17 @@ static void 	generateFontBuffer(char const *str, float step)
 	(void)step;
 }
 
-t_font_model	generateFontModel(char const *str, t_vec3 color, t_vec3 pos, t_vec3 scale, t_vec3 rot, float step)
+void 			setFontModelRotation(t_font_model *model, t_vec3 rot)
+{
+	model->rot = rot;
+}
+
+void 			setFontModelScaling(t_font_model *model, t_vec3 scale)
+{
+	model->scale = scale;
+}
+
+t_font_model	generateFontModel(char const *str, t_vec3 color, t_vec3 pos, float step)
 {
 	t_font_model	model;
 	void 			*data;
@@ -93,8 +102,8 @@ t_font_model	generateFontModel(char const *str, t_vec3 color, t_vec3 pos, t_vec3
 	model.color = color;
 	model.textureID = g_textureID;
 	model.pos = pos;
-	model.rot = rot;
-	model.scale = scale;
+	model.rot = new_vec3(0, 0, 0);
+	model.scale = new_vec3(0.04f, 0.1f, 0);
 	model.vaoID = glhGenVAO();
 	model.vboID = glhGenVBO();
 
