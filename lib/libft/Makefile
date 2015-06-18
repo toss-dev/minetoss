@@ -26,12 +26,7 @@ OBJ	= $(SRCS:.c=.o)
 
 FLAGS	= -Wall -Werror -Wextra -g
 
-CC = gcc
-
-ifeq ($(OS),Windows_NT)
-	CC = x86_64-w64-mingw32-gcc
-endif
-
+CC = x86_64-w64-mingw32-gcc
 
 all: $(NAME)
 

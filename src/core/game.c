@@ -38,6 +38,7 @@ t_game	*gameNew(void)
 	initRenderer(&(game->renderer));
 	initWorld(&(game->world));
 	initTimer(&(game->timer));
+	initSound();
 	glhCheckError("Game initialization");
 	return (game);
 }

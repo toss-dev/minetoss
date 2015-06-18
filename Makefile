@@ -58,6 +58,7 @@ SRC		= blocks/block.c \
 		  render/opengl/model.c \
 		  render/opengl/uniforms.c \
 		  timer/timer.c \
+		  sound/sound.c \
 		  world/setblock.c \
 		  world/terrain.c \
 		  world/terrain_utils.c \
@@ -67,9 +68,8 @@ SRC		= blocks/block.c \
 SRCS	= $(addprefix $(SRC_DIR), $(SRC))
 OBJ		= $(SRCS:.c=.o)
 
-LIBFT_DIR	= ./libft
-LIBMATH_DIR	= ./maths
-LIBGLFW_DIR	= ./minilibx_macos
+LIBFT_DIR	= ./lib/libft
+LIBMATH_DIR	= ./lib/maths
 LIBFT	= $(LIBFT_DIR)/libft.a
 LIBMATH	= $(LIBMATH_DIR)/libft_maths.a
 
@@ -92,7 +92,6 @@ endif
 
 ifeq ($(OS),Windows_NT)
 	LIB = -lglfw3 -lgdi32 -lglew32 ./lib/libglew32.dll.a -lopengl32
-	LIBGLFW = ./glfw3.dll
 	CC = x86_64-w64-mingw32-gcc
 endif
 
@@ -104,7 +103,7 @@ FLAGS_OPTI = -Ofast
 
 all: $(NAME)
 
-$(NAME): $(LIBFT) $(LIBMATH) $(LIBGLFW) $(OBJ) 
+$(NAME): $(LIBFT) $(LIBMATH) $(OBJ) 
 	$(CC) $(FLAGS) -o $(NAME) $(OBJ) $(LIB)
 
 %.o: %.c $(HEADER)
@@ -114,9 +113,6 @@ $(NAME): $(LIBFT) $(LIBMATH) $(LIBGLFW) $(OBJ)
 	git submodule init glfw
 	git submodule update glfw
 	cd glfw ; $(CMAKE_CMD) . ; $(MAKE_CMD)
-
-%.dll:
-	cp ./lib/$@ .
 
 $(LIBMATH):
 	$(MAKE_CMD) -C $(LIBMATH_DIR)

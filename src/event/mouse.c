@@ -28,7 +28,6 @@ static int	raycastCallback(t_world *world, t_vec3 pos, t_vec3 face)
 	return (0);
 }
 
-
 void	cursorMoveCallback(GLFWwindow *window, double x, double y)
 {
 	static double	prevx = 0;

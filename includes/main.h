@@ -222,6 +222,7 @@ void			initWindow(t_window *win);
 void			initEvent(t_window *window);
 void			initWorld(t_world *world);
 void			initRenderer(t_renderer *renderer);
+void			initSound(void);
 void			loadBlocks(t_renderer *renderer);
 
 /** events functions */
