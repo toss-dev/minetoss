@@ -19,12 +19,7 @@ Only faces in camera frustum, and close enough (CHUNK_RENDER_DISTANCE Terrains d
 TODO:
 	
 	- reduce main thread tasks (use for rendering)
-
-	- add a 3th thread for camera movement / mesh should be rendered
-
-	- add a 4th thread to generate terrain's mesh only (so block generation and meshing are seperates)
-
-	- improving meshing algorythm 
+	- improve memory managment in terrani generation / deletion
 
 
 --------------------------------------
@@ -32,5 +27,5 @@ Extern library used:
 * OpenGL (modern pipeline)
 * GLFW (opengl framework)
 * glew (windows only)
-* tinycthread.c tinycthread.h (cross plateform multithreading)
+* ptherad (for thread handling)
 * lodepng.c lodepng.h (png decoder / encoder)
