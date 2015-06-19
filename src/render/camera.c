@@ -77,7 +77,7 @@ void		updateCamera(t_camera *camera)
                   \___/				
 
 */
-bool		isInCameraFrustum(t_camera *camera, t_vec3 point, float impresicion)
+int			isInCameraFrustum(t_camera *camera, t_vec3 point, float impresicion)
 {
 	t_vec3	to_chunk_vector;
 	double 	dot;

@@ -14,6 +14,7 @@
 # define FONT_H
 
 # include "opengl.h"
+# include "maths.h"
 
 # define FONT_TEXTURE_WIDTH 512
 # define FONT_TEXTURE_HEIGHT 512

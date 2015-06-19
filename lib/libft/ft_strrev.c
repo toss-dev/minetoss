@@ -20,7 +20,7 @@ char	*ft_strrev(char *str)
 
 	if (str == NULL)
 		return (str);
-	size = ft_strlen(str);
+	size = strlen(str);
 	j = 0;
 	while (j < size / 2)
 	{

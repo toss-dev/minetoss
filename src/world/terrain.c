@@ -72,30 +72,35 @@ static void	updateTerrain(t_terrain *terrain, t_world *world)
 	}
 }
 
-static void updateTerrainLoad(t_world *world, t_vec3 vec)
+static void updateTerrainLoad(t_world *world, t_vec3 camera_pos)
 {
 	t_terrain	*terrain;
 	t_point3	index;
-	t_point3	pos;
 	int			x;
 	int 		z;
 	double		dist;
+	t_point3	pos;
 
-	pos = getTerrainIndexForPos(vec);
-	for (x = -TERRAIN_KEEP_LOADED_DISTANCE ; x < TERRAIN_KEEP_LOADED_DISTANCE ; x++)
+	pos = getTerrainIndexForPos(camera_pos);
+	for (x = -TERRAIN_LOAD_DISTANCE ; x < TERRAIN_LOAD_DISTANCE ; x++)
 	{
-		for (z = -TERRAIN_KEEP_LOADED_DISTANCE ; z < TERRAIN_KEEP_LOADED_DISTANCE ; z++)
+		for (z = -TERRAIN_LOAD_DISTANCE ; z < TERRAIN_LOAD_DISTANCE ; z++)
 		{
 			index.x = pos.x + x;
 			index.y = 0;
 			index.z = pos.z + z;
 			dist = point3_dist(pos, index);
-			if (dist < TERRAIN_KEEP_LOADED_DISTANCE)
+			if (dist < TERRAIN_LOAD_DISTANCE)
 			{
 				terrain = getTerrain(world, index);
 				if (terrain == NULL)
 				{
 					terrain = createNewTerrain(world, index);
+				}
+				if (terrain == NULL)
+				{
+					logger_log(LOG_ERROR, "Not enough memory to allocate new terrain!");
+					continue ;
 				}
 				if (!terrainHasState(terrain, TERRAIN_GENERATED))
 				{
@@ -108,8 +113,8 @@ static void updateTerrainLoad(t_world *world, t_vec3 vec)
 }
 
 /** update and generate terrain at the given pos in the given world */
-void	updateTerrains(t_world *world, t_vec3 pos)
-{
-	updateTerrainLoad(world, pos);
+void	updateTerrains(t_world *world, t_vec3 camera_pos)
+{	
+	updateTerrainLoad(world, camera_pos);
 	htab_iter(world->terrains, (t_iter_function)updateTerrain, world);
 }

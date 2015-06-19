@@ -37,7 +37,7 @@ static void	prepareParticleTexture(t_renderer *renderer, t_particle *particle)
 	glBindTexture(GL_TEXTURE_2D, renderer->textures_atlases[particle->texture_id].id);
 }
 
-static bool	shouldParticleBeRendered(t_camera *camera, t_particle *particle)
+static int	shouldParticleBeRendered(t_camera *camera, t_particle *particle)
 {
 	t_vec3	vec;
 	double 	dot;

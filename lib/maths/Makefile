@@ -20,7 +20,7 @@ SRCS	= matrix_op.c \
 OBJ		= $(SRCS:.c=.o)
 INC		= -I ../libft/
 
-CC = gcc
+include ../../cc.make
 
 FLAGS	= -Wall -Werror -Wextra -Ofast
 

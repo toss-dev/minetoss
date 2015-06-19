@@ -20,6 +20,7 @@ void		logger_log(int level, char *str, ...)
 		{"WARNING", C_BYELLOW},
 		{"ERROR", C_BRED}
 	};
+
 	char		buffer[1024];
 	time_t		now;
 	struct tm	*t;
@@ -33,5 +34,4 @@ void		logger_log(int level, char *str, ...)
 	va_end(arg);
 
 	printf("%s[%d:%d:%d] [%s]%s %s\n", format[level].color, t->tm_hour, t->tm_min, t->tm_sec, format[level].str, C_RESET, buffer);
-	fflush(stdout);
 }

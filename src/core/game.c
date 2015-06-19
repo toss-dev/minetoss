@@ -12,7 +12,7 @@
 
 #include "main.h"
 
-bool	isGameRunning(t_game *game)
+int	isGameRunning(t_game *game)
 {
 	return (game->state & GAME_STATE_RUNNING);
 }
@@ -33,12 +33,12 @@ t_game	*gameNew(void)
 		return (NULL);
 	}
 	memset(game, 0, sizeof(t_game));
+
 	initWindow(&(game->window));
 	initEvent(&(game->window));
 	initRenderer(&(game->renderer));
 	initWorld(&(game->world));
 	initTimer(&(game->timer));
-	initSound();
 	glhCheckError("Game initialization");
 	return (game);
 }

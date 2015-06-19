@@ -73,33 +73,18 @@ LIBMATH_DIR	= ./lib/maths
 LIBFT	= $(LIBFT_DIR)/libft.a
 LIBMATH	= $(LIBMATH_DIR)/libft_maths.a
 
-UNAME_S = $(shell uname -s)
-
 
 INC		= -I ./includes \
 		  -I $(LIBFT_DIR) \
 		  -I $(LIBMATH_DIR) \
 		  -I ./glfw/include
 
-CC = gcc
-MAKE_CMD = make
-CMAKE_CMD = cmake
-
-ifeq ($(UNAME_S),Darwin)
-	LIBGLFW = ./glfw/src/libglfw3.a
-	LIB = $(LIBGLFW) -framework Cocoa -framework OpenGL -framework IOKit -framework CoreVideo
-endif
-
-ifeq ($(OS),Windows_NT)
-	LIB = -lglfw3 -lgdi32 -lglew32 ./lib/libglew32.dll.a -lopengl32
-	CC = x86_64-w64-mingw32-gcc
-endif
+include cc.make
+include lib.make
 
 LIB += $(LIBFT) $(LIBMATH)
 
 FLAGS	= -Wall -Wextra -Werror -pg
-
-FLAGS_OPTI = -Ofast
 
 all: $(NAME)
 
@@ -112,30 +97,28 @@ $(NAME): $(LIBFT) $(LIBMATH) $(OBJ)
 ./glfw/src/libglfw3.a:
 	git submodule init glfw
 	git submodule update glfw
-	cd glfw ; $(CMAKE_CMD) . ; $(MAKE_CMD)
+	cd glfw ; cmake . ; make
 
 $(LIBMATH):
-	$(MAKE_CMD) -C $(LIBMATH_DIR)
+	make -C $(LIBMATH_DIR)
 
 $(LIBFT):
-	$(MAKE_CMD) -C $(LIBFT_DIR)
+	make -C $(LIBFT_DIR)
 
 cleanlib:
-	$(MAKE_CMD) -C $(LIBFT_DIR) clean
-	$(MAKE_CMD) -C $(LIBMATH_DIR) clean
+	make -C $(LIBFT_DIR) clean
+	make -C $(LIBMATH_DIR) clean
 
 fcleanlib:
-	$(MAKE_CMD) -C $(LIBFT_DIR) fclean
-	$(MAKE_CMD) -C $(LIBMATH_DIR) fclean
+	make -C $(LIBFT_DIR) fclean
+	make -C $(LIBMATH_DIR) fclean
 
 clean: cleanlib
 	rm -rf $(OBJ)
 
 fclean: fcleanlib clean
-	-rm ./glew32.dll
-	-rm ./glew32mx.dll
-	-rm ./glfw3.dll
 	-rm render.exe.stackdump
+	-rm gmon.out
 	rm -rf $(NAME)
 
 re: fclean all

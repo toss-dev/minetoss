@@ -77,6 +77,6 @@ typedef struct 	s_block
 }				t_block;
 
 void 			cleanBlocks(t_block *blocks);
-bool			isBlockVisible(unsigned id);
+int				isBlockVisible(unsigned id);
 
 #endif

@@ -32,15 +32,11 @@ static void	updateThread(t_thread_param *params)
 	}
 	logger_log(LOG_FINE, "Stopping thread: %u (%p)", params->threadID, params);
 	free(params);
-	thrd_exit(EXIT_SUCCESS);
+	pthread_exit(EXIT_SUCCESS);
 }
 
-/**
-**	start a new thread pointing to the given thrd_t pointer
-**
-**	it will loop on the given callback at `ups` update per seconds
-**	the loop will stop when `callbackstop` function will something different from 0
-*/
+//	it will loop on the given callback at `ups` update per seconds
+//	the loop will stop when `callbackstop` function will something different from 0
 void	startThread(t_game *game, unsigned threadID, unsigned ups, t_thread_callback callback)
 {
 	t_thread_param	*params;
@@ -54,10 +50,12 @@ void	startThread(t_game *game, unsigned threadID, unsigned ups, t_thread_callbac
 	params->threadID = threadID;
 	params->ups = ups;
 	params->callback = callback;
-	if (thrd_create(game->threads + threadID, (thrd_start_t)updateThread, params) != thrd_success)
+
+	if (pthread_create(game->threads + threadID, NULL, (t_pthread_start)updateThread, params) != 0)
 	{
 		free(params);
 		logger_log(LOG_ERROR, "Thread couldnt be created: %u\n", threadID);
 		return ;
 	}
+	(void)params;
 }

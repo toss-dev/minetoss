@@ -12,7 +12,7 @@
 
 #include "libft.h"
 
-static int ft_tolower(char c)
+static int ft_tolower(int c)
 {
 	if (c >= 'A' && c <= 'Z')
 	{

@@ -46,7 +46,7 @@ void rendererSwitchConfig(t_renderer *renderer, unsigned config)
 }
 
 /** check if the given config is enable */
-bool rendererHasConfig(t_renderer *renderer, unsigned config)
+int rendererHasConfig(t_renderer *renderer, unsigned config)
 {
 	return (renderer->config & config);
 }

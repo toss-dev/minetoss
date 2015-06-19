@@ -41,7 +41,7 @@ void		gameClean(t_game *game)
 
 	for (i = 0 ; i < THRD_MAX ; i++)	//wait for each thread to exit
 	{
-		thrd_join(game->threads[i], NULL);
+		pthread_join(game->threads[i], NULL);
 	}
 	cleanWindow(&(game->window));
 	cleanRenderer(&(game->renderer));

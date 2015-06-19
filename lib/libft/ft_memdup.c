@@ -16,5 +16,10 @@ void	*ft_memdup(const void* d, size_t s)
 { 
    void	*p;
     
-   return ((p = malloc(s)) ? memcpy(p, d, s) : NULL);
+   p = malloc(s);
+   if (p == NULL)
+   {
+	   return (NULL);
+   }
+   return (memcpy(p, d, s));
 }

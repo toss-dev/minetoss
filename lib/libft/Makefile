@@ -21,12 +21,12 @@ SRCS	= ft_memdup.c ft_strtrim.c ft_epur.c \
 		  htab.c htab_iter.c \
 		  ft_nbrlen.c \
 		  ft_match.c rand_utils.c \
-		  lodepng.c tinycthread.c logger.c
+		  lodepng.c logger.c bordel.c
 OBJ	= $(SRCS:.c=.o)
 
 FLAGS	= -Wall -Werror -Wextra -g
 
-CC = x86_64-w64-mingw32-gcc
+include ../../cc.make
 
 all: $(NAME)
 

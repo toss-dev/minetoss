@@ -14,9 +14,9 @@
 
 char	*ft_strtrim(char const *s)
 {
-	char	*ret;
-	int		len;
-	int		i;
+	char			*ret;
+	unsigned int	len;
+	unsigned int	i;
 
 	if (s == NULL)
 		return (NULL);
@@ -24,12 +24,12 @@ char	*ft_strtrim(char const *s)
 	len = strlen(s) - 1;
 	while (s[i] == ' ' || s[i] == '\n' || s[i] == '\t')
 		i++;
-	if ((ret = malloc(len - i + 1)) == NULL)
+	ret = (char*) malloc(len - i + 1);
+	if (ret == NULL)
 		return (NULL);
 	while (len > 0 && (s[len] == '\n' || s[len] == ' ' || s[len] == '\t'))
 		len--;
 	len = len - i + 1;
-	len < 0 ? len = 0 : 0;
 	ret[len] = 0;
 	return (memcpy(ret, s + i, len));
 }

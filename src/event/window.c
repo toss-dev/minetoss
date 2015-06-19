@@ -25,7 +25,7 @@ static void	prepare_window(void)
 
 static void	prepare_glew(void)
 {
-	# ifdef _WIN32
+	# if defined(_WIN32) || defined(__CYGWIN__)
 		GLenum err = glewInit();
 		if (err != GLEW_OK)
 		{

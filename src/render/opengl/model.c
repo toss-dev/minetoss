@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "opengl.h"
+#include "main.h"
 
 t_model	new_model(GLenum glmode)
 {
@@ -37,12 +37,12 @@ void 	setModelVertices(t_model *model, t_vertex *vertices, unsigned vertex_count
 }
 
 /** update model vbos depending on it data pointer and it vertex vertex_count*/
-bool	updateModelVBO(t_model *model)
+int	updateModelVBO(t_model *model)
 {
 	if (modelHasState(model, MODEL_VBO_UP_TO_DATE))
 	{
 		logger_log(LOG_WARNING, "Trying to update an unchanged model! canceling operation");
-		return (false);
+		return (0);
 	}
 
 	if (!modelHasState(model, MODEL_INITIALIZED))
@@ -77,7 +77,7 @@ bool	updateModelVBO(t_model *model)
 	modelSetState(model, MODEL_VBO_UP_TO_DATE);
 	modelUnsetState(model, MODEL_CLEARED);
 
-	return (true);
+	return (1);
 }
 
 void 	modelSetState(t_model *model, unsigned state)
@@ -90,24 +90,24 @@ void 	modelUnsetState(t_model *model, unsigned state)
 	model->state = model->state & ~(state);
 }
 
-bool 	modelHasState(t_model *model, unsigned state)
+int 	modelHasState(t_model *model, unsigned state)
 {
 	return (model->state & state);
 }
 
 
-bool	clearModelVBO(t_model *model)
+int	clearModelVBO(t_model *model)
 {
 	if (!modelHasState(model, MODEL_INITIALIZED) || modelHasState(model, MODEL_CLEARED))
 	{
-		return (false);
+		return (0);
 	}
 	glBindBuffer(GL_ARRAY_BUFFER, model->vboID);
 	glhVBOData(GL_ARRAY_BUFFER, NULL, 0, model->glmode);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	modelSetState(model, MODEL_CLEARED);
 	modelUnsetState(model, MODEL_VBO_UP_TO_DATE);
-	return (true);
+	return (1);
 }
 
 void 	renderModel(t_model *model)

@@ -77,7 +77,7 @@ void		*array_list_get(t_array_list *array, unsigned idx)
 /**
 **	swap the removed item with the last one to have defragmented memory
 */
-void		array_list_remove(t_array_list *array, int idx)
+void		array_list_remove(t_array_list *array, unsigned int idx)
 {
 	memmove(array->data + idx * array->elem_size, array->data + (array->size - 1) * array->elem_size, array->elem_size);
 	array->size--;
@@ -106,8 +106,8 @@ void		array_list_iter(t_array_list array, t_iter_array_function f, void *extra)
 
 void		array_list_remove_if(t_array_list *array, t_cmp_func cmpf, void *extra)
 {
-	unsigned	i;
-	unsigned	addr;
+	unsigned int	i;
+	unsigned int	addr;
 
 	i = 0;
 	addr = 0;

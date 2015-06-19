@@ -13,15 +13,15 @@
 #ifndef MAIN_H
 # define MAIN_H
 
+# include "maths.h"
 # include "libft.h"
 # include "opengl.h"
-# include "maths.h"
-
 # include "texture.h"
 # include "blocks.h"
 # include "const.h"
 # include "timer.h"
 # include "font.h"
+# include <pthread.h>
 
 enum e_program_id
 {
@@ -152,7 +152,6 @@ typedef struct 	s_terrain	//16x256x16
 {
 	char 		blocks[TERRAIN_SIZEX][TERRAIN_SIZEY][TERRAIN_SIZEZ];
 	t_model		meshes[MESH_PER_TERRAIN];	//the index correspond to the y chunk component
-	char		meshes_state[MESH_PER_TERRAIN];
 	t_point3	index;	//given x, y, z index (for hashtable)
 	int 		state;
 }				t_terrain;
@@ -196,7 +195,7 @@ typedef struct 	s_game
 {
 	t_world		world;
 	t_renderer	renderer;
-	thrd_t		threads[THRD_MAX];
+	pthread_t	threads[THRD_MAX];
 	t_window	window;
 	t_timer		timer;
 	unsigned	state;
@@ -205,7 +204,8 @@ typedef struct 	s_game
 extern t_game	*g_game;
 
 /** threads */
-typedef bool	(*t_thread_callback)(t_game *);
+typedef int		(*t_thread_callback)(t_game *);
+typedef void	*(*t_pthread_start)(void *);
 
 typedef struct 	s_thread_param
 {
@@ -222,7 +222,6 @@ void			initWindow(t_window *win);
 void			initEvent(t_window *window);
 void			initWorld(t_world *world);
 void			initRenderer(t_renderer *renderer);
-void			initSound(void);
 void			loadBlocks(t_renderer *renderer);
 
 /** events functions */
@@ -235,11 +234,11 @@ t_game			*gameNew(void);
 void			gameLoop(t_game *game);
 void			gameStop(t_game *game);
 void			gameClean(t_game *game);
-bool			isGameRunning(t_game *game);
+int				isGameRunning(t_game *game);
 void			startThread(t_game *game, unsigned threadID, unsigned ups, t_thread_callback callback);
 
 /** thread mains */
-bool			updateWorldGenerator(t_game *game);
+int				updateWorldGenerator(t_game *game);
 
 /** memory clean */
 void 			cleanWindow(t_window *window);
@@ -271,7 +270,7 @@ void			raycast(t_vec3 origin, t_vec3 direction, float radius, int (*callback)(),
 /** renderer config */
 void 			rendererActiveConfig(t_renderer *renderer, unsigned config);
 void 			rendererDisableConfig(t_renderer *renderer, unsigned config);
-bool			rendererHasConfig(t_renderer *renderer, unsigned config);
+int				rendererHasConfig(t_renderer *renderer, unsigned config);
 void 			rendererSwitchConfig(t_renderer *renderer, unsigned config);
 
 /**	terrain functions
@@ -283,7 +282,7 @@ void 			loadTerrain(t_terrain *terrain);
 void 			unloadTerrain(t_terrain *terrain);
 void			terrainSetState(t_terrain *terrain, unsigned state);
 void			terrainUnsetState(t_terrain *terrain, unsigned state);
-bool			terrainHasState(t_terrain *terrain, unsigned state);
+int				terrainHasState(t_terrain *terrain, unsigned state);
 void            loadWorldGenerator(void);
 t_terrain		*getTerrainAt(t_world *world, t_vec3 vec);
 t_terrain		*getTerrain(t_world *world, t_point3 index);
@@ -318,7 +317,7 @@ void			loadUniformVec(GLuint id, t_vec3 p);
 void			loadUniformInt(GLuint id, GLuint integer);
 
 /** camera related functions */
-bool			isInCameraFrustum(t_camera *camera, t_vec3 point, float impresicion);
+int				isInCameraFrustum(t_camera *camera, t_vec3 point, float impresicion);
 void			cameraControlRelease(t_camera *camera, int key);
 void			cameraControlPress(t_camera *camera, int key);
 void			updateCamera(t_camera *camera);

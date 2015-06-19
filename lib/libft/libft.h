@@ -27,15 +27,13 @@
 # include <stdlib.h>
 # include <string.h>
 # include <strings.h>
-# include <sys/time.h>
+# include <time.h>
 # include <stdlib.h>
 # include <unistd.h>
 # include <fcntl.h>
 # include <wchar.h>
-# include <stdbool.h>
 # include "color.h"
 # include "lodepng.h"
-# include "tinycthread.h"
 # include "logger.h"
 
 typedef void		(*t_function)();
@@ -51,26 +49,23 @@ typedef int 		(*t_iter_function) (void *data, void *extra);
 typedef struct		s_node
 {
 	void			*content;
-	size_t			content_size;
 	struct s_node	*next;
+	struct s_node	*previous;
 }					t_node;
 
 typedef struct		s_list
 {
-	t_node	*begin;
-	t_node	*end;
+	t_node	*head;
 	size_t	size;
 }					t_list;
 
-void				*list_to_array(t_list lst, size_t size);
 void				*list_push(t_list *lst, void const *content, size_t content_size);
 void				*list_add(t_list *lst, void const *content, size_t content_size);
+void 				*list_get(t_list *lst, t_cmp_func cmpf, void *cmpd);
 void				list_iter(t_list *lst, t_iter_function f, void *extra);
-void				list_iter_remove_if(t_list *lst, t_iter_function f, void *extra);
 t_list				list_new(void);
-t_list				list_new_init(void *content, size_t content_size);
+int 				list_remove(t_list *lst, t_function free_funct, t_cmp_func cmpf, void *cmpd);
 void				list_delete(t_list *lst, void (*delete_node)(void *content));
-bool				list_remove_if(t_list *lst, t_function free_funct, t_cmp_func cmpf, void *cmpd);
 
 /******************************* LINKED LIST END *******************************/
 
@@ -99,8 +94,8 @@ t_htab				htab_new(size_t size);
 void				*htab_get(t_htab tab, char *key);
 void				htab_delete(t_htab *tab, void (*ft_free)());
 void				htab_iter(t_htab tab, t_iter_function f, void *extra);
-void				htab_iter_remove_if(t_htab tab, t_iter_function f, void *extra);
-bool				htab_remove(t_htab tab, char *key);
+int					htab_remove(t_htab tab, char *key);
+void				htab_dump_memory(t_htab tab);
 
 /******************************* HASH MAP END ************************************/
 
@@ -133,7 +128,7 @@ void				array_list_iter(t_array_list array, t_iter_array_function f, void *extra
 void				array_list_iter_remove_if(t_array_list *array, t_iter_array_function f, void *extra);
 void 				array_list_delete(t_array_list *array);
 void				array_list_resize(t_array_list *array, unsigned size);
-void				array_list_remove(t_array_list *array, int idx);
+void				array_list_remove(t_array_list *array, unsigned int idx);
 void 				array_list_sort(t_array_list array, int (*cmpf)(void const *, void const *));
 void				array_list_clear(t_array_list *array);
 void 				array_list_expand(t_array_list *array);
@@ -189,16 +184,9 @@ char				**ft_strsplit_whitespaces(char const *s);
 /** string functions */
 char				*ft_strrev(char *str);
 char				*ft_strtrim(char const *s);
-void				ft_epur(char *str);
 
 int					ft_match(char *s1, char *s2);
 
-typedef struct		s_gnl
-{
-	int		fd;
-	char	*data;
-}					t_gnl;
-
-int					get_next_line(int const fd, char **line);
+void				ft_sleep(unsigned int us);
 
 #endif

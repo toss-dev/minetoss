@@ -17,9 +17,12 @@
 # 	define GLFW_INCLUDE_GLCOREARB
 # endif
 
-# ifdef _WIN32
+# if defined(_WIN32) || defined(__CYGWIN__)
+# 	include <windef.h>
+#	define GLEW_STATIC
 # 	include <GL/glew.h>
 # endif
+
 # include <GLFW/glfw3.h>
 
 # include "maths.h"
@@ -110,13 +113,13 @@ typedef struct 	s_model
 }				t_model;
 
 t_model			new_model(GLenum glmode);
-bool 			updateModelVBO(t_model *model);
-bool			clearModelVBO(t_model *model);
+int 			updateModelVBO(t_model *model);
+int				clearModelVBO(t_model *model);
 void 			renderModel(t_model *model);
 void 			modelDelete(t_model *model);
 void 			modelSetState(t_model *model, unsigned state);
 void 			modelUnsetState(t_model *model, unsigned state);
-bool 			modelHasState(t_model *model, unsigned state);
+int 			modelHasState(t_model *model, unsigned state);
 void 			setModelVertices(t_model *model, t_vertex *vertices, unsigned vertex_count);
 
 #endif

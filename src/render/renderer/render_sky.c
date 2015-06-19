@@ -18,9 +18,9 @@ static void	loadViewMatrix(t_renderer *renderer, t_program *program)
 
 	memcpy(m, renderer->camera.view_matrix, sizeof(m));
 	m[3] = 0, m[7] = 0, m[11] = 0; //make it independant from camera positionm will always be rendered in screen
-	matrix_rotate(m, new_vec3(1, 0, 0), renderer->sky.rot.x);
-	matrix_rotate(m, new_vec3(0, 1, 0), renderer->sky.rot.y);
-	matrix_rotate(m, new_vec3(0, 0, 1), renderer->sky.rot.z);
+	matrix_rotate(m, new_vec3(1.0f, 0.0f, 0.0f), renderer->sky.rot.x);
+	matrix_rotate(m, new_vec3(0.0f, 1.0f, 0.0f), renderer->sky.rot.y);
+	matrix_rotate(m, new_vec3(0.0f, 0.0f, 1.0f), renderer->sky.rot.z);
 	loadUniformMatrix(program->view_matrix, m);
 }
 

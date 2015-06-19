@@ -133,7 +133,7 @@ void	terrainUnsetState(t_terrain *terrain, unsigned state)
 	terrain->state = terrain->state & ~(state);
 }
 
-bool	terrainHasState(t_terrain *terrain, unsigned state)
+int			terrainHasState(t_terrain *terrain, unsigned state)
 {
 	return (terrain->state & state);
 }

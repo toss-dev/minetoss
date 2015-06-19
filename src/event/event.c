@@ -18,5 +18,5 @@ void	initEvent(t_window *window)
 	glfwSetCursorPosCallback(window->ptr, cursorMoveCallback);
 	glfwSetMouseButtonCallback(window->ptr, mouseButtonCallback);
 	glfwSetInputMode(window->ptr, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-	glfwSetCursorPos(window->ptr, WIDTH / 2, HEIGHT / 2);
+	glfwSetCursorPos(window->ptr, (int)(WIDTH / 2), (int)(HEIGHT / 2));
 }

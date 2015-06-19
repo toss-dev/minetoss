@@ -48,23 +48,30 @@ void		*htab_insert(t_htab tab, char *key, void *data, size_t data_size)
 	return (elem.content);
 }
 
+static int	htab_key_cmp(t_htab_elem *elem, char const *key)
+{
+	return (strcmp(elem->key, key));
+}
+
 void	*htab_get(t_htab tab, char *key)
 {
 	t_list		*lst;
-	t_node		*tmp;
+	t_node		*node;
 	t_htab_elem	*elem;
 	size_t		hash;
 
 	hash = htab_hash(key, tab.size);
 	if ((lst = tab.elems + hash) == NULL)
 		return (NULL);
-	tmp = lst->begin;
-	while (tmp)
+	node = lst->head->next;
+	while (node != lst->head)
 	{
-		elem = (t_htab_elem*)tmp->content;
+		elem = (t_htab_elem*)node->content;
 		if (strcmp(elem->key, key) == 0)
+		{
 			return (elem->content);
-		tmp = tmp->next;
+		}
+		node = node->next;
 	}
 	return (NULL);
 }
@@ -76,56 +83,63 @@ static void	htab_free_elem(t_htab_elem *elem)
 	free(elem);
 }
 
-static int	htab_list_remove_cmp(t_htab_elem *elem, char const *key)
-{
-	return (strcmp(elem->key, key));
-}
-
-bool		htab_remove(t_htab tab, char *key)
+int			htab_remove(t_htab tab, char *key)
 {
 	t_list	*lst;
 	size_t	hash;
 
 	hash = htab_hash(key, tab.size);
 	if ((lst = tab.elems + hash) == NULL)
-		return (false);
-	list_remove_if(lst, htab_free_elem, (t_cmp_func)htab_list_remove_cmp, key);
-	return (true);
+		return (0);
+	list_remove(lst, htab_free_elem, (t_cmp_func)htab_key_cmp, key);
+	return (1);
 }
 
 t_htab		htab_new(size_t size)
 {
-	t_htab	tab;
+	t_htab			tab;
+	unsigned int 	i;
 
 	tab.size = size;
 	tab.elems = (t_list*)malloc(sizeof(t_list) * size);
-	memset(tab.elems, 0, sizeof(t_list) * size);
+	for (i = 0 ; i < size ; i++)
+	{
+		tab.elems[i] = list_new();
+	}
 	return (tab);
 }
 
-static void	htab_list_delete(t_list *lst, void (*delete_node)(void *content))
+void		htab_dump_memory(t_htab tab)
 {
-	t_node		*tmp;
-	t_node		*next;
-	t_htab_elem	*elem;
+	unsigned int 	i;
+	unsigned char	*memory;
+	unsigned int 	size;
+	unsigned		m;
 
-	if (delete_node == NULL)
-		delete_node = free;
-	tmp = lst->begin;
-	while (tmp)
+	memory = (unsigned char*)tab.elems;
+	size = tab.size * sizeof(t_list);
+	m = sizeof(t_list) * 2;
+	for (i = 0 ; i < size ; i++)
 	{
-		next = tmp->next;
-		elem = (t_htab_elem*)tmp->content;
-		delete_node(elem->content);
-		free(elem->key);
-		free(elem);
-		free(tmp);
-		tmp = next;
+		if (i % m == 0 && i != 0)
+		{
+			printf(" | \n");
+		}
+		if (i % sizeof(t_list) == 0)
+		{
+			printf(" | ");
+		}
+		printf("%.2x ", memory[i]);
 	}
+	printf(" | \n");
+	fflush(stdout);
 }
 
-void		htab_delete(t_htab *tab, void (*delete_node)(void *content))
+void		htab_delete(t_htab *tab, void (*delete_node)(void *))
 {
+	//TODO: free properly htab_elem with delete_node function
+
+	(void)delete_node;
 	size_t	i;
 
 	if (tab == NULL)
@@ -135,9 +149,10 @@ void		htab_delete(t_htab *tab, void (*delete_node)(void *content))
 	{
 		if (tab->elems + i != NULL)
 		{
-			htab_list_delete(tab->elems + i, delete_node);
+			list_delete(tab->elems + i, free);
 		}
 		i++;
 	}
 	free(tab->elems);
+	tab->elems = NULL;
 }

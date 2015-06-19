@@ -27,7 +27,7 @@ void	initWorld(t_world *world)
 /**                      UPDATE RELATED FUNCTIONS:                            */
 /******************************************************************************/
 
-bool	updateWorldGenerator(t_game *game)
+int		updateWorldGenerator(t_game *game)
 {
 	updateTerrains(&(game->world), game->renderer.camera.pos);
 	return (!glfwWindowShouldClose(game->window.ptr));

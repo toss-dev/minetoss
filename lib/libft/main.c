@@ -1,33 +1,45 @@
 
 
-
-
-
-
-
-
-
 #include "libft.h"
 
-void startThread()
+void	waitinput(char *s1)
 {
-	puts("THREAD: test");
-	usleep(1000000);
-	puts("THREAD: OK");
-	thrd_exit(EXIT_SUCCESS);
+	char	c;
+
+	write(1, s1, strlen(s1));
+	read(0, &c, 1);
+}
+
+int	test_remove()
+{
+	return (0);
+}
+
+void	ft_putendl(char *str)
+{
+	write(1, "A\n", 2);
+}
+
+void	test()
+{
+	t_list	lst;
+	int 	array[8192 * 8];
+	char *str = "hello";
+
+	lst = list_new();
+
+	waitinput("adding");
+	list_add(&lst, array, sizeof(array));
+	list_add(&lst, str, strlen(str) + 1);
+
+	printf("%s\n", list_get(&lst, (t_cmp_func)strcmp, "hello"));
+
+	list_delete(&lst, free);
 }
 
 int	main()
 {
-	thrd_t t;
-
-	if (thrd_create(&t, (thrd_start_t)startThread, NULL) != thrd_success)
-	{
-		puts("MAIN: Couldnt create thread");
-		return (0);
-	}
-	int r;
-	thrd_join(t, &r);
-	puts("MAIN: OK I STOP");
+	test();
+	waitinput("ended");
 	return (0);
 }

@@ -133,7 +133,7 @@ void        loadSky(t_renderer *renderer)
     glUseProgram(0);
     renderer->sky.rot = new_vec3(0, 0, 0);
 }
-
+# include "maths.h"
 static void calculateSunPos(t_world *world, t_renderer *renderer, float tick_ratio)
 {
     float   x;

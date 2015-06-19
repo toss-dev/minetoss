@@ -12,7 +12,7 @@
 
 #include "main.h"
 
-bool	g_press = false;
+int	g_press = 0;
 
 static int	raycastCallback(t_world *world, t_vec3 pos, t_vec3 face)
 {
@@ -27,6 +27,7 @@ static int	raycastCallback(t_world *world, t_vec3 pos, t_vec3 face)
 	(void)face;
 	return (0);
 }
+
 
 void	cursorMoveCallback(GLFWwindow *window, double x, double y)
 {
@@ -49,8 +50,8 @@ void	mouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
 {
 	if (button == 0)
 	{
-		g_press = (action == GLFW_RELEASE) ? false : (action == GLFW_PRESS);
-		if (g_press == false)
+		g_press = (action == GLFW_RELEASE) ? 0 : (action == GLFW_PRESS);
+		if (g_press == 0)
 		{
 			raycast(vec3_add(g_game->renderer.camera.pos, new_vec3(0, 0.5f, 0)), g_game->renderer.camera.look_vec, 128, raycastCallback, &(g_game->world));
 		}

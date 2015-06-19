@@ -198,7 +198,7 @@ t_block		*getBlockByID(unsigned id)
 	return (g_game->renderer.blocks + id);
 }
 
-bool		isBlockVisible(unsigned id)
+int			isBlockVisible(unsigned id)
 {
 	return (id != BLOCK_AIR);
 }

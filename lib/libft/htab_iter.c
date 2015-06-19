@@ -47,39 +47,3 @@ void		htab_iter(t_htab tab, t_iter_function f, void *extra)
 		i++;
 	}
 }
-
-/**
-**	Iterate though the hashtable,
-**	and remove the current iterated elements if the function returns 0
-*/
-static int 	list_iter_htab_remove_if(t_htab_elem *elem, t_iter_extra *iter_extra)
-{
-	int ret;
-
-	ret = iter_extra->f(elem->content, iter_extra->extra);	//will free `elem` pointer if ret
-	if (ret)
-	{
-		free(elem->key);
-		free(elem->content);
-	}
-	return (ret);
-}
-
-void		htab_iter_remove_if(t_htab tab, t_iter_function f, void *extra)
-{
-	t_iter_extra	iter_extra;
-	t_list			*lst;
-	size_t			i;
-
-	i = 0;
-	iter_extra.extra = extra;
-	iter_extra.f = f;
-	while (i < tab.size)
-	{
-		if ((lst = tab.elems + i) != NULL)
-		{
-			list_iter_remove_if(lst, (t_iter_function)list_iter_htab_remove_if, &iter_extra);
-		}
-		i++;
-	}
-}
