@@ -83,14 +83,27 @@ static void 	generateFontBuffer(char const *str, float step)
 	(void)step;
 }
 
-void 			setFontModelRotation(t_font_model *model, t_vec3 rot)
+float	getFontStringWidth(t_font_model *model, char const *str)
+{
+	size_t	len;
+
+	len = strlen(str);
+	return (len * model->scale.x + (len - 1) * model->step);
+}
+
+void 	setFontModelRotation(t_font_model *model, t_vec3 rot)
 {
 	model->rot = rot;
 }
 
-void 			setFontModelScaling(t_font_model *model, t_vec3 scale)
+void 	setFontModelScaling(t_font_model *model, t_vec3 scale)
 {
 	model->scale = scale;
+}
+
+void 	setFontModelPosition(t_font_model *model, t_vec3 pos)
+{
+	model->pos = pos;
 }
 
 t_font_model	generateFontModel(char const *str, t_vec3 color, t_vec3 pos, float step)
@@ -104,6 +117,7 @@ t_font_model	generateFontModel(char const *str, t_vec3 color, t_vec3 pos, float 
 	model.pos = pos;
 	model.rot = new_vec3(0, 0, 0);
 	model.scale = new_vec3(0.04f, 0.1f, 0);
+	model.step = step;
 	model.vaoID = glhGenVAO();
 	model.vboID = glhGenVBO();
 

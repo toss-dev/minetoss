@@ -125,6 +125,7 @@ enum e_renderer_config
 
 typedef struct 	s_renderer
 {
+	t_timer			*timer;
 	unsigned int 	fps;
 	t_camera		camera;
 	t_program		programs[PROGRAM_MAX];
@@ -167,8 +168,10 @@ typedef struct 	s_weather
 
 typedef struct 	s_world
 {
-	t_htab		terrains;
-	t_weather	weather;
+	t_timer			*timer;
+	t_htab			terrains;
+	t_weather		weather;
+	t_array_list	terrain_garbage;	//array list of t_point3, remove chunks at these coordinates
 }				t_world;
 
 
@@ -258,9 +261,10 @@ void			programDelete(t_program *program);
 
 /** main world update functions, will update the world and all it components */
 void			updateWorld(t_world *world);
-void			updateTerrains(t_world *world, t_vec3 pos);
+void			updateTerrains(t_world *world);
 void			updateMesh(t_world *world, t_terrain *terrain, unsigned meshID);
 t_terrain		*createNewTerrain(t_world *world, t_point3 index);
+void 			removeTerrain(t_world *world, t_point3 index);
 
 void 			loadWeather(t_weather *weather);
 
@@ -278,8 +282,8 @@ void 			rendererSwitchConfig(t_renderer *renderer, unsigned config);
 **	Terrain is a 16x128x16 blocks space of (128 / 16 = 8) 8 16x16x16 blocks chunks
 */
 void			loadTerrains(t_world *world);
-void 			loadTerrain(t_terrain *terrain);
-void 			unloadTerrain(t_terrain *terrain);
+void 			loadTerrain(t_world *world, t_terrain *terrain);
+void 			unloadTerrain(t_world *world, t_terrain *terrain);
 void			terrainSetState(t_terrain *terrain, unsigned state);
 void			terrainUnsetState(t_terrain *terrain, unsigned state);
 int				terrainHasState(t_terrain *terrain, unsigned state);

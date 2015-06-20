@@ -11,24 +11,6 @@
 /* ************************************************************************** */
 
 #include "libft.h"
-/*
-static t_node	*new_node(void const *content, size_t content_size)
-{
-	t_node	*node;
-
-	if ((node = (t_node*)malloc(sizeof(t_node))) == NULL)
-		return (NULL);
-	if ((node->content = malloc(content_size)) == NULL)
-	{
-		free(node);
-		return (NULL);
-	}
-	memcpy(node->content, content, content_size);
-	node->content_size = content_size;
-	node->next = NULL;
-	node->previous = NULL;
-	return (node);
-}*/
 
 t_list	list_new(void)
 {
@@ -42,7 +24,7 @@ t_list	list_new(void)
 	return (list);
 }
 
-static void	list_remove_node(t_list *lst, t_node *node, t_function free_funct)
+void	list_remove_node(t_list *lst, t_node *node, t_function free_funct)
 {
 	if (node->previous)
 	{
@@ -56,7 +38,6 @@ static void	list_remove_node(t_list *lst, t_node *node, t_function free_funct)
 	node->next = NULL;
 	node->previous = NULL;
 
-	printf("%p\n", node->content);
 	free_funct(node->content);
 	free(node);
 	lst->size--;
@@ -89,6 +70,23 @@ void 	list_iter(t_list *lst, t_iter_function iterf, void *extra)
 	{
 		iterf(node->content, extra);
 		node = node->next;
+	}
+}
+
+void 	list_iter_remove_if(t_list *lst, t_iter_function iterf, void *extra, t_function free_funct)
+{
+	t_node	*node;
+	t_node	*next;
+
+	node = lst->head->next;
+	while (node != lst->head)
+	{
+		next = node->next;
+		if (iterf(node->content, extra))
+		{
+			list_remove_node(lst, node, free_funct);
+		}
+		node = next;
 	}
 }
 

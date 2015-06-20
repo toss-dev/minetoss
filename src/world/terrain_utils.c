@@ -133,18 +133,8 @@ void	terrainUnsetState(t_terrain *terrain, unsigned state)
 	terrain->state = terrain->state & ~(state);
 }
 
-int			terrainHasState(t_terrain *terrain, unsigned state)
+int		terrainHasState(t_terrain *terrain, unsigned state)
 {
 	return (terrain->state & state);
 }
 
-void 		loadTerrain(t_terrain *terrain)
-{
-	terrainSetState(terrain, TERRAIN_LOADED);
-}
-
-void 		unloadTerrain(t_terrain *terrain)
-{
-	terrainUnsetState(terrain, TERRAIN_LOADED);
-}
-	

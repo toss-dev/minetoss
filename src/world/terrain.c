@@ -13,6 +13,21 @@
 #include "main.h"
 
 /**
+**	A terrain is a strcture, which contains:
+**		- a TERRAIN_SIZE_X * TERRAIN_SIZE_Y * TERRAIN_SIZE_Z array of blocks
+**		- a point3 indices in the world (eg., (0;0;0))
+**		- MESHES_PER_TERRAIN model which are rendered by the terrain rendered if needed
+**		(basically, theses are the blocks meshes)
+**
+**
+**	If a terrain has the state `TERRAIN_LOADED`, the terrain is updated on every loop
+**	else way, it is added to a `garbage list`.
+**	At the end of a world update, every terrain in this garbage list are removed (freed)
+*/
+
+
+
+/**
 **	create a chunk instance and add it to the world chunk hashmap
 **	generate it and creat it mesh
 **
@@ -43,26 +58,43 @@ t_terrain	*createNewTerrain(t_world *world, t_point3 index)
 }
 
 /** called on initialization */
-void		loadTerrains(t_world *world)
+void	loadTerrains(t_world *world)
 {
 	loadWorldGenerator();
 	(void)world;
 }
 
-void 		removeTerrain(t_world *world, t_point3 index)
+void 	removeTerrain(t_world *world, t_point3 index)
 {
-	char	key[64];
+	array_list_add(&(world->terrain_garbage), &index);
+}
 
-	generateTerrainKey(key, index);
-	htab_remove(world->terrains, key);
+/** set the terrainas loaded, which mean it will be updated */
+void 	loadTerrain(t_world *world, t_terrain *terrain)
+{
+	(void)world;
+	terrainSetState(terrain, TERRAIN_LOADED);
+}
+
+/** unload the terrani, which mean it isnt updated no more and added to the garbage collector */
+void 	unloadTerrain(t_world *world, t_terrain *terrain)
+{
+	terrainUnsetState(terrain, TERRAIN_LOADED);
+	removeTerrain(world, terrain->index);
 }
 
 static void	updateTerrain(t_terrain *terrain, t_world *world)
 {
 	unsigned	meshID;
+	t_point3	pos;
+	double		dist;
 
-	if (!terrainHasState(terrain, TERRAIN_LOADED))
+	pos = getTerrainIndexForPos(g_game->renderer.camera.pos);
+	dist = point3_dist(pos, terrain->index);
+
+	if (dist >= TERRAIN_LOAD_DISTANCE)
 	{
+		unloadTerrain(world, terrain);
 		return ;
 	}
 
@@ -72,7 +104,8 @@ static void	updateTerrain(t_terrain *terrain, t_world *world)
 	}
 }
 
-static void updateTerrainLoad(t_world *world, t_vec3 camera_pos)
+
+static void updateTerrainLoad(t_world *world)
 {
 	t_terrain	*terrain;
 	t_point3	index;
@@ -81,7 +114,7 @@ static void updateTerrainLoad(t_world *world, t_vec3 camera_pos)
 	double		dist;
 	t_point3	pos;
 
-	pos = getTerrainIndexForPos(camera_pos);
+	pos = getTerrainIndexForPos(g_game->renderer.camera.pos);
 	for (x = -TERRAIN_LOAD_DISTANCE ; x < TERRAIN_LOAD_DISTANCE ; x++)
 	{
 		for (z = -TERRAIN_LOAD_DISTANCE ; z < TERRAIN_LOAD_DISTANCE ; z++)
@@ -106,15 +139,36 @@ static void updateTerrainLoad(t_world *world, t_vec3 camera_pos)
 				{
 					generateTerrain(terrain);
 				}
-				loadTerrain(terrain);
+				loadTerrain(world, terrain);
 			}
 		}
 	}
 }
 
+static void deleteTerrain(t_terrain *terrain)
+{
+	unsigned	i;
+
+	for (i = 0 ; i < MESH_PER_TERRAIN ; i++)
+	{
+		modelDelete(terrain->meshes + i);
+	}
+	free(terrain);
+}
+
+static void	removeTerrainAt(t_point3 *index, t_world *world)
+{
+	char	key[64];
+
+	generateTerrainKey(key, *index);
+	htab_remove_key(world->terrains, key, deleteTerrain);
+}
+
 /** update and generate terrain at the given pos in the given world */
-void	updateTerrains(t_world *world, t_vec3 camera_pos)
-{	
-	updateTerrainLoad(world, camera_pos);
+void	updateTerrains(t_world *world)
+{
+	updateTerrainLoad(world);
 	htab_iter(world->terrains, (t_iter_function)updateTerrain, world);
+	array_list_iter(world->terrain_garbage, (t_iter_array_function)removeTerrainAt, world);
+	array_list_clear(&(world->terrain_garbage));
 }

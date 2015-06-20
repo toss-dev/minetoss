@@ -14,21 +14,6 @@
 
 int	g_press = 0;
 
-static int	raycastCallback(t_world *world, t_vec3 pos, t_vec3 face)
-{
-	unsigned	blockID;
-
-	blockID = getBlock(world, pos);
-	if (blockID == BLOCK_AIR)
-	{
-		setBlock(world, BLOCK_PACKED_ICE, pos);
-		return (1);
-	}
-	(void)face;
-	return (0);
-}
-
-
 void	cursorMoveCallback(GLFWwindow *window, double x, double y)
 {
 	static double	prevx = 0;
@@ -53,7 +38,10 @@ void	mouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
 		g_press = (action == GLFW_RELEASE) ? 0 : (action == GLFW_PRESS);
 		if (g_press == 0)
 		{
-			raycast(vec3_add(g_game->renderer.camera.pos, new_vec3(0, 0.5f, 0)), g_game->renderer.camera.look_vec, 128, raycastCallback, &(g_game->world));
+			t_vec3	pos;
+
+			pos = vec3_add(vec3_add(g_game->renderer.camera.pos, vec3_multiply(g_game->renderer.camera.look_vec, 4)), new_vec3(0.5f, 0.5f, 0.5f));
+			setBlock(&(g_game->world), BLOCK_PACKED_ICE, pos);
 		}
 	}
 	(void)window;

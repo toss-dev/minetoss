@@ -47,9 +47,9 @@ static void bindTerrainTexture(t_renderer *renderer, double dist)
 
 static void renderTerrain(t_terrain *terrain, t_world_renderer *wr)
 {
-	double		dist;
 	t_vec3		mesh_pos;
 	unsigned	i;
+	double		dist;
 
 	if (!terrainHasState(terrain, TERRAIN_LOADED))
 	{

@@ -24,7 +24,7 @@ SRCS	= ft_memdup.c ft_strtrim.c ft_epur.c \
 		  lodepng.c logger.c bordel.c
 OBJ	= $(SRCS:.c=.o)
 
-FLAGS	= -Wall -Werror -Wextra -g
+FLAGS	= -Wall -Werror -Wextra -pg
 
 include ../../cc.make
 

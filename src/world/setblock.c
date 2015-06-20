@@ -100,7 +100,7 @@ void 			setBlock(t_world *world, unsigned blockID, t_vec3 vec)
 	if (terrain == NULL)
 	{
 		terrain = createNewTerrain(world, getTerrainIndexForPos(vec));
-		loadTerrain(terrain);
+		loadTerrain(world, terrain);
 		logger_log(LOG_FINE, "Created a new terrain when placing block (at %d:%d:%d)", terrain->index.x, terrain->index.y, terrain->index.z);
 	}
 	pos = getTerrainRelativePos(vec);

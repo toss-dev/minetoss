@@ -37,20 +37,13 @@ void		*htab_insert(t_htab tab, char *key, void *data, size_t data_size)
 	hash = htab_hash(key, tab.size);
 	if ((elem.key = strdup(key)) == NULL)
 		return (NULL);
-	if ((elem.content = malloc(data_size)) == NULL)
+	if ((elem.content = ft_memdup(data, data_size)) == NULL)
 	{
 		free(elem.key);
 		return (NULL);
 	}
-	elem.content_size = data_size;
-	memcpy(elem.content, data, data_size);
 	list_add(tab.elems + hash, &elem, sizeof(t_htab_elem));
 	return (elem.content);
-}
-
-static int	htab_key_cmp(t_htab_elem *elem, char const *key)
-{
-	return (strcmp(elem->key, key));
 }
 
 void	*htab_get(t_htab tab, char *key)
@@ -61,8 +54,7 @@ void	*htab_get(t_htab tab, char *key)
 	size_t		hash;
 
 	hash = htab_hash(key, tab.size);
-	if ((lst = tab.elems + hash) == NULL)
-		return (NULL);
+	lst = tab.elems + hash;
 	node = lst->head->next;
 	while (node != lst->head)
 	{
@@ -76,23 +68,29 @@ void	*htab_get(t_htab tab, char *key)
 	return (NULL);
 }
 
-static void	htab_free_elem(t_htab_elem *elem)
+int			htab_remove_key(t_htab tab, char *key, t_function free_funct)
 {
-	free(elem->key);
-	free(elem->content);
-	free(elem);
-}
-
-int			htab_remove(t_htab tab, char *key)
-{
-	t_list	*lst;
-	size_t	hash;
+	t_list		*lst;
+	t_node		*node;
+	t_htab_elem	*elem;
+	size_t		hash;
 
 	hash = htab_hash(key, tab.size);
-	if ((lst = tab.elems + hash) == NULL)
-		return (0);
-	list_remove(lst, htab_free_elem, (t_cmp_func)htab_key_cmp, key);
-	return (1);
+	lst = tab.elems + hash;
+	node = lst->head->next;
+	while (node != lst->head)
+	{
+		elem = (t_htab_elem*)node->content;
+		if (strcmp(elem->key, key) == 0)
+		{
+			free(elem->key);
+			free_funct(elem->content);
+			list_remove_node(lst, node, free);
+			return (1);
+		}
+		node = node->next;
+	}
+	return (0);
 }
 
 t_htab		htab_new(size_t size)
@@ -147,10 +145,7 @@ void		htab_delete(t_htab *tab, void (*delete_node)(void *))
 	i = 0;
 	while (i < tab->size)
 	{
-		if (tab->elems + i != NULL)
-		{
-			list_delete(tab->elems + i, free);
-		}
+		list_delete(tab->elems + i, free);
 		i++;
 	}
 	free(tab->elems);

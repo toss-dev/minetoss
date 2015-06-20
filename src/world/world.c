@@ -15,6 +15,7 @@
 void	initWorld(t_world *world)
 {
 	world->terrains = htab_new(CHUNK_HASHTABLE_SIZE);
+	world->terrain_garbage = array_list_new(128, sizeof(t_point3));
 
 	logger_log(LOG_FINE, "Loading world terrains");
 	loadTerrains(world);
@@ -29,7 +30,7 @@ void	initWorld(t_world *world)
 
 int		updateWorldGenerator(t_game *game)
 {
-	updateTerrains(&(game->world), game->renderer.camera.pos);
+	updateTerrains(&(game->world));
 	return (!glfwWindowShouldClose(game->window.ptr));
 }
 

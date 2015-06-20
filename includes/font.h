@@ -36,6 +36,7 @@ typedef struct 	s_font_model
 	t_vec3		scale;
 	t_vec3		rot;
 	t_vec3		color;
+	float 		step;
 }				t_font_model;
 
 typedef struct 	s_font_vertex
@@ -50,7 +51,10 @@ void 			loadFont(void);
 void 			unloadFont(void);
 void			renderFont(t_program *program, t_font_model *model);
 
+void 			setFontModelPosition(t_font_model *model, t_vec3 pos);
 void 			setFontModelRotation(t_font_model *model, t_vec3 rot);
 void 			setFontModelScaling(t_font_model *model, t_vec3 scale);
+
+float 			getFontStringWidth(t_font_model *model, char const *str);
 
 #endif

@@ -62,9 +62,11 @@ typedef struct		s_list
 void				*list_push(t_list *lst, void const *content, size_t content_size);
 void				*list_add(t_list *lst, void const *content, size_t content_size);
 void 				*list_get(t_list *lst, t_cmp_func cmpf, void *cmpd);
-void				list_iter(t_list *lst, t_iter_function f, void *extra);
+void 				list_iter_remove_if(t_list *lst, t_iter_function iterf, void *extra, t_function free_funct);
+void 				list_iter(t_list *lst, t_iter_function iterf, void *extra);
 t_list				list_new(void);
 int 				list_remove(t_list *lst, t_function free_funct, t_cmp_func cmpf, void *cmpd);
+void				list_remove_node(t_list *lst, t_node *node, t_function free_funct);
 void				list_delete(t_list *lst, void (*delete_node)(void *content));
 
 /******************************* LINKED LIST END *******************************/
@@ -78,7 +80,6 @@ void				list_delete(t_list *lst, void (*delete_node)(void *content));
 typedef struct		s_htab_elem
 {
 	void	*content;
-	size_t	content_size;
 	char	*key;
 }					t_htab_elem;
 
@@ -94,7 +95,7 @@ t_htab				htab_new(size_t size);
 void				*htab_get(t_htab tab, char *key);
 void				htab_delete(t_htab *tab, void (*ft_free)());
 void				htab_iter(t_htab tab, t_iter_function f, void *extra);
-int					htab_remove(t_htab tab, char *key);
+int					htab_remove_key(t_htab tab, char *key, t_function free_funct);
 void				htab_dump_memory(t_htab tab);
 
 /******************************* HASH MAP END ************************************/

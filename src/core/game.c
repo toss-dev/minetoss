@@ -39,6 +39,9 @@ t_game	*gameNew(void)
 	initRenderer(&(game->renderer));
 	initWorld(&(game->world));
 	initTimer(&(game->timer));
+	game->world.timer = &(game->timer);
+	game->renderer.timer = &(game->timer);
+
 	glhCheckError("Game initialization");
 	return (game);
 }
