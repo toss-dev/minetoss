@@ -13,7 +13,8 @@ TODO:
 	- reduce main thread tasks (use for rendering)
 	- improve memory managment in terrain generation / deletion
 	- create a thread pool for terrain generation (1 thread for rendering, 1 for updating world, 2 for generating world)
-
+	- improve memory managment in terrani generation / deletion
+	- find leak in renderUI
 
 --------------------------------------
 Extern library used:
