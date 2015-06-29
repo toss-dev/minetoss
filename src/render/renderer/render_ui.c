@@ -14,8 +14,6 @@
 
 void	renderTime(t_renderer *renderer)
 {
-		(void)renderer;
-
 	char			buffer[64];
 	t_font_model	model;
 	int 			current;
@@ -30,7 +28,6 @@ void	renderTime(t_renderer *renderer)
 
 static void	renderFps(t_renderer *renderer)
 {
-	(void)renderer;
 	char			buffer[64];
 	t_font_model	model;
 

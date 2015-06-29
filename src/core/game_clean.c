@@ -47,5 +47,6 @@ void		gameClean(t_game *game)
 	cleanRenderer(&(game->renderer));
 	cleanWorld(&(game->world));
 	cleanBlocks(game->renderer.blocks);
+	alhStop(&(game->sound_manager));
 	exit(EXIT_SUCCESS);
 }

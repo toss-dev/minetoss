@@ -12,18 +12,25 @@
 
 #include "main.h"
 
-static void	prepareParticleInstance(t_camera camera, t_program program, t_particle *particle)
+static void	prepareParticleInstance(t_camera *camera, t_program *program, t_particle *particle)
 {
-	static float	m[16];
+	float	m[16];
+	t_vec3	vec;
+	t_vec2	angle;
 
+	vec = vec3_normalize(vec3_sub(particle->pos, camera->pos));
+	angle.x = (1 - vec.x) / 2.0f * M_PI;
+	angle.y = 0;
 	matrix_identity(m);
 	matrix_translate(m, particle->pos);
-	matrix_rotate(m, new_vec3(1, 0, 0), camera.pitch);
-	matrix_rotate(m, new_vec3(0, 1, 0), camera.yaw);
-	matrix_rotate(m, new_vec3(0, 0, 1), camera.roll);
+	matrix_rotate(m, new_vec3(0, 1, 0), -M_PI / 2 + angle.x);
+	matrix_rotate(m, new_vec3(1, 0, 0), angle.y);
 	matrix_scale(m, particle->scale);
-	loadUniformMatrix(program.transf_matrix, m);
-	loadUniformVec(program.particle_color, particle->color);
+	loadUniformMatrix(program->transf_matrix, m);
+	loadUniformVec(program->particle_color, particle->color);
+
+
+	(void)vec;
 }
 
 static void	prepareParticleTexture(t_renderer *renderer, t_particle *particle)
@@ -39,21 +46,18 @@ static void	prepareParticleTexture(t_renderer *renderer, t_particle *particle)
 
 static int	shouldParticleBeRendered(t_camera *camera, t_particle *particle)
 {
-	t_vec3	vec;
-	double 	dot;
-
-	vec = vec3_normalize(vec3_sub(camera->pos, particle->pos));
-	dot = vec3_dot_product(vec, camera->look_vec);
-	return (dot < 0);
+	(void)camera;
+	(void)particle;
+	return (1);
 }
 
 static void	renderParticle(t_particle *particle, t_renderer *renderer)
 {
 	if (shouldParticleBeRendered(&(renderer->camera), particle))
 	{
-		prepareParticleInstance(renderer->camera, renderer->programs[PROGRAM_PARTICLE], particle);
+		prepareParticleInstance(&(renderer->camera), renderer->programs + PROGRAM_PARTICLE, particle);
 		prepareParticleTexture(renderer, particle);
-		glDrawArrays(GL_TRIANGLES, 0, renderer->quad_model.vertex_count);
+		renderModel(&(renderer->quad_model));
 	}
 }
 
@@ -69,24 +73,18 @@ static int 	sortParticles(void const *a, void const *b)
 
 void		renderParticles(t_world *world, t_renderer *renderer)
 {
-	return ; //buggued
-	
-	//TESTS
-/*	int i;
-	for (i = 0 ; i < 16 ; i++)
+	(void)world;
+
+
+	static int i = 0;
+	for (i = 0 ; i < 1 ; i++)
 	{
-		t_particle p = new_particle(new_vec3(0, 120, 0),
-							new_vec3(0.5f, 0.5f, 0.5f),
-							new_vec3(0, 0, 0),
+		t_particle p = new_particle(new_vec3(0, 64, 0),
+							new_vec3(10, 10, 10),
 							new_vec3(0.5f, 0, 0),
-							ParticleMoving, T_ATLAS_EXPLOSION, 120);
-		p.pos_vec.x = rand_float_in_range(-1, 1);
-		p.pos_vec.y = rand_float_in_range(-1, 1);
-		p.pos_vec.z = -2;
-		p.pos_vec = vec_multiply(vec_normalize(p.pos_vec), 0.25f);
+							ParticleMoving, T_ATLAS_EXPLOSION, 999999);
 		addParticle(renderer, p);
 	}
-*/
 
 	//TESTS END
 
@@ -98,28 +96,23 @@ void		renderParticles(t_world *world, t_renderer *renderer)
 	array_list_sort(renderer->particles, sortParticles);
 
 	glUseProgram(program->id);
+	{
+		glBindVertexArray(renderer->quad_model.vaoID);
 
-	glBindVertexArray(renderer->quad_model.vaoID);
+		glEnableVertexAttribArray(ATTR_POSITION);
+		glEnableVertexAttribArray(ATTR_UV);
 
-	glEnableVertexAttribArray(ATTR_POSITION);
-	glEnableVertexAttribArray(ATTR_UV);
-	glEnableVertexAttribArray(ATTR_NORMAL);
+		loadUniformMatrix(program->view_matrix, renderer->camera.view_matrix);
 
-	glActiveTexture(GL_TEXTURE0);
 
-	loadUniformMatrix(program->view_matrix, renderer->camera.view_matrix);
-	loadUniformVec(renderer->programs[PROGRAM_PARTICLE].fog_color, world->weather.fog_color);
-	loadUniformFloat(renderer->programs[PROGRAM_PARTICLE].fog_density, world->weather.fog_density);
-	loadUniformFloat(renderer->programs[PROGRAM_PARTICLE].fog_gradient, world->weather.fog_gradient);
+		array_list_iter(renderer->particles, (t_iter_array_function)renderParticle, renderer);
 
-	array_list_iter(renderer->particles, (t_iter_array_function)renderParticle, renderer);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+		glDisableVertexAttribArray(ATTR_POSITION);
+		glDisableVertexAttribArray(ATTR_UV);
 
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-	glDisableVertexAttribArray(ATTR_POSITION);
-	glDisableVertexAttribArray(ATTR_UV);
-	glDisableVertexAttribArray(ATTR_NORMAL);
-
-	glBindVertexArray(0);
-
+		glBindVertexArray(0);
+	}
 	glUseProgram(0);
+
 }

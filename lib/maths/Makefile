@@ -15,7 +15,7 @@ SRCS	= matrix_op.c \
 		  matrix_projection.c matrix_transformation.c \
 		  matrix_utils.c cos_sin.c \
 		  vec2.c vec3.c point2.c point3.c \
-		  math_utils.c triangles.c maths.c
+		  triangles.c maths.c
 
 OBJ		= $(SRCS:.c=.o)
 INC		= -I ../libft/

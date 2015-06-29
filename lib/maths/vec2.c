@@ -40,3 +40,12 @@ t_vec2	to_vec2(t_point2 p)
 {
 	return (new_vec2((float)p.x, (float)p.y));
 }
+
+t_vec2	vec2_multiply(t_vec2 a, double r)
+{
+	t_vec2	ret;
+
+	ret.x = a.x * r;
+	ret.y = a.y * r;
+	return (ret);
+}

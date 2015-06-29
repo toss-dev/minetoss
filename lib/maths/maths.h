@@ -85,6 +85,7 @@ t_vec2	new_vec2(float x, float y);
 double	vec2_dist(t_vec2 a, t_vec2 b);
 double 	vec2_dot(t_vec2 a, t_vec2 b);
 double	vec2_dot_product(t_vec2 a, t_vec2 b);
+t_vec2	vec2_multiply(t_vec2 a, double r);
 
 /*
 **	Matrix utils functions
@@ -102,7 +103,7 @@ float	ft_cosf(float f);
 float	ft_sinf(float f);
 
 /*
-**	vec3 | point4 functions
+**	vec3 functions
 */
 t_vec3	new_vec3(float x, float y, float z);
 t_vec3	vec3_sub(t_vec3 v1, t_vec3 v2);

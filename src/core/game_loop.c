@@ -34,11 +34,12 @@ void		gameLoop(t_game *game)
 		updateTimer(&(game->timer));
 		updateCamera(&(game->renderer.camera));
 		updateWeather(&(game->world), &(game->renderer), &(game->timer));
+		updateSound(&(game->sound_manager), &(game->renderer.camera));
 		render(&(game->world), &(game->renderer));
 		glfwSwapBuffers(game->window.ptr);
 		glfwPollEvents();
 		glhCheckError("main thread loop");
-		updateDebug(game);
 		game->renderer.fps = (unsigned int)(1 / (glfwGetTime() - prev));
+		updateDebug(game);
 	}
 }

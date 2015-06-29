@@ -14,6 +14,8 @@
 
 static void	updateMove(t_particle *particle)
 {
+	return ;
+
 	particle->pos = vec3_add(particle->pos, particle->pos_vec);
 	if (particle->timer % 6 == 0)
 	{

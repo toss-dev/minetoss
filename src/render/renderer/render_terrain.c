@@ -66,22 +66,17 @@ static void renderTerrain(t_terrain *terrain, t_world_renderer *wr)
 		}
 
 		dist = point3_dist(terrain->index, getTerrainIndexForPos(wr->renderer->camera.pos));
+
+		if (dist > TERRAIN_RENDER_DISTANCE)
+		{
+			continue ;
+		}
+		
 		mesh_pos = new_vec3(terrain->index.x * TERRAIN_SIZEX + TERRAIN_SIZEX / 2,	//center of the mesh
 							i * MESH_SIZEY + MESH_SIZEY / 2 + terrain->index.y * TERRAIN_SIZEY,
 							terrain->index.z * TERRAIN_SIZEZ + TERRAIN_SIZEZ / 2);
 
-		if (dist > TERRAIN_RENDER_DISTANCE)
-		{
-			//this will be done in another thread which will also calculate the dist
-			/*if (dist > TERRAIN_KEEP_LOADED_DISTANCE)
-			{
-				clearModelVBO(terrain->meshes + i);
-			}*/
-			continue ;
-		}
-		
-
-		if (dist <= 1 || isInCameraFrustum(&(wr->renderer->camera), mesh_pos, 40))
+		if (dist <= 1 || isInCameraFrustum(&(wr->renderer->camera), mesh_pos, 30))
 		{
 			bindTerrainTexture(wr->renderer, dist);	//bind texture depending on distance (bitmapping)
 			renderModel(terrain->meshes + i);

@@ -77,6 +77,9 @@ int	updateModelVBO(t_model *model)
 	modelSetState(model, MODEL_VBO_UP_TO_DATE);
 	modelUnsetState(model, MODEL_CLEARED);
 
+	free(model->vertices);
+	model->vertices = NULL;
+
 	return (1);
 }
 

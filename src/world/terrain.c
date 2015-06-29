@@ -42,10 +42,6 @@ t_terrain	*createNewTerrain(t_world *world, t_point3 index)
 
 	buffer.index = index;
 	buffer.state = 0;
-	if (index.y != 0)
-	{
-		terrainSetState(&buffer, TERRAIN_GENERATED);
-	}
 	for (i = 0 ; i < MESH_PER_TERRAIN ; i++)
 	{
 		buffer.meshes[i] = new_model(GL_STREAM_DRAW);
@@ -53,7 +49,7 @@ t_terrain	*createNewTerrain(t_world *world, t_point3 index)
 	generateTerrainKey(key, index);
 	memset(buffer.blocks, 0, sizeof(buffer.blocks));
 	terrain = htab_insert(world->terrains, key, &buffer, sizeof(t_terrain));
-	updateTerrainNeighborMeshesData(world, terrain, MESH_PER_TERRAIN - 1);
+	updateTerrainNeighborMeshesData(world, terrain);
 	return (terrain);
 }
 
@@ -91,8 +87,7 @@ static void	updateTerrain(t_terrain *terrain, t_world *world)
 
 	pos = getTerrainIndexForPos(g_game->renderer.camera.pos);
 	dist = point3_dist(pos, terrain->index);
-
-	if (dist >= TERRAIN_LOAD_DISTANCE)
+	if (dist >= TERRAIN_KEEP_LOAD_DISTANCE)
 	{
 		unloadTerrain(world, terrain);
 		return ;
@@ -111,8 +106,8 @@ static void updateTerrainLoad(t_world *world)
 	t_point3	index;
 	int			x;
 	int 		z;
-	double		dist;
 	t_point3	pos;
+	double 		dist;
 
 	pos = getTerrainIndexForPos(g_game->renderer.camera.pos);
 	for (x = -TERRAIN_LOAD_DISTANCE ; x < TERRAIN_LOAD_DISTANCE ; x++)

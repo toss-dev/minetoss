@@ -15,7 +15,7 @@ NAME = render
 HEADER	= ./includes/main.h ./includes/opengl.h \
 		  ./includes/blocks.h ./includes/const.h \
 		  ./includes/timer.h ./includes/const.h \
-		  ./includes/font.h
+		  ./includes/font.h ./includes/sound.h
 
 SRC_DIR	= ./src/
 
@@ -38,7 +38,6 @@ SRC		= blocks/block.c \
 		  render/renderer/render_particles.c \
 		  render/renderer/render_ui.c \
 		  render/renderer/render_sky.c \
-		  render/renderer/renderer_update.c \
 		  render/particles/particles.c \
 		  render/particles/texture.c \
 		  render/particles/particles_update.c \
@@ -59,10 +58,12 @@ SRC		= blocks/block.c \
 		  render/opengl/uniforms.c \
 		  timer/timer.c \
 		  sound/sound.c \
+		  sound/sound_util.c \
 		  world/setblock.c \
 		  world/terrain.c \
 		  world/terrain_utils.c \
 		  world/terrain_generator.c \
+		  world/noise.c \
 		  world/world.c
 
 SRCS	= $(addprefix $(SRC_DIR), $(SRC))
@@ -84,7 +85,7 @@ include lib.make
 
 LIB += $(LIBFT) $(LIBMATH)
 
-FLAGS	= -Wall -Wextra -Werror -pg
+FLAGS	= -Wall -Wextra -Werror -g3
 
 all: $(NAME)
 

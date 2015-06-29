@@ -145,10 +145,11 @@ static void pushFace(unsigned faceID, t_block *block, t_point3 pos)
 }
 
 /** this functions add every block faces like an idiot for now */
-static void addBlockFaces(t_terrain *terrain, t_terrain *neighbor[4], t_block *block, t_point3 pos)
+static void addBlockFaces(t_terrain *terrain, t_terrain *neighbor[6], t_block *block, t_point3 pos)
 {
 
 /*********************************************************************/
+
 	if ((pos.x == 0 && neighbor[0] && !isBlockVisible(neighbor[0]->blocks[TERRAIN_SIZEX - 1][pos.y][pos.z]))
 			|| (pos.x > 0 && !isBlockVisible(terrain->blocks[pos.x - 1][pos.y][pos.z])))
 	{
@@ -166,12 +167,14 @@ static void addBlockFaces(t_terrain *terrain, t_terrain *neighbor[4], t_block *b
 
 
 /*********************************************************************/
-	if (pos.y > 1 && !isBlockVisible(terrain->blocks[pos.x][pos.y - 1][pos.z]))
+	if ((pos.y == 0 && neighbor[4] && !isBlockVisible(neighbor[4]->blocks[pos.x][TERRAIN_SIZEY - 1][pos.z]))
+			|| (pos.y > 0 && !isBlockVisible(terrain->blocks[pos.x][pos.y - 1][pos.z])))
 	{
 		pushFace(BLOCK_FACE_BOT, block, pos);
 	}
 
-	if (pos.y == TERRAIN_SIZEY - 1 || !isBlockVisible(terrain->blocks[pos.x][pos.y + 1][pos.z]))
+	if ((pos.y == TERRAIN_SIZEY - 1 && !isBlockVisible(neighbor[5]->blocks[pos.x][0][pos.z]))
+			|| (pos.y < TERRAIN_SIZEY - 1 && !isBlockVisible(terrain->blocks[pos.x][pos.y + 1][pos.z])))
 	{
 		pushFace(BLOCK_FACE_TOP, block, pos);
 	}
@@ -195,7 +198,7 @@ static void addBlockFaces(t_terrain *terrain, t_terrain *neighbor[4], t_block *b
 }
 
 /** push every visible faces to the vertex array list from the given chunk */
-static void generateVertexArrayList(t_terrain *terrain, t_terrain *neighbor[4], unsigned meshID)
+static void generateVertexArrayList(t_terrain *terrain, t_terrain *neighbor[6], unsigned meshID)
 {
 	t_block 	*block;
 	unsigned	blockID;
@@ -222,12 +225,14 @@ static void generateVertexArrayList(t_terrain *terrain, t_terrain *neighbor[4], 
 	}
 }
 
-static void getChunkNeighbor(t_world *world, t_terrain *terrain, t_terrain *neighbor[4])
+static void getChunkNeighbor(t_world *world, t_terrain *terrain, t_terrain *neighbor[6])
 {
 	neighbor[0] = getTerrain(world, new_point3(terrain->index.x - 1,	terrain->index.y, terrain->index.z));
 	neighbor[1] = getTerrain(world, new_point3(terrain->index.x,		terrain->index.y, terrain->index.z - 1));
 	neighbor[2] = getTerrain(world, new_point3(terrain->index.x + 1,	terrain->index.y, terrain->index.z));
 	neighbor[3] = getTerrain(world, new_point3(terrain->index.x,		terrain->index.y, terrain->index.z + 1));
+	neighbor[4] = getTerrain(world, new_point3(terrain->index.x,		terrain->index.y - 1, terrain->index.z));
+	neighbor[5] = getTerrain(world, new_point3(terrain->index.x,		terrain->index.y + 1, terrain->index.z));
 }
 
 
@@ -236,7 +241,7 @@ static void getChunkNeighbor(t_world *world, t_terrain *terrain, t_terrain *neig
 */
 void		updateTerrainMeshData(t_world *world, t_terrain *terrain, unsigned meshID)
 {
-	t_terrain	*neighbor[4];
+	t_terrain	*neighbor[6];
 
 	getChunkNeighbor(world, terrain, neighbor);
 	generateVertexArrayList(terrain, neighbor, meshID);
@@ -247,30 +252,53 @@ void		updateTerrainMeshData(t_world *world, t_terrain *terrain, unsigned meshID)
 /**
 **	update every meshes for the given terrain
 */
-void		updateTerrainNeighborMeshesData(t_world *world, t_terrain *terrain, unsigned meshID)
+void		updateTerrainMeshes(t_world *world, t_terrain *terrain)
 {
-	t_terrain	*neighbor[4];
+	unsigned	i;
+
+	for (i = 0 ; i < MESH_PER_TERRAIN ; i++)
+	{
+		updateTerrainMeshData(world, terrain, i);
+	}
+}
+
+/**
+**	update every neighbor chunks
+*/
+void		updateTerrainNeighborMeshesData(t_world *world, t_terrain *terrain)
+{
+	t_terrain	*neighbor[6];
 	
 	getChunkNeighbor(world, terrain, neighbor);
 	
 	if (neighbor[0])
 	{
-		updateTerrainMeshData(world, neighbor[0], meshID);
+		updateTerrainMeshes(world, neighbor[0]);
 	}
 
 	if (neighbor[1])
 	{
-		updateTerrainMeshData(world, neighbor[1], meshID);
+		updateTerrainMeshes(world, neighbor[1]);
 	}
 
 	if (neighbor[2])
 	{
-		updateTerrainMeshData(world, neighbor[2], meshID);
+		updateTerrainMeshes(world, neighbor[2]);
 	}
 
 	if (neighbor[3])
 	{
-		updateTerrainMeshData(world, neighbor[3], meshID);
+		updateTerrainMeshes(world, neighbor[3]);
+	}
+
+	if (neighbor[4])
+	{
+		updateTerrainMeshes(world, neighbor[4]);
+	}
+
+	if (neighbor[5])
+	{
+		updateTerrainMeshes(world, neighbor[5]);
 	}
 }
 

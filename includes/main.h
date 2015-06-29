@@ -21,7 +21,21 @@
 # include "const.h"
 # include "timer.h"
 # include "font.h"
+# include "sound.h"
 # include <pthread.h>
+
+/** file has to be added in the same order as these enum are declared */
+enum e_sounds
+{
+	SOUND_KALIMBA,
+	SOUND_MAX
+};
+
+enum e_sound_sources
+{
+	SOUND_SOURCE_MUSIC,
+	SOUND_SOURCE_MAX
+};
 
 enum e_program_id
 {
@@ -196,11 +210,12 @@ enum e_game_state
 
 typedef struct 	s_game
 {
-	t_world		world;
-	t_renderer	renderer;
-	pthread_t	threads[THRD_MAX];
-	t_window	window;
-	t_timer		timer;
+	pthread_t		threads[THRD_MAX];
+	t_world			world;
+	t_renderer		renderer;
+	t_window		window;
+	t_sound_manager	sound_manager;
+	t_timer			timer;
 	unsigned	state;
 }				t_game;
 
@@ -226,6 +241,10 @@ void			initEvent(t_window *window);
 void			initWorld(t_world *world);
 void			initRenderer(t_renderer *renderer);
 void			loadBlocks(t_renderer *renderer);
+void 			initSound(t_sound_manager *manager);
+
+/** sounds */
+void 			updateSound(t_sound_manager *sound_manager, t_camera *camera);
 
 /** events functions */
 void			keyCallback(GLFWwindow *window, int key, int scancode, int action, int mods);
@@ -287,11 +306,16 @@ void 			unloadTerrain(t_world *world, t_terrain *terrain);
 void			terrainSetState(t_terrain *terrain, unsigned state);
 void			terrainUnsetState(t_terrain *terrain, unsigned state);
 int				terrainHasState(t_terrain *terrain, unsigned state);
-void            loadWorldGenerator(void);
 t_terrain		*getTerrainAt(t_world *world, t_vec3 vec);
 t_terrain		*getTerrain(t_world *world, t_point3 index);
-void   			generateTerrain(t_terrain *terrain);
 void			generateTerrainKey(char *buffer, t_point3 index);
+
+/** world generator */
+void   			generateTerrain(t_terrain *terrain);
+void            loadWorldGenerator(void);
+void 			prepareNoise(void);
+double			noise2(t_vec2 in);
+double			noise3(t_vec3 in);
 
 int				getTerrainHeightAt(t_terrain *terrain, float x, float z);
 t_point3		getTerrainRelativePos(t_vec3 vec);
@@ -303,7 +327,8 @@ void 			setBlock(t_world *world, unsigned blockID, t_vec3 pos);
 /** terrain's mesh factory */
 void 			loadTerrainMeshFactory(t_renderer *renderer);
 void			updateTerrainMeshData(t_world *world, t_terrain *terrain, unsigned chunkID);
-void			updateTerrainNeighborMeshesData(t_world *world, t_terrain *terrain, unsigned meshID);
+void			updateTerrainNeighborMeshesData(t_world *world, t_terrain *terrain);
+void			updateTerrainMeshes(t_world *world, t_terrain *terrain);
 void			updateMeshes(t_world *world, t_terrain *terrain, unsigned meshID);
 
 /** main render functions, will render the whole world to default framebuffers */
@@ -336,7 +361,7 @@ void			loadParticleTextures(t_renderer *renderer);
 void 			loadParticles(t_renderer *renderer);
 void 			updateParticles(t_renderer *renderer);
 void 			addParticle(t_renderer *renderer, t_particle particle);
-t_particle		new_particle(t_vec3 pos, t_vec3 scal, t_vec3 rot, t_vec3 color,
+t_particle		new_particle(t_vec3 pos, t_vec3 scal, t_vec3 color,
 				int id, GLuint texture_id, float life);
 
 #endif

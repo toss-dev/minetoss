@@ -16,6 +16,5 @@ void	main(void)
 	vec4	color;
 
 	texture_color = texture(texture_sampler, pass_uv);
-	color = texture_color * vec4(particle_color, texture_color.a);
-	vertexColor = mix(vec4(fog_color, texture_color.a), color, visibility);
+	vertexColor = texture_color * vec4(particle_color, texture_color.a);
 }
