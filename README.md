@@ -3,23 +3,25 @@
 Minecraft like engine openGL / GLFW
 -----------------------------------------------
 
-• Currently working on the rendering system: (https://github.com/toss-dev/minetoss/blob/master/includes/const.h)
+• Currently working on the networking system
 
 For technical questions, see comments in code :)
 
+-----------------------------------------------
+Client / Server model:
+* using select on a socket, using udp protocol (recvfrom, sendto functions)
+	: see network files
 
+-----------------------------------------------
 
-TODO:
-	- reduce main thread tasks (use for rendering)
-	- improve memory managment in terrain generation / deletion
-	- create a thread pool for terrain generation (1 thread for rendering, 1 for updating world, 2 for generating world)
-	- improve memory managment in terrani generation / deletion
-	- find leak in renderUI
-
---------------------------------------
 Extern library used:
 * OpenGL (modern pipeline)
 * GLFW (opengl framework)
 * glew (windows only)
 * pthread
 * lodepng.c lodepng.h (png decoder / encoder)
+
+-----------------------------------------------
+
+NOT IMPLEMENTED YET:
+* Detect hidden chunks of block: occlusion culling
