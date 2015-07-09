@@ -22,12 +22,10 @@ static void	updateDebug(t_game *game)
 	glfwSetWindowTitle(game->window.ptr, buffer);
 }
 
-void		gameLoop(t_game *game)
+void		startGame(t_game *game)
 {
 	double	prev;
 
-	game->state = game->state | GAME_STATE_RUNNING;
-	startThread(game, THRD_GENERATOR, 60, updateWorldGenerator);
 	while (!glfwWindowShouldClose(game->window.ptr))
 	{
 		prev = glfwGetTime();
@@ -41,5 +39,14 @@ void		gameLoop(t_game *game)
 		glhCheckError("main thread loop");
 		game->renderer.fps = (unsigned int)(1 / (glfwGetTime() - prev));
 		updateDebug(game);
+		usleep(10000);
 	}
+}
+
+void		gameLoop(t_game *game)
+{
+	game->state = game->state | GAME_STATE_RUNNING;
+	startNetwork(game);
+	startWorldGenerator(game);
+	startGame(game);
 }

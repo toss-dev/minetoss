@@ -26,10 +26,9 @@ t_client *cltConnect(char const *hostname, PORT port)
 
 
    t_client *client;
-   PROTOENT *protocol;
    HOSTENT  *hostinfo;
 
-   client = malloc(sizeof(t_client));
+   client = (t_client*)malloc(sizeof(t_client));
 	if (client == NULL)
    {
       perror("malloc");
@@ -37,36 +36,49 @@ t_client *cltConnect(char const *hostname, PORT port)
    }
    client->port = port;
 	client->hostname = strdup(hostname);
+   client->state = 0;
 	if (client->hostname == NULL)
 	{
 		perror("malloc");
-		exit(EXIT_FAILURE);
+      free(client);
+      return (NULL);
 	}
 
-   protocol = getprotobyname("udp");
-   if (protocol == NULL)
-   {
-      perror("getprotobyname");
-      exit(EXIT_FAILURE);
-   }
-   client->sock = socket(AF_INET, SOCK_DGRAM, protocol->p_proto);
+   client->sock = socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP);
+
    if (client->sock == INVALID_SOCKET)
    {
       perror("socket()");
-      exit(errno);
+      free(client->hostname);
+      free(client);
+      return (NULL);
    }
 
    hostinfo = gethostbyname(client->hostname);
    if (hostinfo == NULL)
    {
       fprintf(stderr, "Unknown host %s.\n", client->hostname);
-      exit(EXIT_FAILURE);
+      free(client->hostname);
+      free(client);
+      return (NULL);
    }
 
    client->sin.sin_addr = *((IN_ADDR*)hostinfo->h_addr);
    client->sin.sin_port = htons(client->port);
    client->sin.sin_family = AF_INET;
 
+
+   t_packet packet;
+
+   packetCreate(&packet, NULL, 0, PACKET_ID_CONNECTION);
+   packetSend(client->sock, &(client->sin), &packet);
+   if (packetReceive(client->sock, &(client->sin), 5, 0, &packet) < 0)
+   {
+      logger_log(LOG_ERROR, "Couldnt connect to server, stopping game.");
+      exit(EXIT_FAILURE);
+   }
+   printf("connected, server answered\n");
+   client->state = client->state | CLIENT_CONNECTED;
    return (client);
 }
 
@@ -78,46 +90,8 @@ void	cltDisconnect(t_client *client)
 	closesocket(client->sock);
 	free(client->hostname);
 	client->hostname = NULL;
-	memset(client, 0, sizeof(t_client));
+   client->state = client->state & ~(CLIENT_CONNECTED);
 }
-
-void	cltLoop(t_client *client, t_function packet_handler)
-{
-   fd_set   rdfs;
-   t_packet packet;
-
-   packetCreate(&packet, (BYTE*)"A", 1, 0);
-   packetSend(client->sock, &(client->sin), &packet);
-   while (1)
-   {
-      FD_ZERO(&rdfs);
-      FD_SET(client->sock, &rdfs);
-
-      if (select(client->sock + 1, &rdfs, NULL, NULL, NULL) == -1)
-      {
-         perror("select()");
-         exit(errno);
-      }
-
-      if (FD_ISSET(client->sock, &rdfs))
-      {
-         t_packet packet;
-         int      n;
-
-         n = packetRead(client->sock, &(client->sin), &packet);
-         if (n == -1)
-         {
-            printf("Server disconnected !\n");
-            break;
-         }
-         else
-         {
-            packet_handler(client, packet);
-         }
-      }
-   }
-}
-
 
 /*static void cltPacketHandler(t_client *client, t_packet *packet)
 {

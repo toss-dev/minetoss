@@ -23,7 +23,6 @@ int 	main(void)
 		return (EXIT_FAILURE);
 	}
 	gameLoop(g_game);
-	gameStop(g_game);
-	gameClean(g_game);
+	gameExit(g_game);
 	return (EXIT_SUCCESS);
 }

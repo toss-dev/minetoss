@@ -35,10 +35,12 @@ static void	cleanWorld(t_world *world)
 	htab_delete(&(world->terrains), deleteTerrain);
 }
 
-void		gameClean(t_game *game)
+void		gameExit(t_game *game)
 {
-	unsigned	i;
+	game->state = game->state & ~(GAME_STATE_RUNNING);
+	stopNetwork(game);
 
+	unsigned	i;
 	for (i = 0 ; i < THRD_MAX ; i++)	//wait for each thread to exit
 	{
 		pthread_join(game->threads[i], NULL);

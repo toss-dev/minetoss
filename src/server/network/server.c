@@ -24,7 +24,6 @@ t_server *srvStart(PORT port, unsigned int max_client)
       }
    # endif
 
-   PROTOENT *protocol;
    t_server *server;
 
    server = (t_server*)malloc(sizeof(t_server));
@@ -47,13 +46,7 @@ t_server *srvStart(PORT port, unsigned int max_client)
    server->client_count = 0;
    server->port = port;
 
-   protocol = getprotobyname("udp");
-   if (protocol == NULL)
-   {
-      perror("getprotobyname");
-      exit(EXIT_FAILURE);
-   }
-   server->sock = socket(AF_INET, SOCK_DGRAM, protocol->p_proto);
+   server->sock = socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP);
    if (server->sock == INVALID_SOCKET)
    {
       perror("socket()");

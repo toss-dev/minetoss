@@ -17,11 +17,6 @@ int	isGameRunning(t_game *game)
 	return (game->state & GAME_STATE_RUNNING);
 }
 
-void	gameStop(t_game *game)
-{
-	game->state = game->state & ~(GAME_STATE_RUNNING);
-}
-
 t_game	*gameNew(void)
 {
 	t_game	*game;
@@ -34,11 +29,14 @@ t_game	*gameNew(void)
 	}
 	memset(game, 0, sizeof(t_game));
 
+	initWorld(&(game->world));
+	initTimer(&(game->timer));
+	initNetwork(game);
+
 	initWindow(&(game->window));
 	initEvent(&(game->window));
 	initRenderer(&(game->renderer));
-	initWorld(&(game->world));
-	initTimer(&(game->timer));
+	
 	initSound(&(game->sound_manager));
 	game->world.timer = &(game->timer);
 	game->renderer.timer = &(game->timer);

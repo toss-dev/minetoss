@@ -23,10 +23,15 @@ typedef struct 	s_client
 	SOCKADDR_IN		sin;
 	char			*hostname;
 	PORT			port;
+	unsigned		state;
 }				t_client;
+
+enum e_client_state
+{
+	CLIENT_CONNECTED = 1
+};
 
 t_client	*cltConnect(char const *hostname, PORT port);
 void		cltDisconnect(t_client *client);
-void 		cltLoop(t_client *client, t_function packet_handler);
 
 #endif

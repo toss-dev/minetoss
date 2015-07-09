@@ -196,6 +196,7 @@ typedef struct 	s_world_renderer
 enum e_thread_name
 {
 	THRD_GENERATOR,
+	THRD_NETWORK,
 	THRD_MAX
 };
 
@@ -212,7 +213,8 @@ typedef struct 	s_game
 	t_window		window;
 	t_sound_manager	sound_manager;
 	t_timer			timer;
-	unsigned	state;
+	t_client		*client;
+	unsigned		state;
 }				t_game;
 
 extern t_game	*g_game;
@@ -251,7 +253,7 @@ void			mouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
 t_game			*gameNew(void);
 void			gameLoop(t_game *game);
 void			gameStop(t_game *game);
-void			gameClean(t_game *game);
+void			gameExit(t_game *game);
 int				isGameRunning(t_game *game);
 void			startThread(t_game *game, unsigned threadID, unsigned ups, t_thread_callback callback);
 
@@ -307,6 +309,8 @@ t_terrain		*getTerrain(t_world *world, t_point3 index);
 void			generateTerrainKey(char *buffer, t_point3 index);
 
 /** world generator */
+void			startWorldGenerator(t_game *game);
+
 void   			generateTerrain(t_terrain *terrain);
 void            loadWorldGenerator(void);
 void 			prepareNoise(void);
@@ -354,6 +358,11 @@ void			updateWeather(t_world *world, t_renderer *renderer, t_timer *timer);
 
 /** blocks */
 void			createBlockTextures(t_renderer *renderer);
+
+/** network*/
+void			startNetwork(t_game *game);
+void			initNetwork(t_game *game);
+void			stopNetwork(t_game *game);
 
 /** particles */
 void			loadParticleTextures(t_renderer *renderer);

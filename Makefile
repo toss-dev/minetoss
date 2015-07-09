@@ -21,7 +21,7 @@ CLT_SRC	= main.c \
 		  core/args.c \
 		  core/game.c \
 		  core/game_loop.c \
-		  core/game_clean.c \
+		  core/game_exit.c \
 		  core/thread.c \
 		  event/event.c \
 		  event/key.c \
@@ -29,6 +29,7 @@ CLT_SRC	= main.c \
 		  event/camera_control.c \
 		  event/window.c \
 		  network/client.c \
+		  network/network.c \
 		  render/camera.c \
 		  render/render.c \
 		  render/renderer/render_terrain.c \

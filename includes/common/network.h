@@ -50,6 +50,12 @@ typedef struct 	s_packet_header
 	short	size;
 }				t_packet_header;
 
+enum e_standart_packet_id
+{
+	PACKET_ID_CONNECTION,
+	PACKET_STANDART_MAX
+};
+
 typedef struct 	s_packet
 {
 	t_packet_header	header;
@@ -57,9 +63,10 @@ typedef struct 	s_packet
 }				t_packet;
 
 void	packetDelete(t_packet *packet);
-void 	packetCreate(t_packet *packet, BYTE *data, short size, BYTE id);
+void 	packetCreate(t_packet *packet, BYTE *data, short size, short id);
 int		packetSend(SOCKET sock, SOCKADDR_IN *sin, t_packet *packet);
 int 	packetRead(SOCKET sock, SOCKADDR_IN *sin, t_packet *packet);
+int		packetReceive(SOCKET sock, SOCKADDR_IN *sin, unsigned int sec, unsigned int usec, t_packet *packet);
 
 /** the following packet id depends on the server usage */
 enum e_packet_id

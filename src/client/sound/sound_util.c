@@ -212,8 +212,8 @@ void	alhStop(t_sound_manager *manager)
     alDeleteSources(manager->sources_count, manager->sources);
     alDeleteBuffers(1, &(manager->internal_buffer));
     alcMakeContextCurrent(NULL);
-    alcDestroyContext(manager->context);
     alcCloseDevice(manager->device);
+    alcDestroyContext(manager->context);
     free(manager->sources);
     manager->sources = NULL;
     manager->sources_count = 0;
