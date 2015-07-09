@@ -10,18 +10,14 @@
 #                                                                              #
 # **************************************************************************** #
 
-NAME = render
+CLIENT = client
 
-HEADER	= ./includes/main.h ./includes/opengl.h \
-		  ./includes/blocks.h ./includes/const.h \
-		  ./includes/timer.h ./includes/const.h \
-		  ./includes/font.h ./includes/sound.h
+SERVER = server
 
-SRC_DIR	= ./src/
-
-SRC		= blocks/block.c \
+CLT_SRC	= main.c \
+		  blocks/block.c \
+		  blocks/block_texture.c \
 		  blocks/raytracing.c \
-		  core/main.c \
 		  core/args.c \
 		  core/game.c \
 		  core/game_loop.c \
@@ -32,6 +28,7 @@ SRC		= blocks/block.c \
 		  event/mouse.c \
 		  event/camera_control.c \
 		  event/window.c \
+		  network/client.c \
 		  render/camera.c \
 		  render/render.c \
 		  render/renderer/render_terrain.c \
@@ -66,8 +63,22 @@ SRC		= blocks/block.c \
 		  world/noise.c \
 		  world/world.c
 
-SRCS	= $(addprefix $(SRC_DIR), $(SRC))
-OBJ		= $(SRCS:.c=.o)
+CLT_SRCS	= $(addprefix ./src/client/, $(CLT_SRC))
+CLT_OBJ		= $(CLT_SRCS:.c=.o)
+
+
+
+SRV_SRC = main.c \
+		  network/server.c
+
+SRV_SRCS	= $(addprefix ./src/server/, $(SRV_SRC))
+SRV_OBJ	= $(SRV_SRCS:.c=.o)
+
+
+COMMON_SRC 	= network/packet.c
+
+COMMON_SRCS	= $(addprefix ./src/common/, $(COMMON_SRC))
+COMMON_OBJ 	= $(COMMON_SRCS:.c=.o)
 
 LIBFT_DIR	= ./lib/libft
 LIBMATH_DIR	= ./lib/maths
@@ -87,12 +98,15 @@ LIB += $(LIBFT) $(LIBMATH)
 
 FLAGS	= -Wall -Wextra -Werror -g3
 
-all: $(NAME)
+all: $(CLIENT) $(SERVER)
 
-$(NAME): $(LIBFT) $(LIBMATH) $(OBJ) 
-	$(CC) $(FLAGS) -o $(NAME) $(OBJ) $(LIB)
+$(CLIENT): $(LIBFT) $(LIBMATH) $(COMMON_OBJ) $(CLT_OBJ)
+	$(CC) $(FLAGS) -o $(CLIENT) $(CLT_OBJ) $(COMMON_OBJ) $(LIB)
 
-%.o: %.c $(HEADER)
+$(SERVER): $(LIBFT) $(LIBMATH) $(COMMON_OBJ) $(SRV_OBJ)
+	$(CC) $(FLAGS) -o $(SERVER) $(SRV_OBJ) $(COMMON_OBJ) $(LIB)
+
+%.o: %.c
 	$(CC) $(FLAGS) -o $@ -c $< $(INC)
 
 ./glfw/src/libglfw3.a:
@@ -115,12 +129,15 @@ fcleanlib:
 	make -C $(LIBMATH_DIR) fclean
 
 clean: cleanlib
-	rm -rf $(OBJ)
+	rm -rf $(CLT_OBJ)
+	rm -rf $(SRV_OBJ)
+	rm -rf $(COMMON_OBJ)
 
 fclean: fcleanlib clean
 	-rm render.exe.stackdump
 	-rm gmon.out
-	rm -rf $(NAME)
+	rm -rf $(CLIENT)
+	rm -rf $(SERVER)
 
 re: fclean all
 

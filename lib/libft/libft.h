@@ -20,6 +20,11 @@
 
 # define BUFF_SIZE 8192
 
+# include <errno.h>
+# include <sys/ioctl.h>
+# include <sys/mman.h>
+# include <sys/types.h>
+# include <sys/wait.h>
 # include <unistd.h>
 # include <float.h>
 # include <stdio.h>
