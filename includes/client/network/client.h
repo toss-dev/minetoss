@@ -31,7 +31,7 @@ enum e_client_state
 	CLIENT_CONNECTED = 1
 };
 
-t_client	*cltConnect(char const *hostname, PORT port);
-void		cltDisconnect(t_client *client);
+t_client	*cltInit(char const *hostname, PORT port);
+void		cltStop(t_client *client);
 
 #endif

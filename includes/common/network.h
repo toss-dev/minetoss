@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   common.h                                           :+:      :+:    :+:   */
+/*   network.h                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: rpereira <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -44,17 +44,14 @@ typedef struct protoent	PROTOENT;
 	typedef struct hostent		HOSTENT;
 # endif
 
+typedef char	t_session_id[16];
+
 typedef struct 	s_packet_header
 {
-	short	id;
-	short	size;
+	short			id;
+	short			size;
+	t_session_id	sessionID;
 }				t_packet_header;
-
-enum e_standart_packet_id
-{
-	PACKET_ID_CONNECTION,
-	PACKET_STANDART_MAX
-};
 
 typedef struct 	s_packet
 {
@@ -63,15 +60,13 @@ typedef struct 	s_packet
 }				t_packet;
 
 void	packetDelete(t_packet *packet);
-void 	packetCreate(t_packet *packet, BYTE *data, short size, short id);
+void 	packetCreate(t_packet *packet, BYTE *data, short size, short id, t_session_id sessionID);
 int		packetSend(SOCKET sock, SOCKADDR_IN *sin, t_packet *packet);
 int 	packetRead(SOCKET sock, SOCKADDR_IN *sin, t_packet *packet);
 int		packetReceive(SOCKET sock, SOCKADDR_IN *sin, unsigned int sec, unsigned int usec, t_packet *packet);
 
-/** the following packet id depends on the server usage */
-enum e_packet_id
-{
-	PACKET_CONNECTION_ID = 0
-};
+typedef void   (*t_packet_handler)(void *extra, BYTE data[PACKET_MAX_SIZE], unsigned int size, unsigned int id);
+
+
 
 #endif

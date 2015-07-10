@@ -1,10 +1,11 @@
 #include "common/common.h"
 
-void 	packetCreate(t_packet *packet, BYTE *data, short size, short id)
+void 	packetCreate(t_packet *packet, BYTE *data, short size, short id, t_session_id sessionID)
 {
 	size = MIN(size, PACKET_MAX_SIZE);
 	packet->header.id = id;
 	packet->header.size = size;
+	memcpy(packet->header.sessionID, sessionID, sizeof(t_session_id));
 	memcpy(packet->data, data, size);
 }
 

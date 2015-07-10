@@ -12,7 +12,7 @@
 
 #include "client/network/client.h"
 
-t_client *cltConnect(char const *hostname, PORT port)
+t_client *cltInit(char const *hostname, PORT port)
 {
 	# ifdef WIN32
 	   WSADATA wsa;
@@ -67,22 +67,10 @@ t_client *cltConnect(char const *hostname, PORT port)
    client->sin.sin_port = htons(client->port);
    client->sin.sin_family = AF_INET;
 
-
-   t_packet packet;
-
-   packetCreate(&packet, NULL, 0, PACKET_ID_CONNECTION);
-   packetSend(client->sock, &(client->sin), &packet);
-   if (packetReceive(client->sock, &(client->sin), 5, 0, &packet) < 0)
-   {
-      logger_log(LOG_ERROR, "Couldnt connect to server, stopping game.");
-      exit(EXIT_FAILURE);
-   }
-   printf("connected, server answered\n");
-   client->state = client->state | CLIENT_CONNECTED;
    return (client);
 }
 
-void	cltDisconnect(t_client *client)
+void	cltStop(t_client *client)
 {
 	# ifdef WIN32
 	   WSACleanup();
@@ -92,20 +80,3 @@ void	cltDisconnect(t_client *client)
 	client->hostname = NULL;
    client->state = client->state & ~(CLIENT_CONNECTED);
 }
-
-/*static void cltPacketHandler(t_client *client, t_packet *packet)
-{
-   (void)client;
-   printf("CLIENT: packet received: size: %d id: %d\n", packet->header.size, packet->header.id);
-}
-
-
-int 	main(void)
-{
-	t_client   *client;
-
-	client = cltConnect("localhost", 4242);
-	cltLoop(client, cltPacketHandler);
-	cltDisconnect(client);
-	return (0);
-}*/

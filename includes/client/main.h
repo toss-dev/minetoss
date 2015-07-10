@@ -115,19 +115,6 @@ typedef struct  s_sky
     t_vec3		rot;
 }				t_sky;
 
-typedef struct	s_entity
-{
-	t_vec3	rot;
-	t_vec3	scale;
-	t_vec3	pos;
-	t_vec3	rot_vec;
-	t_vec3	scale_vec;
-	t_vec3	pos_vec;
-	int		textureID;
-	float	health;
-	float 	speed;
-}				t_entity;
-
 enum e_renderer_config
 {
 	RENDERER_CONFIG_DEBUG = 1
@@ -167,24 +154,6 @@ typedef struct 	s_terrain	//16x256x16
 	int 		state;
 }				t_terrain;
 
-typedef struct 	s_weather
-{
-	t_vec3	sun_pos;
-	t_vec3	sun_color;
-	t_vec3	fog_color;
-	float 	fog_density;
-	float 	fog_gradient;
-}				t_weather;
-
-typedef struct 	s_world
-{
-	t_timer			*timer;
-	t_htab			terrains;
-	t_weather		weather;
-	t_array_list	terrain_garbage;	//array list of t_point3, remove chunks at these coordinates
-}				t_world;
-
-
 typedef struct 	s_world_renderer
 {
 	t_world 	*world;
@@ -219,17 +188,12 @@ typedef struct 	s_game
 
 extern t_game	*g_game;
 
-/** threads */
-typedef int		(*t_thread_callback)(t_game *);
-typedef void	*(*t_pthread_start)(void *);
 
-typedef struct 	s_thread_param
-{
-	t_game				*game;
-	unsigned			threadID;
-	unsigned			ups;
-	t_thread_callback	callback;
-}				t_thread_param;
+/** network*/
+void			startNetwork(t_game *game);
+void			initNetwork(t_game *game);
+void			stopNetwork(t_game *game);
+
 
 /** initiazers functions */
 void			initArgs(t_game *game, int argc, char **argv);
@@ -255,7 +219,6 @@ void			gameLoop(t_game *game);
 void			gameStop(t_game *game);
 void			gameExit(t_game *game);
 int				isGameRunning(t_game *game);
-void			startThread(t_game *game, unsigned threadID, unsigned ups, t_thread_callback callback);
 
 /** thread mains */
 int				updateWorldGenerator(t_game *game);
@@ -358,11 +321,6 @@ void			updateWeather(t_world *world, t_renderer *renderer, t_timer *timer);
 
 /** blocks */
 void			createBlockTextures(t_renderer *renderer);
-
-/** network*/
-void			startNetwork(t_game *game);
-void			initNetwork(t_game *game);
-void			stopNetwork(t_game *game);
 
 /** particles */
 void			loadParticleTextures(t_renderer *renderer);

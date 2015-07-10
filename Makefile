@@ -10,9 +10,8 @@
 #                                                                              #
 # **************************************************************************** #
 
-CLIENT = client
-
-SERVER = server
+CLIENT 	= client
+SERVER 	= server
 
 CLT_SRC	= main.c \
 		  blocks/block.c \
@@ -22,7 +21,6 @@ CLT_SRC	= main.c \
 		  core/game.c \
 		  core/game_loop.c \
 		  core/game_exit.c \
-		  core/thread.c \
 		  event/event.c \
 		  event/key.c \
 		  event/mouse.c \
@@ -70,11 +68,12 @@ CLT_OBJ		= $(CLT_SRCS:.c=.o)
 
 
 SRV_SRC = main.c \
+		  game.c \
+		  network/network.c \
 		  network/server.c
 
 SRV_SRCS	= $(addprefix ./src/server/, $(SRV_SRC))
 SRV_OBJ	= $(SRV_SRCS:.c=.o)
-
 
 COMMON_SRC 	= network/packet.c
 
@@ -99,7 +98,7 @@ LIB += $(LIBFT) $(LIBMATH)
 
 FLAGS	= -Wall -Wextra -Werror -g3
 
-all: $(CLIENT) $(SERVER)
+all: $(CLIENT) $(SERVER) $(DB)
 
 $(CLIENT): $(LIBFT) $(LIBMATH) $(COMMON_OBJ) $(CLT_OBJ)
 	$(CC) $(FLAGS) -o $(CLIENT) $(CLT_OBJ) $(COMMON_OBJ) $(LIB)

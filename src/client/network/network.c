@@ -45,7 +45,7 @@ void	startNetwork(t_game *game)
 
 void	initNetwork(t_game *game)
 {
-	game->client = cltConnect("localhost", 4242);
+	game->client = cltInit("localhost", 4242);
 	if (game->client == NULL)
 	{
 		logger_log(LOG_ERROR, "Couldnt connect to host.");
@@ -55,6 +55,6 @@ void	initNetwork(t_game *game)
 
 void	stopNetwork(t_game *game)
 {
-	cltDisconnect(game->client);
+	cltStop(game->client);
 	game->client = NULL;
 }

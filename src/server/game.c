@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.c                                             :+:      :+:    :+:   */
+/*   game.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: rpereira <rpereira@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -12,42 +12,45 @@
 
 #include "server/main.h"
 
-/**
-
-	TO IMPLEMENT:
-
-	The client has to send a certain packet asking for it token
-
-	the server generate, save, and send the token to the client
-
-	the token is 16 octets long
-
-	everytime the client send a message to the server, the token is send with it
-
-	the server get the client from it token, and handle the packet
-
-	if the token is invalid, the server say to the client that he is not connected
-
-	if the server receive an invalid / unexisting token, it ignore it
-
-**/
-
-
-
-int		main(void)
+int 	isGameRunning(t_game *game)
 {
-	t_game	*game;
+	return (game->state & GAME_STATE_RUNNING);
+}
 
-	game = (t_game*)malloc(sizeof(t_game));
-	if (game == NULL)
+void	gameInit(t_game *game)
+{
+	logger_log(LOG_FINE, "Initializing network");
+	gameNetworkInit(game);
+}
+
+/** main server loop for updates */
+void	gameLoop(t_game *game)
+{
+	logger_log(LOG_FINE, "Starting loop");
+	while (isGameRunning(game))
 	{
-		logger_log(LOG_ERROR, "Not enough memory!");
-		exit(EXIT_FAILURE);
+		sleep(1);
 	}
-	gameInit(game);
-	gameStart(game);
-	gameLoop(game);
-	gameStop(game);
+}
 
-	return (0);
+void	gameStart(t_game *game)
+{
+	logger_log(LOG_FINE, "Starting network");
+	gameNetworkStart(game);
+	game->state = game->state | GAME_STATE_RUNNING;
+}
+
+void	gameStop(t_game *game)
+{
+	game->state = game->state & ~(GAME_STATE_RUNNING);
+
+	unsigned	i;
+	for (i = 0 ; i < THRD_MAX ; ++i)	//wait for each thread to exit
+	{
+		pthread_join(game->threads[i], NULL);
+	}
+
+	gameNetworkStop(game);
+	free(game);
+	exit(EXIT_SUCCESS);
 }

@@ -15,14 +15,13 @@ enum 	e_server_state
 
 typedef struct 	s_client
 {
-	SOCKET		sock;
 	SOCKADDR_IN	sin;
+	size_t		sessionID;
 }				t_client;
 
 typedef struct 	s_server
 {
-	t_client		*clients;
-	unsigned int	max_client;
+	t_htab			clients;
 	unsigned int 	client_count;
 	PORT 			port;
 	SOCKET 			sock;
@@ -30,9 +29,8 @@ typedef struct 	s_server
 	unsigned		state;
 }				t_server;
 
-t_server	*srvStart(PORT port, unsigned int max_client);
+t_server	*srvStart(PORT port);
 void		srvStop(t_server *server);
 t_client	*srvGetClient(t_server *server, SOCKADDR_IN *csin);
-void		srvLoop(t_server *server, t_function packet_handler);
 
 #endif
