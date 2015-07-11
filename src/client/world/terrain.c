@@ -79,7 +79,7 @@ void 	unloadTerrain(t_world *world, t_terrain *terrain)
 	removeTerrain(world, terrain->index);
 }
 
-static void	updateTerrain(t_terrain *terrain, t_world *world)
+static void	updateTerrain(t_world *world, t_terrain *terrain)
 {
 	unsigned	meshID;
 	t_point3	pos;
@@ -162,8 +162,16 @@ static void	removeTerrainAt(t_point3 *index, t_world *world)
 /** update and generate terrain at the given pos in the given world */
 void	updateTerrains(t_world *world)
 {
+	t_terrain 	*terrain;
+
 	updateTerrainLoad(world);
-	htab_iter(world->terrains, (t_iter_function)updateTerrain, world);
+
+	HTAB_ITER_START(world->terrains, terrain);
+	{
+		updateTerrain(world, terrain);
+	}
+	HTAB_ITER_END(world->terrains, terrain);
+
 	array_list_iter(world->terrain_garbage, (t_iter_array_function)removeTerrainAt, world);
 	array_list_clear(&(world->terrain_garbage));
 }

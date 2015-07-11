@@ -22,11 +22,11 @@ static void	networkPacketHandler(t_game *game, t_packet *packet)
 //thread network main function
 static void	networkStartLoop(t_game *game)
 {
-	t_packet    packet;
-
+	t_packet 	packet;
+	
 	while (isGameRunning(game))
 	{
-		if (packetReceive(game->client->sock, &(game->client->sin), 1, 0, &packet) > 0)
+		if (packetReceive(&packet, game->client->sock, &(game->client->sockaddr), 1, 0) > 0)
 		{
 			networkPacketHandler(game, &packet);
 		}
@@ -34,8 +34,17 @@ static void	networkStartLoop(t_game *game)
 	pthread_exit(EXIT_SUCCESS);
 }
 
+static void	 getSessionIDFromServer(t_client *client)
+{
+	t_client_packet	cp;
+
+	cltPacketCreate(client, &cp, PACKET_ID_CONNECTION, 0, 0);
+	cltPacketSend(client, &cp);
+}
+
 void	startNetwork(t_game *game)
 {
+	getSessionIDFromServer(game->client);
 	if (pthread_create(game->threads + THRD_NETWORK, NULL, (t_pthread_start)networkStartLoop, game) != 0)
 	{
 		logger_log(LOG_ERROR, "Couldnt start network thread");

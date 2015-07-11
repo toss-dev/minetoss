@@ -1,11 +1,10 @@
 #include "common/common.h"
 
-void 	packetCreate(t_packet *packet, BYTE *data, short size, short id, t_session_id sessionID)
+void 	packetCreate(t_packet *packet, BYTE *data, short size, short id)
 {
 	size = MIN(size, PACKET_MAX_SIZE);
 	packet->header.id = id;
 	packet->header.size = size;
-	memcpy(packet->header.sessionID, sessionID, sizeof(t_session_id));
 	memcpy(packet->data, data, size);
 }
 
@@ -15,7 +14,7 @@ void	packetDelete(t_packet *packet)
 }
 
 /** return the number of read octets, -1 on read error, -2 on tiemout */
-int		packetReceive(SOCKET sock, SOCKADDR_IN *sin, unsigned int sec, unsigned int usec, t_packet *packet)
+int		packetReceive(t_packet *packet, SOCKET sock, SOCKADDR_IN *sockaddr, unsigned int sec, unsigned int usec)
 {
 	struct timeval	tv;
 	fd_set 			rdfs;
@@ -33,7 +32,7 @@ int		packetReceive(SOCKET sock, SOCKADDR_IN *sin, unsigned int sec, unsigned int
 
 	if (FD_ISSET(sock, &rdfs))
 	{
-		return (packetRead(sock, sin, packet));
+		return (packetRead(packet, sock, sockaddr));
 	}
 	return (-2);
 }
@@ -41,11 +40,11 @@ int		packetReceive(SOCKET sock, SOCKADDR_IN *sin, unsigned int sec, unsigned int
 /**
 **	return the number of octet writen, or -1 on error
 */
-int		packetSend(SOCKET sock, SOCKADDR_IN *sin, t_packet *packet)
+int		packetSend(t_packet *packet, SOCKET sock, SOCKADDR_IN *sockaddr)
 {
 	int n;
 
-	if ((n = sendto(sock, packet, sizeof(t_packet_header) + packet->header.size, 0, (SOCKADDR*)sin, sizeof(SOCKADDR_IN))) < 0)
+	if ((n = sendto(sock, packet, sizeof(t_packet_header) + packet->header.size, 0, (SOCKADDR*)sockaddr, sizeof(SOCKADDR_IN))) < 0)
 	{
 		perror("send()");
 		return (-1);
@@ -57,13 +56,13 @@ int		packetSend(SOCKET sock, SOCKADDR_IN *sin, t_packet *packet)
 /**
 **	return -1 on error, or the size of the packet (in octets)
 */
-int 	packetRead(SOCKET sock, SOCKADDR_IN *sin, t_packet *packet)
+int 	packetRead(t_packet *packet, SOCKET sock, SOCKADDR_IN *sockaddr)
 {
    int         n;
-   socklen_t   sinsize = sizeof(SOCKADDR_IN);
+   socklen_t   sockaddrsize = sizeof(SOCKADDR_IN);
 
    puts("i read");
-   if ((n = recvfrom(sock, packet, sizeof(packet), 0, (SOCKADDR*)sin, &sinsize)) < 0)
+   if ((n = recvfrom(sock, packet, sizeof(packet), 0, (SOCKADDR*)sockaddr, &sockaddrsize)) < 0)
    {
       perror("recvfrom()");
       return (-1);

@@ -12,42 +12,54 @@
 
 #include "server/main.h"
 
-void		gameNetworkStart(t_game *game)
+void		gameNetworkInit(t_game *game)
 {
 	game->server = srvStart(4242);
 }
 
-static void	gameNetworkPacketHandler(t_game *game, t_packet *packet, SOCKADDR_IN *sin)
+static void	gamePacketHandlerConnection(t_game *game, t_client_packet *packet, SOCKADDR_IN *sockaddr)
 {
-	if (packet->header.id < 0 || packet->header.id >= PACKET_ID_MAX)
+	(void)game;
+	(void)packet;
+	(void)sockaddr;
+}
+
+static void	gameNetworkPacketHandler(t_game *game, t_client_packet *cp, SOCKADDR_IN *sockaddr)
+{
+	t_function	packet_handler[PACKET_ID_MAX] = {
+		gamePacketHandlerConnection
+	};
+
+	if (cp->packet.header.id >= PACKET_ID_MAX)
 	{
 		logger_log(LOG_WARNING, "Received an unknown packet id!");
 		return ;
 	}
-	logger_log(LOG_FINE, "Server received packet: id: %d size: %d\n", packet->header.id, packet->header.size);
+	packet_handler[cp->packet.header.id](game, cp, sockaddr);
+	logger_log(LOG_FINE, "Server received packet: id: %d size: %d\n", cp->packet.header.id, cp->packet.header.size);
 
 	(void)game;
-	(void)sin;
+	(void)sockaddr;
 }
 
 //thread network main function
 static void	gameNetworkStartLoop(t_game *game)
 {
-	t_packet    packet;
-	SOCKADDR_IN	sin;
+	t_client_packet	packet;
+	SOCKADDR_IN		sockaddr;
 
 	while (isGameRunning(game))
 	{
-		if (packetReceive(game->server->sock, &sin, 1, 0, &packet) > 0)
+		if (srvPacketReceive(game->server, &packet, &sockaddr, 1, 0) > 0)
 		{
-			gameNetworkPacketHandler(game, &packet, &sin);
+			gameNetworkPacketHandler(game, &packet, &sockaddr);
 		}
 	}
 	pthread_exit(EXIT_SUCCESS);
 }
 
 /** one thread is created here and will loop reading packets, the other one exit the function */
-void		gameNetworkInit(t_game *game)
+void		gameNetworkStart(t_game *game)
 {
 	if (pthread_create(game->threads + THRD_NETWORK, NULL, (t_pthread_start)gameNetworkStartLoop, game) != 0)
 	{

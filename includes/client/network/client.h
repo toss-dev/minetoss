@@ -18,9 +18,9 @@
 
 typedef struct 	s_client
 {
-	unsigned int	id;
+	BYTE 			sessionID[SESSION_ID_SIZE];
 	SOCKET			sock;
-	SOCKADDR_IN		sin;
+	SOCKADDR_IN		sockaddr;
 	char			*hostname;
 	PORT			port;
 	unsigned		state;
@@ -33,5 +33,8 @@ enum e_client_state
 
 t_client	*cltInit(char const *hostname, PORT port);
 void		cltStop(t_client *client);
+
+void 		cltPacketCreate(t_client *client, t_client_packet *cp, BYTE *data, short size, short id);
+int 		cltPacketSend(t_client *client, t_client_packet *cp);
 
 #endif

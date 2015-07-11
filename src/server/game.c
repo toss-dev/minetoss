@@ -35,9 +35,9 @@ void	gameLoop(t_game *game)
 
 void	gameStart(t_game *game)
 {
+	game->state = game->state | GAME_STATE_RUNNING;
 	logger_log(LOG_FINE, "Starting network");
 	gameNetworkStart(game);
-	game->state = game->state | GAME_STATE_RUNNING;
 }
 
 void	gameStop(t_game *game)

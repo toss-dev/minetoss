@@ -14,8 +14,6 @@
 
 /**
 
-	TO IMPLEMENT:
-
 	The client has to send a certain packet asking for it token
 
 	the server generate, save, and send the token to the client
@@ -31,8 +29,6 @@
 	if the server receive an invalid / unexisting token, it ignore it
 
 **/
-
-
 
 int		main(void)
 {

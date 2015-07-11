@@ -49,8 +49,6 @@ typedef int 		(*t_cmp_func) (void const *a, void const *b);
 /*                              LINKED LIST                               */
 /**************************************************************************/
 
-typedef int 		(*t_iter_function) (void *data, void *extra);
-
 typedef struct		s_node
 {
 	void			*content;
@@ -67,12 +65,21 @@ typedef struct		s_list
 void				*list_push(t_list *lst, void const *content, size_t content_size);
 void				*list_add(t_list *lst, void const *content, size_t content_size);
 void 				*list_get(t_list *lst, t_cmp_func cmpf, void *cmpd);
-void 				list_iter_remove_if(t_list *lst, t_iter_function iterf, void *extra, t_function free_funct);
-void 				list_iter(t_list *lst, t_iter_function iterf, void *extra);
 t_list				list_new(void);
 int 				list_remove(t_list *lst, t_function free_funct, t_cmp_func cmpf, void *cmpd);
 void				list_remove_node(t_list *lst, t_node *node, t_function free_funct);
 void				list_delete(t_list *lst, void (*delete_node)(void *content));
+
+//X should be the hashtable structure, and Y the element variable
+
+#define LIST_ITER_START(X, Y)	t_node *n;\
+								\
+								n = X.head->next;\
+								while (n != X.head)\
+								{\
+									Y = n->content;		
+#define LIST_ITER_END(X, Y)			n = n->next; \
+								}
 
 /******************************* LINKED LIST END *******************************/
 
@@ -99,9 +106,30 @@ void				*htab_insert(t_htab tab, char *key, void *d, size_t s);
 t_htab				htab_new(size_t size);
 void				*htab_get(t_htab tab, char *key);
 void				htab_delete(t_htab *tab, void (*ft_free)());
-void				htab_iter(t_htab tab, t_iter_function f, void *extra);
 int					htab_remove_key(t_htab tab, char *key, t_function free_funct);
 void				htab_dump_memory(t_htab tab);
+
+//X should be the hashtable structure, and Y the element variable
+
+# define HTAB_ITER_START(X, Y)	t_htab_elem	*e;\
+								t_list		*a;\
+								t_node		*n;\
+								size_t		i;\
+								\
+								i = 0;\
+								while (i < X.size)\
+								{\
+									a = X.elems + i;\
+									n = a->head->next;\
+									while (n != a->head)\
+									{\
+										e = n->content;\
+										Y = e->content;
+# define HTAB_ITER_END(X, Y)			n = n->next;\
+									}\
+									++i;\
+								}
+
 
 /******************************* HASH MAP END ************************************/
 

@@ -21,13 +21,6 @@
 # include "libft.h"
 # include <pthread.h>
 
-enum 			e_packet_id
-{
-	PACKET_ID_CONNECTION,
-	PACKET_ID_MAX
-};
-
-
 /** threads */
 typedef void	*(*t_pthread_start)(void *);
 

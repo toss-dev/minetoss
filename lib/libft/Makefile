@@ -18,7 +18,7 @@ SRCS	= ft_memdup.c ft_strtrim.c ft_epur.c \
 		  btree_create_node.c btree_insert_data.c \
 		  btree_apply_infix.c btree_apply_prefix.c btree_apply_suffix.c \
 		  btree_search_item.c btree_level_count.c \
-		  htab.c htab_iter.c \
+		  htab.c \
 		  ft_nbrlen.c \
 		  ft_match.c rand_utils.c \
 		  lodepng.c logger.c bordel.c

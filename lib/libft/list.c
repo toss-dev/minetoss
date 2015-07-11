@@ -61,35 +61,6 @@ int 	list_remove(t_list *lst, t_function free_funct, t_cmp_func cmpf, void *cmpd
 	return (0);
 }
 
-void 	list_iter(t_list *lst, t_iter_function iterf, void *extra)
-{
-	t_node	*node;
-
-	node = lst->head->next;
-	while (node != lst->head)
-	{
-		iterf(node->content, extra);
-		node = node->next;
-	}
-}
-
-void 	list_iter_remove_if(t_list *lst, t_iter_function iterf, void *extra, t_function free_funct)
-{
-	t_node	*node;
-	t_node	*next;
-
-	node = lst->head->next;
-	while (node != lst->head)
-	{
-		next = node->next;
-		if (iterf(node->content, extra))
-		{
-			list_remove_node(lst, node, free_funct);
-		}
-		node = next;
-	}
-}
-
 void 	*list_add(t_list *lst, void const *content, size_t content_size)
 {
 	t_node	*node;

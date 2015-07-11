@@ -15,7 +15,15 @@
 
 # include "libft.h"
 
-# define PROTOCOL_EXPERIMENTAL 253 //RFC protocol id for experimental protocols
+# define SESSION_ID_SIZE 16
+
+
+enum e_packet_id
+{
+	PACKET_ID_CONNECTION,
+	PACKET_ID_MAX
+};
+
 
 typedef unsigned char	BYTE;
 typedef unsigned int 	PORT;
@@ -37,20 +45,17 @@ typedef struct protoent	PROTOENT;
 #	define SOCKET_ERROR -1
 #	define closesocket(s) close(s)
 
-	typedef int SOCKET;
+	typedef int 				SOCKET;
 	typedef struct sockaddr_in 	SOCKADDR_IN;
 	typedef struct sockaddr 	SOCKADDR;
 	typedef struct in_addr		IN_ADDR;
 	typedef struct hostent		HOSTENT;
 # endif
 
-typedef char	t_session_id[16];
-
 typedef struct 	s_packet_header
 {
-	short			id;
-	short			size;
-	t_session_id	sessionID;
+	unsigned short	id;
+	unsigned short	size;
 }				t_packet_header;
 
 typedef struct 	s_packet
@@ -59,14 +64,16 @@ typedef struct 	s_packet
 	BYTE			data[PACKET_MAX_SIZE];
 }				t_packet;
 
+typedef struct 	s_client_packet
+{
+	t_packet 	packet;
+	BYTE		sessionID[SESSION_ID_SIZE];
+}				t_client_packet;
+
 void	packetDelete(t_packet *packet);
-void 	packetCreate(t_packet *packet, BYTE *data, short size, short id, t_session_id sessionID);
-int		packetSend(SOCKET sock, SOCKADDR_IN *sin, t_packet *packet);
-int 	packetRead(SOCKET sock, SOCKADDR_IN *sin, t_packet *packet);
-int		packetReceive(SOCKET sock, SOCKADDR_IN *sin, unsigned int sec, unsigned int usec, t_packet *packet);
-
-typedef void   (*t_packet_handler)(void *extra, BYTE data[PACKET_MAX_SIZE], unsigned int size, unsigned int id);
-
-
+void 	packetCreate(t_packet *packet, BYTE *data, short size, short id);
+int		packetSend(t_packet *packet, SOCKET sock, SOCKADDR_IN *sockaddr);
+int 	packetRead(t_packet *packet, SOCKET sock, SOCKADDR_IN *sockaddr);
+int		packetReceive(t_packet *packet, SOCKET sock, SOCKADDR_IN *sin, unsigned int sec, unsigned int usec);
 
 #endif
