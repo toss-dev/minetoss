@@ -25,3 +25,7 @@ Extern library used:
 
 NOT IMPLEMENTED YET:
 * Detect hidden chunks of block: occlusion culling
+* 
+
+![alt tag](http://img11.hostingpics.net/pics/526266test.png)
+
