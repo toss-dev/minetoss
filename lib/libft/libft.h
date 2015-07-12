@@ -49,17 +49,16 @@ typedef int 		(*t_cmp_func) (void const *a, void const *b);
 /*                              LINKED LIST                               */
 /**************************************************************************/
 
-typedef struct		s_node
+typedef struct		s_list_node
 {
-	void			*content;
-	struct s_node	*next;
-	struct s_node	*previous;
-}					t_node;
+	struct s_list_node	*next;
+	struct s_list_node	*previous;
+}					t_list_node;
 
 typedef struct		s_list
 {
-	t_node	*head;
-	size_t	size;
+	t_list_node	*head;
+	size_t		size;
 }					t_list;
 
 void				*list_push(t_list *lst, void const *content, size_t content_size);
@@ -67,18 +66,18 @@ void				*list_add(t_list *lst, void const *content, size_t content_size);
 void 				*list_get(t_list *lst, t_cmp_func cmpf, void *cmpd);
 t_list				list_new(void);
 int 				list_remove(t_list *lst, t_function free_funct, t_cmp_func cmpf, void *cmpd);
-void				list_remove_node(t_list *lst, t_node *node, t_function free_funct);
+void				list_remove_node(t_list *lst, t_list_node *node, t_function free_funct);
 void				list_delete(t_list *lst, void (*delete_node)(void *content));
 
 //X should be the hashtable structure, and Y the element variable
 
 #define LIST_ITER_START(L, T, X)	T 		*X;\
-									t_node *node;\
+									t_list_node *node;\
 									\
 									node = L.head->next;\
 									while (node != L.head)\
 									{\
-										X = (T*)node->content;		
+										X = (T*)(node + 1);		
 #define LIST_ITER_END(L, T, X)			node = node->next; \
 									}
 
@@ -99,12 +98,12 @@ typedef struct		s_htab_elem
 typedef struct		s_htab
 {
 	t_list	*elems;
-	size_t	size;
+	size_t	capacity;
 }					t_htab;
 
-size_t				htab_hash(char *str, size_t size);
+size_t				htab_hash(char *str, size_t capacity);
 void				*htab_insert(t_htab tab, char *key, void *d, size_t s);
-t_htab				htab_new(size_t size);
+t_htab				htab_new(size_t capacity);
 void				*htab_get(t_htab tab, char *key);
 void				htab_delete(t_htab *tab, void (*ft_free)());
 int					htab_remove_key(t_htab tab, char *key, t_function free_funct);
@@ -117,7 +116,7 @@ void				htab_dump_memory(t_htab tab);
 										size_t	i;\
 										\
 										i = 0;\
-										while (i < H.size)\
+										while (i < H.capacity)\
 										{\
 											LIST_ITER_START(H.elems[i], t_htab_elem, elem)\
 											{\
@@ -136,8 +135,6 @@ void				htab_dump_memory(t_htab tab);
 /**************************************************************************/
 /*                              ARRAY LIST                                */
 /**************************************************************************/
-
-typedef int 		(*t_iter_array_function) (void *data, void *extra, unsigned idx);
 
 enum e_array_list_buffer_type
 {
@@ -182,6 +179,43 @@ void				*array_list_to_buffer(t_array_list array, unsigned type);
 											}
 
 
+
+/******************************  ARRAY LIST END *********************************/
+
+
+/**************************************************************************/
+/*                              STACK                                     */
+/**************************************************************************/
+
+typedef struct 		s_stack_node
+{
+	struct s_stack_node	*next;
+}					t_stack_node;
+
+typedef struct		s_stack
+{
+	t_stack_node	*head;
+	unsigned int 	size;
+}					t_stack;
+
+t_stack 		stack_new(void);
+void 			*stack_get_list_node_content(t_stack_node *node);
+void			*stack_push(t_stack *stack, void *content, size_t size);
+void 			stack_pop(t_stack *stack);
+size_t			stack_size(t_stack *stack);
+void 			stack_delete(t_stack *stack);
+
+# define STACK_ITER_START(S, T, X)	{\
+										t_stack_node	*node;\
+										T 				*X;\
+										\
+										node = S.head;\
+										while (node)\
+										{\
+											X = (T*)(node + 1);
+# define STACK_ITER_END(S, T, X)			node = node->next;\
+										}\
+									}
 
 /******************************  ARRAY LIST END *********************************/
 

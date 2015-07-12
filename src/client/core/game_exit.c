@@ -27,7 +27,6 @@ static void deleteTerrain(t_terrain *terrain)
 	{
 		modelDelete(terrain->meshes + i);
 	}
-	free(terrain);
 }
 
 static void	cleanWorld(t_world *world)

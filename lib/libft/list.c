@@ -16,15 +16,14 @@ t_list	list_new(void)
 {
 	t_list	list;
 
-	list.head = (t_node*)malloc(sizeof(t_node));
-	list.head->content = NULL;
+	list.head = (t_list_node*)malloc(sizeof(t_list_node));
 	list.head->next = list.head;
 	list.head->previous = list.head;
 	list.size = 0;
 	return (list);
 }
 
-void	list_remove_node(t_list *lst, t_node *node, t_function free_funct)
+void	list_remove_node(t_list *lst, t_list_node *node, t_function free_funct)
 {
 	if (node->previous)
 	{
@@ -38,7 +37,7 @@ void	list_remove_node(t_list *lst, t_node *node, t_function free_funct)
 	node->next = NULL;
 	node->previous = NULL;
 
-	free_funct(node->content);
+	free_funct(node + 1);
 	free(node);
 	lst->size--;
 }
@@ -46,12 +45,12 @@ void	list_remove_node(t_list *lst, t_node *node, t_function free_funct)
 /** remove if the comparison return elements are equals (works like strcmp) */
 int 	list_remove(t_list *lst, t_function free_funct, t_cmp_func cmpf, void *cmpd)
 {
-	t_node	*node;
+	t_list_node	*node;
 
 	node = lst->head->next;
 	while (node != lst->head)
 	{
-		if (cmpf(node->content, cmpd) == 0)
+		if (cmpf(node + 1, cmpd) == 0)
 		{
 			list_remove_node(lst, node, free_funct);
 			return (1);
@@ -61,14 +60,19 @@ int 	list_remove(t_list *lst, t_function free_funct, t_cmp_func cmpf, void *cmpd
 	return (0);
 }
 
+/** the content of size content_size is stored just after the node, so only 1 malloc is used */
 void 	*list_add(t_list *lst, void const *content, size_t content_size)
 {
-	t_node	*node;
-	t_node	*tmp;
+	t_list_node	*node;
+	t_list_node	*tmp;
 
-	node = (t_node*)malloc(sizeof(t_node));
-	node->content = ft_memdup(content, content_size);
-	
+	node = (t_list_node*)malloc(sizeof(t_list_node) + content_size);
+	if (node == NULL)
+	{
+		return (NULL);
+	}
+	memcpy(node + 1, content, content_size);
+
 	tmp = lst->head->next;
 
 	lst->head->next = node;
@@ -79,32 +83,20 @@ void 	*list_add(t_list *lst, void const *content, size_t content_size)
 
 	lst->size++;
 
-	return (node->content);
-}
-
-void 	*list_get(t_list *lst, t_cmp_func cmpf, void *cmpd)
-{
-	t_node	*node;
-
-	node = lst->head->next;
-	while (node != lst->head)
-	{
-		if (cmpf(node->content, cmpd) == 0)
-		{
-			return (node->content);
-		}
-		node = node->next;
-	}
-	return (NULL);
+	return (node + 1);
 }
 
 void 	*list_push(t_list *lst, void const *content, size_t content_size)
 {
-	t_node	*node;
-	t_node	*tmp;
+	t_list_node	*node;
+	t_list_node	*tmp;
 
-	node = (t_node*)malloc(sizeof(t_node));
-	node->content = ft_memdup(content, content_size);
+	node = (t_list_node*)malloc(sizeof(t_list_node) + content_size);
+	if (node == NULL)
+	{
+		return (NULL);
+	}
+	memcpy(node + 1, content, content_size);
 	
 	tmp = lst->head->previous;
 
@@ -116,19 +108,35 @@ void 	*list_push(t_list *lst, void const *content, size_t content_size)
 
 	lst->size++;
 
-	return (node->content);
+	return (node + 1);
+}
+
+void 	*list_get(t_list *lst, t_cmp_func cmpf, void *cmpd)
+{
+	t_list_node	*node;
+
+	node = lst->head->next;
+	while (node != lst->head)
+	{
+		if (cmpf(node + 1, cmpd) == 0)
+		{
+			return (node + 1);
+		}
+		node = node->next;
+	}
+	return (NULL);
 }
 
 void	list_delete(t_list *lst, void (*delete_content)(void *content))
 {
-	t_node	*node;
-	t_node	*next;
+	t_list_node	*node;
+	t_list_node	*next;
 
 	node = lst->head->next;
 	while (node != lst->head)
 	{
 		next = node->next;
-		delete_content(node->content);
+		delete_content(node + 1);
 		free(node);
 		node = next;
 	}
