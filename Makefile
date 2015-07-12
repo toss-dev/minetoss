@@ -28,6 +28,7 @@ CLT_SRC	= main.c \
 		  event/window.c \
 		  network/client.c \
 		  network/network.c \
+		  network/packet/connection.c \
 		  render/camera.c \
 		  render/render.c \
 		  render/renderer/render_terrain.c \
@@ -70,7 +71,8 @@ CLT_OBJ		= $(CLT_SRCS:.c=.o)
 SRV_SRC = main.c \
 		  game.c \
 		  network/network.c \
-		  network/server.c
+		  network/server.c \
+		  network/packet/connection.c
 
 SRV_SRCS	= $(addprefix ./src/server/, $(SRV_SRC))
 SRV_OBJ	= $(SRV_SRCS:.c=.o)

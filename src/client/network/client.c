@@ -67,6 +67,8 @@ t_client *cltInit(char const *hostname, PORT port)
    client->sockaddr.sin_port = htons(client->port);
    client->sockaddr.sin_family = AF_INET;
 
+   client->clientID = -1;
+
    return (client);
 }
 
@@ -84,18 +86,19 @@ void	cltStop(t_client *client)
 void  cltPacketCreate(t_client *client, t_client_packet *cp, BYTE *data, short size, short id)
 {
    packetCreate(&(cp->packet), data, size, id);
-   memcpy(cp->sessionID, client->sessionID, sizeof(cp->sessionID));
+   cp->clientID = client->clientID;
 }
 
 int  cltPacketSend(t_client *client, t_client_packet *cp)
 {
    int n;
 
-   if ((n = sendto(client->sock, cp, sizeof(t_packet_header) + cp->packet.header.size + sizeof(cp->sessionID), 0, (SOCKADDR*)&(client->sockaddr), sizeof(SOCKADDR_IN))) < 0)
+   //sizeof(header) + sizeof(packet data) + sizeof(client ID)
+   if ((n = sendto(client->sock, cp, sizeof(t_packet_header) + cp->packet.header.size + sizeof(int), 0, (SOCKADDR*)&(client->sockaddr), sizeof(SOCKADDR_IN))) < 0)
    {
       perror("send()");
       return (-1);
    }
-   logger_log(LOG_FINE, "Client sent: id: %u size: %u (sendto return: %d)\n", cp->packet.header.id, cp->packet.header.size, n);
+   logger_log(LOG_FINE, "Client sent: size: %d ; id: %d", cp->packet.header.size, cp->packet.header.id);
    return (n);
 }

@@ -21,6 +21,8 @@
 # include "libft.h"
 # include <pthread.h>
 
+# define WRONG_CLIENT_ID -1
+
 /** threads */
 typedef void	*(*t_pthread_start)(void *);
 

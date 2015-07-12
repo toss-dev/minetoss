@@ -53,4 +53,7 @@ void	gameStop(t_game *game);
 
 int 	isGameRunning(t_game *game);
 
+/** packets*/
+void	packetHandlerConnection(t_game *game, SOCKADDR_IN *sockaddr);
+
 #endif

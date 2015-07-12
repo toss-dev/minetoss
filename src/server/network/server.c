@@ -12,34 +12,6 @@
 
 #include "server/network/server.h"
 
-
-/* sessionID generator starts here */
-
-unsigned int   session_token;
-
-static unsigned int srvHashInt(unsigned int x)
-{
-   x = ((x >> 16) ^ x) * 0x45d9f3b;
-   x = ((x >> 16) ^ x) * 0x45d9f3b;
-   x = ((x >> 16) ^ x);
-   return (x);
-}
-
-void  srvNewSessionID(BYTE sessionID[SESSION_ID_SIZE])
-{
-   memcpy(sessionID + 0, &session_token, 4);
-   session_token = srvHashInt(session_token);
-   memcpy(sessionID + 4, &session_token, 4);
-   session_token = srvHashInt(session_token);
-   memcpy(sessionID + 8, &session_token, 4);
-   session_token = srvHashInt(session_token);
-   memcpy(sessionID + 12, &session_token, 4);
-   session_token = srvHashInt(session_token);
-   sessionID[SESSION_ID_SIZE - 1] = 0;
-}
-
-/** sessionID generator ends here */
-
 t_server *srvStart(PORT port)
 {
    # ifdef WIN32
@@ -62,8 +34,6 @@ t_server *srvStart(PORT port)
    }
    memset(server, 0, sizeof(t_server));
 
-   server->clients = htab_new(8192);
-   server->client_count = 0;
    server->port = port;
 
    server->sock = socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP);
@@ -84,13 +54,8 @@ t_server *srvStart(PORT port)
    }
 
    server->state = server->state | SERVER_INITIALIZED;
-   session_token = srvHashInt(time(NULL));
-   return (server);
-}
 
-static void srvClientDelete(t_client *client)
-{
-   (void)client;
+   return (server);
 }
 
 void  srvStop(t_server *server)
@@ -98,44 +63,45 @@ void  srvStop(t_server *server)
 	# ifdef WIN32
 		WSACleanup();
 	# endif
-   closesocket(server->sock);
-   htab_delete(&(server->clients), srvClientDelete);
+   close(server->sock);
    free(server);
 }
 
-void  srvAddClient(t_server *server, SOCKADDR_IN *sockaddr)
+int   srvAddClient(t_server *server, SOCKADDR_IN *sockaddr)
 {
-   t_packet packet;
-   t_client client;
-
-   if (server->client_count >= 1024)
+   if (server->client_count >= SRV_MAX_CLIENT)
    {
-      //server is full, say the client the server is full
+      return (0);
    }
-   else
-   {
-      srvNewSessionID(client.sessionID);
-      memcpy(&(client.sockaddr), sockaddr, sizeof(SOCKADDR_IN));
-      htab_insert(server->clients, (char*)client.sessionID, &client, sizeof(t_client)); 
-      server->client_count++;
-      packetCreate(&packet, client.sessionID, sizeof(client.sessionID), PACKET_ID_CONNECTION);
-   }
+   memcpy(&(server->clients[server->client_count].sockaddr), sockaddr, sizeof(SOCKADDR_IN));
+   server->client_count = server->client_count + 1;
+   return (1);
 }
 
 /**
-** read one packet, store it into "packet", store client socket address in "sockaddr", and it sessionID into "sessionID"
+** read one packet, store it into "packet", store client socket address in "sockaddr"
 */
-int   srvPacketRead(t_server *server, t_client_packet *packet, SOCKADDR_IN *sockaddr)
+int   srvPacketRead(t_server *server, t_client_packet *cp, SOCKADDR_IN *sockaddr)
 {
    int         n;
    socklen_t   sockaddrsize = sizeof(SOCKADDR_IN);
 
-   if ((n = recvfrom(server->sock, packet, sizeof(t_client_packet), 0, (SOCKADDR*)sockaddr, &sockaddrsize)) < 0)
+   if ((n = recvfrom(server->sock, cp, sizeof(t_client_packet), 0, (SOCKADDR*)sockaddr, &sockaddrsize)) < 0)
    {
       perror("recvfrom()");
       return (-1);
    }
+   logger_log(LOG_FINE, "Server received: size: %d ; id: %d", cp->packet.header.size, cp->packet.header.id);
    return (n);
+}
+
+t_client *srvGetClient(t_server *server, int clientID)
+{
+   if (clientID < 0 || clientID >= SRV_MAX_CLIENT)
+   {
+      return (NULL);
+   }
+   return (server->clients + clientID);
 }
 
 /** return the number of read octets, -1 on read error, -2 on timeout */

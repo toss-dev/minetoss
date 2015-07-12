@@ -49,7 +49,7 @@ int		packetSend(t_packet *packet, SOCKET sock, SOCKADDR_IN *sockaddr)
 		perror("send()");
 		return (-1);
 	}
-	printf("%d\n", n);
+	logger_log(LOG_FINE, "Sent: size: %d ; id: %d", packet->header.size, packet->header.id);
 	return (n);
 }
 
@@ -61,12 +61,11 @@ int 	packetRead(t_packet *packet, SOCKET sock, SOCKADDR_IN *sockaddr)
    int         n;
    socklen_t   sockaddrsize = sizeof(SOCKADDR_IN);
 
-   puts("i read");
    if ((n = recvfrom(sock, packet, sizeof(packet), 0, (SOCKADDR*)sockaddr, &sockaddrsize)) < 0)
    {
       perror("recvfrom()");
       return (-1);
    }
-   puts("i stop");
+   logger_log(LOG_FINE, "Received: size: %d ; id: %d", packet->header.size, packet->header.id);
    return (n);
 }

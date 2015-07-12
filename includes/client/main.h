@@ -330,4 +330,9 @@ void 			addParticle(t_renderer *renderer, t_particle particle);
 t_particle		new_particle(t_vec3 pos, t_vec3 scal, t_vec3 color,
 				int id, GLuint texture_id, float life);
 
+/** packet ID */
+
+/** packets handler */
+void			packetHandlerConnection(t_game *game, t_packet *packet);
+
 #endif

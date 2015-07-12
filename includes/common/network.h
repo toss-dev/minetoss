@@ -66,8 +66,8 @@ typedef struct 	s_packet
 
 typedef struct 	s_client_packet
 {
+	int 		clientID;
 	t_packet 	packet;
-	BYTE		sessionID[SESSION_ID_SIZE];
 }				t_client_packet;
 
 void	packetDelete(t_packet *packet);

@@ -13,38 +13,54 @@
 #include "client/main.h"
 
 //call when the given packet is received
-static void	networkPacketHandler(t_game *game, t_packet *packet)
+static void	networkPacketHandler(t_game *game, t_packet *packet, SOCKADDR_IN *sockaddr)
 {
-	(void)game;
-	(void)packet;
+	static t_function	packet_handler[PACKET_ID_MAX] = {
+		packetHandlerConnection
+	};
+
+	if (packet->header.id >= PACKET_ID_MAX)
+	{
+		logger_log(LOG_WARNING, "Received an unknown packet!");
+		return ;
+	}
+
+	if (memcmp(&(game->client->sockaddr), sockaddr, sizeof(SOCKADDR_IN)) != 0)
+	{
+		logger_log(LOG_WARNING, "Received a packet from a wrong server!");
+		return ;
+	}
+
+	packet_handler[packet->header.id](game, packet);
 }
 
 //thread network main function
 static void	networkStartLoop(t_game *game)
 {
 	t_packet 	packet;
+	SOCKADDR_IN	sockaddr;
 	
 	while (isGameRunning(game))
 	{
-		if (packetReceive(&packet, game->client->sock, &(game->client->sockaddr), 1, 0) > 0)
+		if (packetReceive(&packet, game->client->sock, &sockaddr, 1, 0) > 0)
 		{
-			networkPacketHandler(game, &packet);
+			networkPacketHandler(game, &packet, &sockaddr);
 		}
 	}
 	pthread_exit(EXIT_SUCCESS);
 }
 
-static void	 getSessionIDFromServer(t_client *client)
+static void	 connectToServer(t_client *client)
 {
 	t_client_packet	cp;
 
-	cltPacketCreate(client, &cp, PACKET_ID_CONNECTION, 0, 0);
+	cltPacketCreate(client, &cp, NULL, 0, PACKET_ID_CONNECTION);
 	cltPacketSend(client, &cp);
 }
 
 void	startNetwork(t_game *game)
 {
-	getSessionIDFromServer(game->client);
+	connectToServer(game->client);
 	if (pthread_create(game->threads + THRD_NETWORK, NULL, (t_pthread_start)networkStartLoop, game) != 0)
 	{
 		logger_log(LOG_ERROR, "Couldnt start network thread");

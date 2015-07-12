@@ -17,17 +17,10 @@ void		gameNetworkInit(t_game *game)
 	game->server = srvStart(4242);
 }
 
-static void	gamePacketHandlerConnection(t_game *game, t_client_packet *packet, SOCKADDR_IN *sockaddr)
-{
-	(void)game;
-	(void)packet;
-	(void)sockaddr;
-}
-
 static void	gameNetworkPacketHandler(t_game *game, t_client_packet *cp, SOCKADDR_IN *sockaddr)
 {
-	t_function	packet_handler[PACKET_ID_MAX] = {
-		gamePacketHandlerConnection
+	static t_function	packet_handler[PACKET_ID_MAX] = {
+		packetHandlerConnection
 	};
 
 	if (cp->packet.header.id >= PACKET_ID_MAX)
@@ -35,11 +28,31 @@ static void	gameNetworkPacketHandler(t_game *game, t_client_packet *cp, SOCKADDR
 		logger_log(LOG_WARNING, "Received an unknown packet id!");
 		return ;
 	}
-	packet_handler[cp->packet.header.id](game, cp, sockaddr);
-	logger_log(LOG_FINE, "Server received packet: id: %d size: %d\n", cp->packet.header.id, cp->packet.header.size);
 
-	(void)game;
-	(void)sockaddr;
+	if (cp->packet.header.id == PACKET_ID_CONNECTION)
+	{
+		packetHandlerConnection(game, sockaddr);
+		return ;
+	}
+
+	t_client 	*client;
+
+	client = srvGetClient(game->server, cp->clientID);
+	if (client)
+	{
+		if (memcmp(&(client->sockaddr), sockaddr, sizeof(SOCKADDR_IN)) != 0)
+		{
+			packet_handler[cp->packet.header.id](game, cp, client);
+		}
+		else
+		{
+			logger_log(LOG_WARNING, "Received a packet from a valid clientID but from wrong adress! hacking?");
+		}
+	}
+	else
+	{
+		logger_log(LOG_WARNING, "Received a packet from an unknown client!");
+	}
 }
 
 //thread network main function
