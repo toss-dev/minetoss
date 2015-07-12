@@ -66,36 +66,41 @@ void 	removeTerrain(t_world *world, t_point3 index)
 }
 
 /** set the terrainas loaded, which mean it will be updated */
-void 	loadTerrain(t_world *world, t_terrain *terrain)
+void 	loadTerrain(t_terrain *terrain)
 {
-	(void)world;
 	terrainSetState(terrain, TERRAIN_LOADED);
 }
 
 /** unload the terrani, which mean it isnt updated no more and added to the garbage collector */
-void 	unloadTerrain(t_world *world, t_terrain *terrain)
+void 	unloadTerrain(t_terrain *terrain)
 {
 	terrainUnsetState(terrain, TERRAIN_LOADED);
-	removeTerrain(world, terrain->index);
 }
 
 static void	updateTerrain(t_world *world, t_terrain *terrain)
 {
-	unsigned	meshID;
-	t_point3	pos;
-	double		dist;
-
-	pos = getTerrainIndexForPos(g_game->renderer.camera.pos);
-	dist = point3_dist(pos, terrain->index);
-	if (dist >= TERRAIN_KEEP_LOAD_DISTANCE)
+	if (terrainHasState(terrain, TERRAIN_LOADED))
 	{
-		unloadTerrain(world, terrain);
-		return ;
+		t_point3	pos;
+		double		dist;
+		int			meshID;
+
+		pos = getTerrainIndexForPos(g_game->renderer.camera.pos);
+		dist = point3_dist(pos, terrain->index);
+		if (dist >= TERRAIN_KEEP_LOAD_DISTANCE)
+		{
+			unloadTerrain(terrain);
+			return ;
+		}
+
+		for (meshID = 0 ; meshID < MESH_PER_TERRAIN ; meshID++)
+		{
+			updateMeshes(world, terrain, meshID);
+		}
 	}
-
-	for (meshID = 0 ; meshID < MESH_PER_TERRAIN ; meshID++)
+	else
 	{
-		updateMeshes(world, terrain, meshID);
+		removeTerrain(world, terrain->index);
 	}
 }
 
@@ -128,11 +133,11 @@ void		updateTerrains(t_world *world)
 	HTAB_ITER_END(world->terrains, t_terrain, terrain);
 
 
-	ARRAY_LIST_ITER_START(world->terrain_garbage, t_point3, index, i)
+	ARRAY_LIST_ITER_START(world->terrain_garbage, t_point3, index, i);
 	{
 		removeTerrainAt(world, new_point3(index->x, index->y, index->z));
 	}
-	ARRAY_LIST_ITER_END(world->terrain_garbage, t_point3, index, i)
+	ARRAY_LIST_ITER_END(world->terrain_garbage, t_point3, index, i);
 
 	array_list_clear(&(world->terrain_garbage));
 }

@@ -37,7 +37,6 @@ enum e_program_id
 {
 	PROGRAM_TERRAIN,
 	PROGRAM_SKYBOX,
-	PROGRAM_PARTICLE,
 	PROGRAM_FONT,
 	PROGRAM_MAX
 };
@@ -75,30 +74,6 @@ typedef struct	s_camera
 	int		state;
 }				t_camera;
 
-enum	e_particles
-{
-	ParticleMoving,
-	PARTICLES_MAX_TYPE
-};
-
-typedef struct	s_particle
-{
-	t_vec3		rot;
-	t_vec3		scale;
-	t_vec3		pos;
-	t_vec3		rot_vec;
-	t_vec3		scale_vec;
-	t_vec3		pos_vec;
-	int			texture_id;
-	unsigned	id;
-	float		health;
-	float 		speed;
-	t_vec3		color;
-	int 		texture_atlas_id;
-	unsigned	timer;
-	float 		camera_dist;
-}				t_particle;
-
 enum e_cumebap_id
 {
     CUBEMAP_DAY,
@@ -129,7 +104,6 @@ typedef struct 	s_renderer
 	t_sky			sky;
 	t_block			blocks[BLOCK_MAX];
 	GLuint			block_atlas[RESOLUTION_BLOCK_ATLAS_MAX];
-	t_array_list	particles;
 	t_texture_atlas	textures_atlases[T_ATLAS_MAX];
 	t_model			quad_model;
 	size_t			config;
@@ -262,8 +236,8 @@ void 			rendererSwitchConfig(t_renderer *renderer, unsigned config);
 **	Terrain is a 16x128x16 blocks space of (128 / 16 = 8) 8 16x16x16 blocks chunks
 */
 void			loadTerrains(t_world *world);
-void 			loadTerrain(t_world *world, t_terrain *terrain);
-void 			unloadTerrain(t_world *world, t_terrain *terrain);
+void 			loadTerrain(t_terrain *terrain);
+void 			unloadTerrain(t_terrain *terrain);
 void			terrainSetState(t_terrain *terrain, unsigned state);
 void			terrainUnsetState(t_terrain *terrain, unsigned state);
 int				terrainHasState(t_terrain *terrain, unsigned state);
@@ -298,11 +272,10 @@ void			updateTerrainMeshes(t_world *world, t_terrain *terrain);
 void			updateMeshes(t_world *world, t_terrain *terrain, unsigned meshID);
 
 /** main render functions, will render the whole world to default framebuffers */
-void			render(t_world *world, t_renderer *renderer);
+void			render(t_game *game);
 void			renderSky(t_world *world, t_renderer *renderer);
 void 			renderTerrains(t_world *world, t_renderer *renderer);
 void			renderUI(t_world *world, t_renderer *renderer);
-void			renderParticles(t_world *world, t_renderer *renderer);
 
 /** opengl function wrapper */
 
@@ -324,15 +297,6 @@ void			updateWeather(t_world *world, t_renderer *renderer, t_timer *timer);
 
 /** blocks */
 void			createBlockTextures(t_renderer *renderer);
-
-/** particles */
-void			loadParticleTextures(t_renderer *renderer);
-void 			loadParticles(t_renderer *renderer);
-void 			updateParticles(t_renderer *renderer);
-void 			addParticle(t_renderer *renderer, t_particle particle);
-t_particle		new_particle(t_vec3 pos, t_vec3 scal, t_vec3 color,
-				int id, GLuint texture_id, float life);
-
 /** packet ID */
 
 /** packets handler */

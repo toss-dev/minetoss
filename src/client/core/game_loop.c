@@ -34,7 +34,7 @@ static void	updateGame(t_game *game)
 
 static void	renderGame(t_game *game)
 {
-	render(&(game->world), &(game->renderer));
+	render(game);
 	glfwSwapBuffers(game->window.ptr);
 	glfwPollEvents();
 }
@@ -51,10 +51,11 @@ void		gameLoop(t_game *game)
 	while (!glfwWindowShouldClose(game->window.ptr))
 	{
 		prev = glfwGetTime();
+		usleep(1000000 / 120);
+
 		updateGame(game);
 		renderGame(game);
-		game->renderer.fps = (unsigned int)(1 / (glfwGetTime() - prev));
 		updateDebug(game);
-		usleep(10000);
+		game->renderer.fps = (unsigned int)(1 / (glfwGetTime() - prev));
 	}
 }

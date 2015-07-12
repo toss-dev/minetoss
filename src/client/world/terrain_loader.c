@@ -34,7 +34,7 @@ static void	updateTerrainLoad(t_world *world)
 				{
 					generateTerrain(terrain);
 				}
-				loadTerrain(world, terrain);
+				loadTerrain(terrain);
 			}
 		}
 	}

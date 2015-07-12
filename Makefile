@@ -32,12 +32,8 @@ CLT_SRC	= main.c \
 		  render/camera.c \
 		  render/render.c \
 		  render/renderer/render_terrain.c \
-		  render/renderer/render_particles.c \
 		  render/renderer/render_ui.c \
 		  render/renderer/render_sky.c \
-		  render/particles/particles.c \
-		  render/particles/texture.c \
-		  render/particles/particles_update.c \
 		  render/texture/png_parser.c \
 		  render/texture/bmp_parser.c \
 		  render/terrain/terrain_mesh.c \
@@ -75,8 +71,8 @@ SRV_SRC = main.c \
 		  network/server.c \
 		  network/packet/connection.c
 
-SRV_SRCS	= $(addprefix ./src/server/, $(SRV_SRC))
-SRV_OBJ	= $(SRV_SRCS:.c=.o)
+SRV_SRCS 	= $(addprefix ./src/server/, $(SRV_SRC))
+SRV_OBJ		= $(SRV_SRCS:.c=.o)
 
 COMMON_SRC 	= network/packet.c
 
