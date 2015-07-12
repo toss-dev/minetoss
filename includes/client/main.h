@@ -164,7 +164,7 @@ typedef struct 	s_world_renderer
 //main thread is for rendering ONLY
 enum e_thread_name
 {
-	THRD_GENERATOR,
+	THRD_MESHER,
 	THRD_NETWORK,
 	THRD_MAX
 };
@@ -272,6 +272,9 @@ t_terrain		*getTerrain(t_world *world, t_point3 index);
 void			generateTerrainKey(char *buffer, t_point3 index);
 
 /** world generator */
+void			updateWorld(t_world *world);
+void 			startTerrainMesher(t_game *game);
+
 void			startWorldGenerator(t_game *game);
 
 void   			generateTerrain(t_terrain *terrain);
@@ -334,5 +337,6 @@ t_particle		new_particle(t_vec3 pos, t_vec3 scal, t_vec3 color,
 
 /** packets handler */
 void			packetHandlerConnection(t_game *game, t_packet *packet);
+
 
 #endif

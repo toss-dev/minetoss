@@ -72,14 +72,15 @@ void				list_delete(t_list *lst, void (*delete_node)(void *content));
 
 //X should be the hashtable structure, and Y the element variable
 
-#define LIST_ITER_START(X, Y)	t_node *n;\
-								\
-								n = X.head->next;\
-								while (n != X.head)\
-								{\
-									Y = n->content;		
-#define LIST_ITER_END(X, Y)			n = n->next; \
-								}
+#define LIST_ITER_START(L, T, X)	T 		*X;\
+									t_node *node;\
+									\
+									node = L.head->next;\
+									while (node != L.head)\
+									{\
+										X = (T*)node->content;		
+#define LIST_ITER_END(L, T, X)			node = node->next; \
+									}
 
 /******************************* LINKED LIST END *******************************/
 
@@ -111,24 +112,21 @@ void				htab_dump_memory(t_htab tab);
 
 //X should be the hashtable structure, and Y the element variable
 
-# define HTAB_ITER_START(X, Y)	t_htab_elem	*e;\
-								t_list		*a;\
-								t_node		*n;\
-								size_t		i;\
-								\
-								i = 0;\
-								while (i < X.size)\
-								{\
-									a = X.elems + i;\
-									n = a->head->next;\
-									while (n != a->head)\
-									{\
-										e = n->content;\
-										Y = e->content;
-# define HTAB_ITER_END(X, Y)			n = n->next;\
-									}\
-									++i;\
-								}
+# define HTAB_ITER_START(H, T, X)	{\
+										T 		*X;\
+										size_t	i;\
+										\
+										i = 0;\
+										while (i < H.size)\
+										{\
+											LIST_ITER_START(H.elems[i], t_htab_elem, elem)\
+											{\
+												X = (T*)elem->content;
+# define HTAB_ITER_END(H, T, X)				}\
+											LIST_ITER_END(H.elems[i], t_htab_elem, elem)\
+											++i;\
+										}\
+									}
 
 
 /******************************* HASH MAP END ************************************/
@@ -158,8 +156,6 @@ typedef struct		s_array_list
 
 t_array_list		array_list_new(unsigned nb, unsigned elem_size);
 void				array_list_add(t_array_list *array, void *data);
-void				array_list_iter(t_array_list array, t_iter_array_function f, void *extra);
-void				array_list_iter_remove_if(t_array_list *array, t_iter_array_function f, void *extra);
 void 				array_list_delete(t_array_list *array);
 void				array_list_resize(t_array_list *array, unsigned size);
 void				array_list_remove(t_array_list *array, unsigned int idx);
@@ -168,7 +164,24 @@ void				array_list_clear(t_array_list *array);
 void 				array_list_expand(t_array_list *array);
 void				array_list_add_all(t_array_list *array, void *buffer, unsigned nb);
 void				*array_list_to_buffer(t_array_list array, unsigned type);
-void				array_list_remove_if(t_array_list *array, t_cmp_func cmpf, void *extra);
+
+//L = arrray list
+//T = type
+//X = variable of pointer type T
+//I = iterator
+# define ARRAY_LIST_ITER_START(L, T, X, I)	{\
+												T 		*X;\
+												size_t 	I;\
+												\
+												I = 0;\
+												while (I < L.size)\
+												{\
+													X = (T*)L.data + I;
+# define ARRAY_LIST_ITER_END(L, T, X, I)			++I;\
+												}\
+											}
+
+
 
 /******************************  ARRAY LIST END *********************************/
 

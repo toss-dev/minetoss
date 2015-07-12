@@ -20,33 +20,41 @@ static void	updateDebug(t_game *game)
 		game->renderer.camera.pos.x, game->renderer.camera.pos.y, game->renderer.camera.pos.z,
 		game->renderer.camera.look_vec.x, game->renderer.camera.look_vec.y, game->renderer.camera.look_vec.z);
 	glfwSetWindowTitle(game->window.ptr, buffer);
+	glhCheckError("main thread loop");
 }
 
-void		startGame(t_game *game)
+/**	update the timer, camera, sounds and render */
+static void	updateGame(t_game *game)
 {
-	double	prev;
+	updateTimer(&(game->timer));
+	updateCamera(&(game->renderer.camera));
+	updateWeather(&(game->world), &(game->renderer), &(game->timer));
+	updateSound(&(game->sound_manager), &(game->renderer.camera));
+}
 
-	while (!glfwWindowShouldClose(game->window.ptr))
-	{
-		prev = glfwGetTime();
-		updateTimer(&(game->timer));
-		updateCamera(&(game->renderer.camera));
-		updateWeather(&(game->world), &(game->renderer), &(game->timer));
-		updateSound(&(game->sound_manager), &(game->renderer.camera));
-		render(&(game->world), &(game->renderer));
-		glfwSwapBuffers(game->window.ptr);
-		glfwPollEvents();
-		glhCheckError("main thread loop");
-		game->renderer.fps = (unsigned int)(1 / (glfwGetTime() - prev));
-		updateDebug(game);
-		usleep(10000);
-	}
+static void	renderGame(t_game *game)
+{
+	render(&(game->world), &(game->renderer));
+	glfwSwapBuffers(game->window.ptr);
+	glfwPollEvents();
 }
 
 void		gameLoop(t_game *game)
 {
+	double	prev;
+
 	game->state = game->state | GAME_STATE_RUNNING;
+
 	startNetwork(game);
-	startWorldGenerator(game);
-	startGame(game);
+	startTerrainMesher(game);
+
+	while (!glfwWindowShouldClose(game->window.ptr))
+	{
+		prev = glfwGetTime();
+		updateGame(game);
+		renderGame(game);
+		game->renderer.fps = (unsigned int)(1 / (glfwGetTime() - prev));
+		updateDebug(game);
+		usleep(10000);
+	}
 }

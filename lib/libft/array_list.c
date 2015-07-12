@@ -88,66 +88,6 @@ void		array_list_clear(t_array_list *array)
 	array->size = 0;
 }
 
-/** this functions assumes the array is defragmented */
-void		array_list_iter(t_array_list array, t_iter_array_function f, void *extra)
-{
-	unsigned	i;
-	unsigned	addr;
-
-	i = 0;
-	addr = 0;
-	while (i < array.size)
-	{
-		f(array.data + addr, extra, i);
-		addr += array.elem_size;
-		++i;
-	}
-}
-
-void		array_list_remove_if(t_array_list *array, t_cmp_func cmpf, void *extra)
-{
-	unsigned int	i;
-	unsigned int	addr;
-
-	i = 0;
-	addr = 0;
-	while (i < array->size)
-	{
-		if (cmpf(array->data + addr, extra))
-		{
-			array_list_remove(array, i);
-			return ;
-		}
-		else
-		{
-			addr += array->elem_size;
-			++i;
-		}
-	}
-}
-
-/** this functions assumes the array is defragmented */
-void		array_list_iter_remove_if(t_array_list *array, t_iter_array_function f, void *extra)
-{
-	unsigned	i;
-	unsigned	addr;
-
-	i = 0;
-	addr = 0;
-	while (i < array->size)
-	{
-		if (f(array->data + addr, extra, i))
-		{
-			array_list_remove(array, i);
-		}
-		else
-		{
-			addr += array->elem_size;
-			++i;
-		}
-	}
-}
-
 /**
 **	remove the array list from the heap
 */

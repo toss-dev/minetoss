@@ -99,47 +99,6 @@ static void	updateTerrain(t_world *world, t_terrain *terrain)
 	}
 }
 
-
-static void updateTerrainLoad(t_world *world)
-{
-	t_terrain	*terrain;
-	t_point3	index;
-	int			x;
-	int 		z;
-	t_point3	pos;
-	double 		dist;
-
-	pos = getTerrainIndexForPos(g_game->renderer.camera.pos);
-	for (x = -TERRAIN_LOAD_DISTANCE ; x < TERRAIN_LOAD_DISTANCE ; x++)
-	{
-		for (z = -TERRAIN_LOAD_DISTANCE ; z < TERRAIN_LOAD_DISTANCE ; z++)
-		{
-			index.x = pos.x + x;
-			index.y = 0;
-			index.z = pos.z + z;
-			dist = point3_dist(pos, index);
-			if (dist < TERRAIN_LOAD_DISTANCE)
-			{
-				terrain = getTerrain(world, index);
-				if (terrain == NULL)
-				{
-					terrain = createNewTerrain(world, index);
-				}
-				if (terrain == NULL)
-				{
-					logger_log(LOG_ERROR, "Not enough memory to allocate new terrain!");
-					continue ;
-				}
-				if (!terrainHasState(terrain, TERRAIN_GENERATED))
-				{
-					generateTerrain(terrain);
-				}
-				loadTerrain(world, terrain);
-			}
-		}
-	}
-}
-
 static void deleteTerrain(t_terrain *terrain)
 {
 	unsigned	i;
@@ -151,27 +110,29 @@ static void deleteTerrain(t_terrain *terrain)
 	free(terrain);
 }
 
-static void	removeTerrainAt(t_point3 *index, t_world *world)
+static void	removeTerrainAt(t_world *world, t_point3 index)
 {
 	char	key[64];
 
-	generateTerrainKey(key, *index);
+	generateTerrainKey(key, index);
 	htab_remove_key(world->terrains, key, deleteTerrain);
 }
 
 /** update and generate terrain at the given pos in the given world */
-void	updateTerrains(t_world *world)
+void		updateTerrains(t_world *world)
 {
-	t_terrain 	*terrain;
-
-	updateTerrainLoad(world);
-
-	HTAB_ITER_START(world->terrains, terrain);
+	HTAB_ITER_START(world->terrains, t_terrain, terrain);
 	{
 		updateTerrain(world, terrain);
 	}
-	HTAB_ITER_END(world->terrains, terrain);
+	HTAB_ITER_END(world->terrains, t_terrain, terrain);
 
-	array_list_iter(world->terrain_garbage, (t_iter_array_function)removeTerrainAt, world);
+
+	ARRAY_LIST_ITER_START(world->terrain_garbage, t_point3, index, i)
+	{
+		removeTerrainAt(world, new_point3(index->x, index->y, index->z));
+	}
+	ARRAY_LIST_ITER_END(world->terrain_garbage, t_point3, index, i)
+
 	array_list_clear(&(world->terrain_garbage));
 }

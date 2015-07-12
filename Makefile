@@ -58,6 +58,7 @@ CLT_SRC	= main.c \
 		  sound/sound_util.c \
 		  world/setblock.c \
 		  world/terrain.c \
+		  world/terrain_loader.c \
 		  world/terrain_utils.c \
 		  world/terrain_generator.c \
 		  world/noise.c \

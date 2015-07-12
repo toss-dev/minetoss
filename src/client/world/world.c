@@ -28,22 +28,9 @@ void	initWorld(t_world *world)
 /**                      UPDATE RELATED FUNCTIONS:                            */
 /******************************************************************************/
 
-void	worldGenerateLoop(t_game *game)
+void	updateWorld(t_world *world)
 {
-	while (isGameRunning(game))
-	{
-		updateTerrains(&(game->world));
-		usleep(100000);
-	}
-}
-
-void	startWorldGenerator(t_game *game)
-{
-	if (pthread_create(game->threads + THRD_GENERATOR, NULL, (t_pthread_start)worldGenerateLoop, game) != 0)
-	{
-		logger_log(LOG_ERROR, "Couldnt create world generator thread.");
-		exit(EXIT_FAILURE);
-	}
+	updateTerrains(world);
 }
 
 /******************************************************************************/

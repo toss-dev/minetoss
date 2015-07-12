@@ -12,7 +12,7 @@
 
 #include "client/main.h"
 
-int	isGameRunning(t_game *game)
+int		isGameRunning(t_game *game)
 {
 	return (game->state & GAME_STATE_RUNNING);
 }
