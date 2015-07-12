@@ -9,7 +9,7 @@ For technical questions, see comments in code :)
 
 -----------------------------------------------
 Client / Server model:
-* using select on a socket, using udp protocol (recvfrom, sendto functions)
+* using udp protocol (recvfrom, sendto functions)
 	: see network files
 
 -----------------------------------------------
@@ -17,7 +17,7 @@ Client / Server model:
 Extern library used:
 * OpenGL (modern pipeline)
 * GLFW (opengl framework)
-* glew (windows only)
+* glew (windows only, opengl version compatibility)
 * pthread
 * lodepng.c lodepng.h (png decoder / encoder)
 
@@ -25,3 +25,7 @@ Extern library used:
 
 NOT IMPLEMENTED YET:
 * Detect hidden chunks of block: occlusion culling
+* 
+
+![alt tag](http://img11.hostingpics.net/pics/526266test.png)
+
