@@ -45,6 +45,11 @@ static void	networkStartLoop(t_game *game)
 		if (packetReceive(&packet, game->client->sock, &sockaddr, 1, 0) > 0)
 		{
 			networkPacketHandler(game, &packet, &sockaddr);
+		
+			t_client_packet	cp;
+
+			cltPacketCreate(game->client, &cp, (BYTE*)"hello", strlen("hello") + 1, PACKET_ID_LOL_STUFF);
+			cltPacketSend(game->client, &cp);
 		}
 	}
 	pthread_exit(EXIT_SUCCESS);

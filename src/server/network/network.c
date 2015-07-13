@@ -12,11 +12,19 @@
 
 #include "server/main.h"
 
+static void 	packetHandlerDoLolStuff(t_game *game, t_server_packet *sp)
+{
+	(void)game;
+	(void)sp;
+	printf("Received a do lol stuff from: %d\n", sp->cp.clientID);
+}
+
 /** thread that handle packets */
 void	networkHandlePackets(t_game *game)
 {
 	t_function	packet_handler[PACKET_ID_MAX] = {
-		NULL		//PACKET_ID_CONNECTION, will never be queued
+		NULL,
+		packetHandlerDoLolStuff
 	};
 	t_server_packet	*sp;
 

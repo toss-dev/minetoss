@@ -25,6 +25,7 @@ typedef void	*(*t_pthread_start)(void *);
 enum e_packet_id
 {
 	PACKET_ID_CONNECTION,
+	PACKET_ID_LOL_STUFF,
 	PACKET_ID_MAX
 };
 

@@ -12,30 +12,52 @@
 
 #include "server/network/server.h"
 
+int        srvClientHasState(t_server *server, unsigned int clientID, unsigned int state)
+{
+   return (server->clients[clientID].state & state);
+}
+
+void        srvClientSetState(t_server *server, unsigned int clientID, unsigned int state)
+{
+   server->clients[clientID].state |= state;
+}
+
+void        srvClientUnsetState(t_server *server, unsigned int clientID, unsigned int state)
+{
+   server->clients[clientID].state &= ~(state);
+}
+
 /** add the client */
 static int  srvConnectClient(t_server *server, SOCKADDR_IN *sockaddr)
 {
-   static int clientID = 0;
-
    t_packet packet;
-   int      response;
+   int      clientID;
+
+   logger_log(LOG_FINE, "A client is connecting!");
 
    if (server->client_count >= SRV_MAX_CLIENT)
    {
-      response = WRONG_CLIENT_ID;
+      clientID = WRONG_CLIENT_ID;
    }
    else
    {
-      memcpy(&(server->clients[server->client_count].sockaddr), sockaddr, sizeof(SOCKADDR_IN));
-      response = clientID;
-      ++clientID;
-      server->client_count = server->client_count + 1;
+      for (clientID = 0 ; clientID < SRV_MAX_CLIENT ; clientID++)
+      {
+         if (srvClientHasState(server, clientID, CLIENT_CONNECTED) == 0)
+         {
+            printf("%d\n", clientID);
+            srvClientSetState(server, clientID, CLIENT_CONNECTED);
+            memcpy(&(server->clients[clientID].sockaddr), sockaddr, sizeof(SOCKADDR_IN));
+            server->client_count = server->client_count + 1;
+            break ;
+         }
+      }
    }
 
-   packetCreate(&packet, (BYTE*)&response, sizeof(int), PACKET_ID_CONNECTION);
+   packetCreate(&packet, (BYTE*)&clientID, sizeof(int), PACKET_ID_CONNECTION);
    packetSend(&packet, server->sock, sockaddr);
 
-   return (response);
+   return (clientID);
 }
 
 
@@ -75,7 +97,7 @@ static void srvQueuePackets(t_server *server)
          }
          else
          {
-            logger_log(LOG_WARNING, "Received a packet from an unknown client!");
+            logger_log(LOG_WARNING, "Received a packet from an unknown client! (%d)" , sp.cp.clientID);
          }
       }
       else  //4 secondes timeout

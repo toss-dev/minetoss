@@ -43,10 +43,15 @@ enum 	e_server_state
 	SERVER_RUNNING = 2
 };
 
+enum 	e_client_state
+{
+	CLIENT_CONNECTED = 1
+};
+
 typedef struct 	s_client
 {
+	unsigned int 	state;
 	SOCKADDR_IN		sockaddr;
-	unsigned int 	clientID;
 }				t_client;
 
 typedef struct 	s_server_packet
@@ -76,5 +81,9 @@ int      			srvPacketReceive(t_server *server, t_client_packet *packet, SOCKADDR
 
 void              	srvPopPacket(t_server *server);
 t_server_packet   	*srvGetNextPacket(t_server *server);
+
+int        			srvClientHasState(t_server *server, unsigned int clientID, unsigned int state);
+void       			srvClientSetState(t_server *server, unsigned int clientID, unsigned int state);
+void        		srvClientUnsetState(t_server *server, unsigned int clientID, unsigned int state);
 
 #endif
