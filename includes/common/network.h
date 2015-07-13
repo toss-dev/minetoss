@@ -16,14 +16,17 @@
 # include "libft.h"
 
 # define SESSION_ID_SIZE 16
+# define WRONG_CLIENT_ID -1
 
+
+/** threads */
+typedef void	*(*t_pthread_start)(void *);
 
 enum e_packet_id
 {
 	PACKET_ID_CONNECTION,
 	PACKET_ID_MAX
 };
-
 
 typedef unsigned char	BYTE;
 typedef unsigned int 	PORT;

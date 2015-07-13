@@ -19,8 +19,8 @@ int 	isGameRunning(t_game *game)
 
 void	gameInit(t_game *game)
 {
-	logger_log(LOG_FINE, "Initializing network");
-	gameNetworkInit(game);
+	(void)game;
+	logger_log(LOG_FINE, "Initializing game");
 }
 
 /** main server loop for updates */
@@ -37,7 +37,7 @@ void	gameStart(t_game *game)
 {
 	game->state = game->state | GAME_STATE_RUNNING;
 	logger_log(LOG_FINE, "Starting network");
-	gameNetworkStart(game);
+	networkStart(game);
 }
 
 void	gameStop(t_game *game)
@@ -50,7 +50,7 @@ void	gameStop(t_game *game)
 		pthread_join(game->threads[i], NULL);
 	}
 
-	gameNetworkStop(game);
+	networkStop(game);
 	free(game);
 	exit(EXIT_SUCCESS);
 }

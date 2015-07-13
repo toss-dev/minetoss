@@ -67,7 +67,9 @@ void 				*list_get(t_list *lst, t_cmp_func cmpf, void *cmpd);
 t_list				list_new(void);
 int 				list_remove(t_list *lst, t_function free_funct, t_cmp_func cmpf, void *cmpd);
 void				list_remove_node(t_list *lst, t_list_node *node, t_function free_funct);
-void				list_delete(t_list *lst, void (*delete_node)(void *content));
+void				list_delete(t_list *lst, t_function free_funct);
+void				list_pop(t_list *lst, t_function free_funct);
+void				*list_head(t_list *lst);
 
 //X should be the hashtable structure, and Y the element variable
 
@@ -200,6 +202,7 @@ typedef struct		s_stack
 
 t_stack 		stack_new(void);
 void 			*stack_get_list_node_content(t_stack_node *node);
+void			*stack_head(t_stack *stack);
 void			*stack_push(t_stack *stack, void *content, size_t size);
 void 			stack_pop(t_stack *stack);
 size_t			stack_size(t_stack *stack);
@@ -217,8 +220,7 @@ void 			stack_delete(t_stack *stack);
 										}\
 									}
 
-/******************************  ARRAY LIST END *********************************/
-
+/******************************  STACK  END *********************************/
 
 
 /**************************************************************************/

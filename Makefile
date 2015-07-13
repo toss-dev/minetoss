@@ -68,8 +68,7 @@ CLT_OBJ		= $(CLT_SRCS:.c=.o)
 SRV_SRC = main.c \
 		  game.c \
 		  network/network.c \
-		  network/server.c \
-		  network/packet/connection.c
+		  network/server.c
 
 SRV_SRCS 	= $(addprefix ./src/server/, $(SRV_SRC))
 SRV_OBJ		= $(SRV_SRCS:.c=.o)

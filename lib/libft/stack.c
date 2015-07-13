@@ -40,6 +40,7 @@ void	*stack_push(t_stack *stack, void *content, size_t size)
 	node->next = stack->head;
 	memcpy(node + 1, content, size);
 	stack->head = node;
+	stack->size++;
 	return (stack->head);
 }
 
@@ -52,6 +53,7 @@ void 	stack_pop(t_stack *stack)
 		node = stack->head->next;
 		free(stack->head);
 		stack->head = node;
+		stack->size--;
 	}
 }
 
@@ -66,4 +68,13 @@ void 	stack_delete(t_stack *stack)
 	{
 		stack_pop(stack);
 	}
+}
+
+void	*stack_head(t_stack *stack)
+{
+	if (stack->head)
+	{
+		return (stack->head + 1);
+	}
+	return (NULL);
 }

@@ -41,9 +41,9 @@ typedef struct 	s_game
 }				t_game;
 
 /** network*/
-void	gameNetworkInit(t_game *game);
-void	gameNetworkStart(t_game *game);
-void	gameNetworkStop(t_game *game);
+void	networkInit(t_game *game);
+void	networkStart(t_game *game);
+void	networkStop(t_game *game);
 
 /** game */
 void	gameInit(t_game *game);
@@ -52,8 +52,5 @@ void	gameStart(t_game *game);
 void	gameStop(t_game *game);
 
 int 	isGameRunning(t_game *game);
-
-/** packets*/
-void	packetHandlerConnection(t_game *game, SOCKADDR_IN *sockaddr);
 
 #endif

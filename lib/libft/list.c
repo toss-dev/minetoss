@@ -37,10 +37,33 @@ void	list_remove_node(t_list *lst, t_list_node *node, t_function free_funct)
 	node->next = NULL;
 	node->previous = NULL;
 
-	free_funct(node + 1);
+	if (free_funct)
+	{
+		free_funct(node + 1);
+	}
 	free(node);
 	lst->size--;
 }
+
+/** remove list head */
+void	list_pop(t_list *lst, t_function free_funct)
+{
+	if (lst->size > 0)
+	{
+		list_remove_node(lst, lst->head->next, free_funct);
+	}
+}
+
+/** return content at the begining of the list */
+void	*list_head(t_list *lst)
+{
+	if (lst->size > 0)
+	{
+		return (lst->head->next + 1);
+	}
+	return (NULL);
+}
+
 
 /** remove if the comparison return elements are equals (works like strcmp) */
 int 	list_remove(t_list *lst, t_function free_funct, t_cmp_func cmpf, void *cmpd)
@@ -111,6 +134,7 @@ void 	*list_push(t_list *lst, void const *content, size_t content_size)
 	return (node + 1);
 }
 
+/** cmpf is a function which should work like strcmp */
 void 	*list_get(t_list *lst, t_cmp_func cmpf, void *cmpd)
 {
 	t_list_node	*node;
@@ -136,7 +160,10 @@ void	list_delete(t_list *lst, void (*delete_content)(void *content))
 	while (node != lst->head)
 	{
 		next = node->next;
-		delete_content(node + 1);
+		if (delete_content)
+		{
+			delete_content(node + 1);
+		}
 		free(node);
 		node = next;
 	}
