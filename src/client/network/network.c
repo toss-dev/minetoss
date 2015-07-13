@@ -12,73 +12,39 @@
 
 #include "client/main.h"
 
-//call when the given packet is received
-static void	networkPacketHandler(t_game *game, t_packet *packet, SOCKADDR_IN *sockaddr)
-{
-	static t_function	packet_handler[PACKET_ID_MAX] = {
-		packetHandlerConnection
-	};
-
-	if (packet->header.id >= PACKET_ID_MAX)
-	{
-		logger_log(LOG_WARNING, "Received an unknown packet!");
-		return ;
-	}
-
-	if (memcmp(&(game->client->sockaddr), sockaddr, sizeof(SOCKADDR_IN)) != 0)
-	{
-		logger_log(LOG_WARNING, "Received a packet from a wrong server!");
-		return ;
-	}
-
-	packet_handler[packet->header.id](game, packet);
-}
-
 //thread network main function
 static void	networkStartLoop(t_game *game)
 {
-	t_packet 	packet;
-	SOCKADDR_IN	sockaddr;
-	
+	t_function	packet_handler[PACKET_ID_MAX] = {
+		packetHandlerConnection
+	};
+	t_packet 	*packet;
+
 	while (isGameRunning(game))
 	{
-		if (packetReceive(&packet, game->client->sock, &sockaddr, 1, 0) > 0)
+		while ((packet = cltGetNextPacket(game->client)) != NULL)
 		{
-			networkPacketHandler(game, &packet, &sockaddr);
-		
-			t_client_packet	cp;
-
-			cltPacketCreate(game->client, &cp, (BYTE*)"hello", strlen("hello") + 1, PACKET_ID_LOL_STUFF);
-			cltPacketSend(game->client, &cp);
+			packet_handler[packet->header.id](game, packet);
+			cltPopPacket(game->client);
 		}
+		usleep(1000);
 	}
 	pthread_exit(EXIT_SUCCESS);
 }
 
-static void	 connectToServer(t_client *client)
-{
-	t_client_packet	cp;
-
-	cltPacketCreate(client, &cp, NULL, 0, PACKET_ID_CONNECTION);
-	cltPacketSend(client, &cp);
-}
-
 void	startNetwork(t_game *game)
 {
-	connectToServer(game->client);
-	if (pthread_create(game->threads + THRD_NETWORK, NULL, (t_pthread_start)networkStartLoop, game) != 0)
-	{
-		logger_log(LOG_ERROR, "Couldnt start network thread");
-		exit(EXIT_FAILURE);
-	}
-}
-
-void	initNetwork(t_game *game)
-{
-	game->client = cltInit("localhost", 4242);
+	game->client = cltStart("localhost", 4242);
 	if (game->client == NULL)
 	{
 		logger_log(LOG_ERROR, "Couldnt connect to host.");
+		exit(EXIT_FAILURE);
+	}
+
+	//create the thread that will pop packets from the queue and handle it
+	if (pthread_create(game->threads + THRD_NETWORK, NULL, (t_pthread_start)networkStartLoop, game) != 0)
+	{
+		logger_log(LOG_ERROR, "Couldnt start network thread");
 		exit(EXIT_FAILURE);
 	}
 }

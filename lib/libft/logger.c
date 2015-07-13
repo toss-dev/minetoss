@@ -33,5 +33,5 @@ void		logger_log(int level, char *str, ...)
 	vsprintf(buffer, str, arg);
 	va_end(arg);
 
-	printf("%s[%d:%d:%d] [%s]%s %s\n", format[level].color, t->tm_hour, t->tm_min, t->tm_sec, format[level].str, C_RESET, buffer);
+	printf("%s[%.2d:%.2d:%.2d] [%s]%s %s\n", format[level].color, t->tm_hour, t->tm_min, t->tm_sec, format[level].str, C_RESET, buffer);
 }

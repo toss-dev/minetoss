@@ -45,7 +45,6 @@ static int  srvConnectClient(t_server *server, SOCKADDR_IN *sockaddr)
       {
          if (srvClientHasState(server, clientID, CLIENT_CONNECTED) == 0)
          {
-            printf("%d\n", clientID);
             srvClientSetState(server, clientID, CLIENT_CONNECTED);
             memcpy(&(server->clients[clientID].sockaddr), sockaddr, sizeof(SOCKADDR_IN));
             server->client_count = server->client_count + 1;
@@ -70,11 +69,18 @@ static void srvQueuePackets(t_server *server)
 
    while (server->state & SERVER_RUNNING)
    {
-      if (srvPacketReceive(server, &(sp.cp), &(sockaddr), 4, 0) > 0)
+      if (srvPacketReceive(server, &(sp.cp), &(sockaddr), 2, 0) > 0)
       {
          if (sp.cp.packet.header.id >= PACKET_ID_MAX)
          {
             logger_log(LOG_WARNING, "Received an unknown packet id!");
+            continue ;
+         }
+
+         if (sp.cp.packet.header.size >= PACKET_MAX_SIZE)
+         {
+            logger_log(LOG_WARNING, "Received a too big packet!");
+            continue ;
          }
 
          sender = srvGetClient(server, sp.cp.clientID);
@@ -100,7 +106,7 @@ static void srvQueuePackets(t_server *server)
             logger_log(LOG_WARNING, "Received a packet from an unknown client! (%d)" , sp.cp.clientID);
          }
       }
-      else  //4 secondes timeout
+      else  //no packet received during 2 second, server make a pause
       {
          sleep(1);
       }
@@ -108,7 +114,7 @@ static void srvQueuePackets(t_server *server)
    pthread_exit(EXIT_SUCCESS);
 }
 
-t_server *srvStart(PORT port)
+static void srvInit(void)
 {
    # ifdef WIN32
       WSADATA wsa;
@@ -119,8 +125,11 @@ t_server *srvStart(PORT port)
          exit(EXIT_FAILURE);
       }
    # endif
+}
 
-   t_server *server;
+static t_server *srvNew(PORT port)
+{
+   t_server    *server;
 
    server = (t_server*)malloc(sizeof(t_server));
    if (server == NULL)
@@ -128,10 +137,16 @@ t_server *srvStart(PORT port)
       perror("malloc");
       exit(EXIT_FAILURE);
    }
-   memset(server, 0, sizeof(t_server));
 
+   server->state = 0;
    server->port = port;
+   server->packet_queue = list_new();
 
+   return (server);
+}
+
+static void srvStartSocket(t_server *server)
+{
    server->sock = socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP);
    if (server->sock == INVALID_SOCKET)
    {
@@ -148,8 +163,15 @@ t_server *srvStart(PORT port)
       perror("bind()");
       exit(errno);
    }
+}
 
-   server->packet_queue = list_new();
+t_server *srvStart(PORT port)
+{
+   t_server *server;
+
+   srvInit();
+   server = srvNew(port);
+   srvStartSocket(server);
 
    server->state = server->state | SERVER_RUNNING;
    server->state = server->state | SERVER_INITIALIZED;

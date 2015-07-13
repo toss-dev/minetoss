@@ -19,7 +19,6 @@
 # include "common/timer.h"
 # include "maths.h"
 # include "libft.h"
-# include <pthread.h>
 
 typedef struct	s_entity
 {

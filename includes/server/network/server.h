@@ -32,7 +32,6 @@
 # define SERVER_H
 
 # include "common/network.h"
-# include <pthread.h>
 
 # define SRV_MAX_CLIENT 1024
 # define SERVER_QUEUE_SIZE 64

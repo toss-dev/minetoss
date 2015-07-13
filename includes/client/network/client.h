@@ -24,17 +24,23 @@ typedef struct 	s_client
 	char			*hostname;
 	PORT			port;
 	unsigned		state;
+	t_list 			packet_queue;
+	pthread_t		packet_queue_thread;
 }				t_client;
 
 enum e_client_state
 {
-	CLIENT_CONNECTED = 1
+	CLIENT_CONNECTED = 1,
+	CLIENT_RUNNING = 2,
 };
 
-t_client	*cltInit(char const *hostname, PORT port);
+t_client	*cltStart(char const *hostname, PORT port);
 void		cltStop(t_client *client);
 
 void 		cltPacketCreate(t_client *client, t_client_packet *cp, BYTE *data, short size, short id);
 int 		cltPacketSend(t_client *client, t_client_packet *cp);
+
+t_packet 	*cltGetNextPacket(t_client *client);
+void 		cltPopPacket(t_client *client);
 
 #endif

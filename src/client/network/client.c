@@ -12,37 +12,70 @@
 
 #include "client/network/client.h"
 
-t_client *cltInit(char const *hostname, PORT port)
+static void cltLoop(t_client *client)
 {
-	# ifdef WIN32
-	   WSADATA wsa;
-	   int err = WSAStartup(MAKEWORD(2, 2), &wsa);
-	   if(err < 0)
-	   {
-	      puts("WSAStartup failed !");
-	      exit(EXIT_FAILURE);
-	   }
-	# endif
+   t_packet    packet;
+
+   while (client->state & CLIENT_RUNNING)
+   {
+      if (packetReceive(&packet, client->sock, &(client->sockaddr), 1, 0) > 0)
+      {
+         if (packet.header.id >= PACKET_ID_MAX)
+         {
+            logger_log(LOG_WARNING, "Received an unknown packet!");
+            continue ;
+         }
+
+         if (packet.header.size >= PACKET_MAX_SIZE)
+         {
+            logger_log(LOG_WARNING, "Received a too big packet!");
+            continue ;
+         }
+
+         list_add(&(client->packet_queue), &(packet), sizeof(t_packet_header) + packet.header.size);
+      }
+      else
+      {
+         logger_log(LOG_WARNING, "No packet received from server for 1 second!");
+      }
+   }
+}
 
 
-   t_client *client;
-   HOSTENT  *hostinfo;
+static void cltInit(void)
+{
+   # ifdef WIN32
+      WSADATA wsa;
+      int err = WSAStartup(MAKEWORD(2, 2), &wsa);
+      if(err < 0)
+      {
+         puts("WSAStartup failed !");
+         exit(EXIT_FAILURE);
+      }
+   # endif
+}
+
+static t_client   *cltNew(char const *hostname, PORT port)
+{
+   t_client    *client;
 
    client = (t_client*)malloc(sizeof(t_client));
-	if (client == NULL)
+   if (client == NULL)
    {
       perror("malloc");
       exit(EXIT_FAILURE);
    }
    client->port = port;
-	client->hostname = strdup(hostname);
+   client->hostname = strdup(hostname);
    client->state = 0;
-	if (client->hostname == NULL)
-	{
-		perror("malloc");
-      free(client);
-      return (NULL);
-	}
+   client->clientID = -1;
+   client->packet_queue = list_new();
+   return (client);
+}
+
+static void cltStartSocket(t_client *client)
+{
+   HOSTENT  *hostinfo;
 
    client->sock = socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP);
 
@@ -51,7 +84,7 @@ t_client *cltInit(char const *hostname, PORT port)
       perror("socket()");
       free(client->hostname);
       free(client);
-      return (NULL);
+      exit(EXIT_FAILURE);
    }
 
    hostinfo = gethostbyname(client->hostname);
@@ -60,28 +93,70 @@ t_client *cltInit(char const *hostname, PORT port)
       fprintf(stderr, "Unknown host %s.\n", client->hostname);
       free(client->hostname);
       free(client);
-      return (NULL);
+      exit(EXIT_FAILURE);
    }
 
    client->sockaddr.sin_addr = *((IN_ADDR*)hostinfo->h_addr);
    client->sockaddr.sin_port = htons(client->port);
    client->sockaddr.sin_family = AF_INET;
+}
 
-   client->clientID = -1;
+static void cltConnect(t_client *client)
+{
+   t_client_packet packet;
+
+   cltPacketCreate(client, &packet, NULL, 0, PACKET_ID_CONNECTION);
+   cltPacketSend(client, &packet);
+}
+
+t_client *cltStart(char const *hostname, PORT port)
+{
+   t_client       *client;
+
+   cltInit();
+   client = cltNew(hostname, port);
+   cltStartSocket(client);
+
+   client->state = client->state | CLIENT_RUNNING;
+
+   if (pthread_create(&(client->packet_queue_thread), NULL, (t_pthread_start)cltLoop, client) != 0)
+   {
+      logger_log(LOG_ERROR, "Couldnt start client thread");
+      exit(EXIT_FAILURE);
+   }
+
+   cltConnect(client);
 
    return (client);
 }
 
 void	cltStop(t_client *client)
 {
+   client->state = client->state & ~(CLIENT_RUNNING);
+   client->state = client->state & ~(CLIENT_CONNECTED);
+
+   pthread_join(client->packet_queue_thread, NULL);
+
 	# ifdef WIN32
 	   WSACleanup();
 	# endif
 	closesocket(client->sock);
 	free(client->hostname);
 	client->hostname = NULL;
-   client->state = client->state & ~(CLIENT_CONNECTED);
 }
+
+/** return the first packet */
+t_packet    *cltGetNextPacket(t_client *client)
+{
+   return (list_head(&(client->packet_queue)));
+}
+
+/** delete the first packet */
+void        cltPopPacket(t_client *client)
+{
+   list_pop(&(client->packet_queue), NULL);
+}
+
 
 void  cltPacketCreate(t_client *client, t_client_packet *cp, BYTE *data, short size, short id)
 {

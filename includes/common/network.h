@@ -14,6 +14,8 @@
 # define NETWORK_H
 
 # include "libft.h"
+# include <pthread.h>
+
 
 # define SESSION_ID_SIZE 16
 # define WRONG_CLIENT_ID -1

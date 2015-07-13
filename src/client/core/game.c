@@ -31,7 +31,6 @@ t_game	*gameNew(void)
 
 	initWorld(&(game->world));
 	initTimer(&(game->timer));
-	initNetwork(game);
 
 	initWindow(&(game->window));
 	initEvent(&(game->window));
