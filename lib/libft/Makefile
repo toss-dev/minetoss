@@ -22,11 +22,12 @@ SRCS	= ft_memdup.c ft_strtrim.c ft_epur.c \
 		  ft_nbrlen.c \
 		  ft_match.c rand_utils.c \
 		  lodepng.c logger.c bordel.c
+
+CC = gcc
+
 OBJ	= $(SRCS:.c=.o)
 
 FLAGS	= -Wall -Werror -Wextra -g3
-
-include ../../cc.make
 
 all: $(NAME)
 

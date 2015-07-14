@@ -79,31 +79,42 @@ COMMON_SRC 	= network/packet.c
 COMMON_SRCS	= $(addprefix ./src/common/, $(COMMON_SRC))
 COMMON_OBJ 	= $(COMMON_SRCS:.c=.o)
 
-LIBFT_DIR	= ./lib/libft
-LIBMATH_DIR	= ./lib/maths
+LIBFT_DIR 	= ./lib/libft
+LIBMATH_DIR = ./lib/maths
+
 LIBFT	= $(LIBFT_DIR)/libft.a
 LIBMATH	= $(LIBMATH_DIR)/libft_maths.a
 
-
 INC		= -I ./includes \
 		  -I $(LIBFT_DIR) \
-		  -I $(LIBMATH_DIR) \
-		  -I ./glfw/include
-
-include cc.make
-include lib.make
-
-LIB += $(LIBFT) $(LIBMATH)
+		  -I $(LIBMATH_DIR)
 
 FLAGS	= -Wall -Wextra -Werror -g3
 
-all: $(CLIENT) $(SERVER) $(DB)
+ifeq ($(OS),Darwin)
+	LIBGLFW = ./glfw/src/libglfw3.a
+	LIB = $(LIBGLFW) -framework Cocoa -framework OpenGL -framework IOKit -framework CoreVideo -lopenal
+	INC += -I ./glfw/include
+endif
+
+ifeq ($(OS),Windows_NT)
+	LIB = -L./lib/win/ -lglfw3 -lgdi32 -lglew32 -lopengl32 -lopenal
+	LIBGLFW = ./lib/win/libglw.a
+	DLLS_CLIENT = glew32.dll glew32mx.dll
+endif
+
+LIB += $(LIBFT) $(LIBMATH)
+
+all: $(DLLS_CLIENT) $(CLIENT) $(SERVER)
 
 $(CLIENT): $(LIBFT) $(LIBMATH) $(COMMON_OBJ) $(CLT_OBJ)
 	$(CC) $(FLAGS) -o $(CLIENT) $(CLT_OBJ) $(COMMON_OBJ) $(LIB)
 
 $(SERVER): $(LIBFT) $(LIBMATH) $(COMMON_OBJ) $(SRV_OBJ)
 	$(CC) $(FLAGS) -o $(SERVER) $(SRV_OBJ) $(COMMON_OBJ) $(LIB)
+
+%.dll:
+	cp ./bin/$@ .
 
 %.o: %.c
 	$(CC) $(FLAGS) -o $@ -c $< $(INC)
@@ -119,24 +130,21 @@ $(LIBMATH):
 $(LIBFT):
 	make -C $(LIBFT_DIR)
 
-cleanlib:
-	make -C $(LIBFT_DIR) clean
-	make -C $(LIBMATH_DIR) clean
-
-fcleanlib:
-	make -C $(LIBFT_DIR) fclean
-	make -C $(LIBMATH_DIR) fclean
-
-clean: cleanlib
+clean:
 	rm -rf $(CLT_OBJ)
 	rm -rf $(SRV_OBJ)
 	rm -rf $(COMMON_OBJ)
 
-fclean: fcleanlib clean
-	-rm render.exe.stackdump
+fclean: clean
+	-rm client.exe.stackdump
+	-rm $(DLLS_CLIENT)
 	-rm gmon.out
 	rm -rf $(CLIENT)
 	rm -rf $(SERVER)
+
+fcleanlib:
+	make -C $(LIBFT_DIR) fclean
+	make -C $(LIBMATH_DIR) fclean
 
 re: fclean all
 
