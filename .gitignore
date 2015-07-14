@@ -1,3 +1,5 @@
 *.o
 lib/libft/libft.a
 lib/maths/libft_maths.a
+client.exe
+server.exe
