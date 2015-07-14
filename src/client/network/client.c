@@ -36,7 +36,7 @@ static void cltLoop(t_client *client)
       }
       else
       {
-         logger_log(LOG_WARNING, "No packet received from server for 1 second!");
+         //logger_log(LOG_WARNING, "No packet received from server for 1 second!");
       }
    }
 }

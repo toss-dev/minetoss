@@ -1,6 +1,6 @@
 #include "common/common.h"
 
-void 	packetCreate(t_packet *packet, BYTE *data, short size, short id)
+void 	packetCreate(t_packet *packet, BYTE *data, unsigned int size, unsigned short id)
 {
 	size = MIN(size, PACKET_MAX_SIZE);
 	packet->header.id = id;

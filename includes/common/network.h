@@ -16,9 +16,9 @@
 # include "libft.h"
 # include <pthread.h>
 
-
-# define SESSION_ID_SIZE 16
-# define WRONG_CLIENT_ID -1
+# define PACKET_MAX_SIZE	131072	//128 ko
+# define SESSION_ID_SIZE 	16	//nb of BYTE for the session ID
+# define WRONG_CLIENT_ID 	-1
 
 
 /** threads */
@@ -34,9 +34,6 @@ enum e_packet_id
 typedef unsigned char	BYTE;
 typedef unsigned int 	PORT;
 typedef struct protoent	PROTOENT;
-
-# define PACKET_MAX_SIZE	1024
-# define PACKET_MAGIC		42
 
 # ifdef WIN32
 #	include <winsock2.h> 
@@ -61,7 +58,7 @@ typedef struct protoent	PROTOENT;
 typedef struct 	s_packet_header
 {
 	unsigned short	id;
-	unsigned short	size;
+	unsigned int	size;
 }				t_packet_header;
 
 typedef struct 	s_packet
@@ -77,7 +74,7 @@ typedef struct 	s_client_packet
 }				t_client_packet;
 
 void	packetDelete(t_packet *packet);
-void 	packetCreate(t_packet *packet, BYTE *data, short size, short id);
+void 	packetCreate(t_packet *packet, BYTE *data, unsigned int size, unsigned short id);
 int		packetSend(t_packet *packet, SOCKET sock, SOCKADDR_IN *sockaddr);
 int 	packetRead(t_packet *packet, SOCKET sock, SOCKADDR_IN *sockaddr);
 int		packetReceive(t_packet *packet, SOCKET sock, SOCKADDR_IN *sin, unsigned int sec, unsigned int usec);

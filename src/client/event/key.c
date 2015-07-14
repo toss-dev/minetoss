@@ -29,13 +29,27 @@ static void	keyNotifyClose(t_game *game)
 	glfwSetWindowShouldClose(game->window.ptr, GL_TRUE);
 }
 
-# define KEY_CALLBACKS_MAX 2
+static void	keyToggleCursor(t_game *game)
+{
+	if (glfwGetInputMode(game->window.ptr, GLFW_CURSOR) == GLFW_CURSOR_DISABLED)
+	{
+		glfwSetInputMode(game->window.ptr, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+	}
+	else
+	{
+		glfwSetInputMode(game->window.ptr, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	}
+	glfwSetCursorPos(game->window.ptr, (int)(WIDTH / 2), (int)(HEIGHT / 2));
+}
+
+# define KEY_CALLBACKS_MAX 3
 
 void	keyCallback(GLFWwindow *window, int key, int scancode, int action, int mods)
 {
 	static t_key_callback	callbacks[KEY_CALLBACKS_MAX] = {
 		{GLFW_KEY_R, GLFW_RELEASE, keyDebugCallback},
-		{GLFW_KEY_ESCAPE, GLFW_PRESS, keyNotifyClose}
+		{GLFW_KEY_ESCAPE, GLFW_PRESS, keyNotifyClose},
+		{GLFW_KEY_T, GLFW_RELEASE, keyToggleCursor}
 	};
 	unsigned	i;
 

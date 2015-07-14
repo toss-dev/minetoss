@@ -19,6 +19,7 @@
 # include "client/texture.h"
 # include "client/font.h"
 # include "client/sound.h"
+# include "client/view.h"
 
 /** file has to be added in the same order as these enum are declared */
 enum e_sounds
@@ -38,6 +39,7 @@ enum e_program_id
 	PROGRAM_TERRAIN,
 	PROGRAM_SKYBOX,
 	PROGRAM_FONT,
+	PROGRAM_QUAD,
 	PROGRAM_MAX
 };
 
@@ -95,6 +97,12 @@ enum e_renderer_config
 	RENDERER_CONFIG_DEBUG = 1
 };
 
+enum e_texture_id
+{
+	TEXTURE_GUI_BUTTON = 0,
+	TEXTURES_MAX = 1
+};
+
 typedef struct 	s_renderer
 {
 	t_timer			*timer;
@@ -104,9 +112,11 @@ typedef struct 	s_renderer
 	t_sky			sky;
 	t_block			blocks[BLOCK_MAX];
 	GLuint			block_atlas[RESOLUTION_BLOCK_ATLAS_MAX];
-	t_texture_atlas	textures_atlases[T_ATLAS_MAX];
+	GLuint			textures[TEXTURES_MAX];
 	t_model			quad_model;
 	size_t			config;
+	t_view			views[VIEW_MAX];
+	t_view			*current_view;
 }				t_renderer;
 
 /**
@@ -277,6 +287,12 @@ void			renderSky(t_world *world, t_renderer *renderer);
 void 			renderTerrains(t_world *world, t_renderer *renderer);
 void			renderUI(t_world *world, t_renderer *renderer);
 
+/** view functions */
+void			renderView(t_renderer *renderer, t_view *view);
+void 			loadViews(t_renderer *renderer);
+t_view			loadViewMainMenu(void);
+void 			rendererSetCurrentView(t_renderer *renderer, unsigned int viewID);
+
 /** opengl function wrapper */
 
 void			loadUniformMatrix(GLuint id, float *matrix);
@@ -297,7 +313,6 @@ void			updateWeather(t_world *world, t_renderer *renderer, t_timer *timer);
 
 /** blocks */
 void			createBlockTextures(t_renderer *renderer);
-/** packet ID */
 
 /** packets handler */
 void			packetHandlerConnection(t_game *game, t_packet *packet);

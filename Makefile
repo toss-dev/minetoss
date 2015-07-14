@@ -26,6 +26,8 @@ CLT_SRC	= main.c \
 		  event/mouse.c \
 		  event/camera_control.c \
 		  event/window.c \
+		  gui/view.c \
+		  gui/main_menu.c \
 		  network/client.c \
 		  network/network.c \
 		  network/packet/connection.c \

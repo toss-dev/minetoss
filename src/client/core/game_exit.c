@@ -14,6 +14,12 @@
 
 static void	cleanRenderer(t_renderer *renderer)
 {
+	unsigned int i;
+
+	for (i = 0 ; i < VIEW_MAX ; i++)
+	{
+		viewDestroy(renderer->views + i);
+	}
 	skyDelete(&(renderer->sky));
 	modelDelete(&(renderer->quad_model));
 	unloadFont();
@@ -44,6 +50,7 @@ void		gameExit(t_game *game)
 	{
 		pthread_join(game->threads[i], NULL);
 	}
+	puts("A");
 	cleanWindow(&(game->window));
 	cleanRenderer(&(game->renderer));
 	cleanWorld(&(game->world));

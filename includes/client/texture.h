@@ -17,17 +17,6 @@
 
 # define BMP_HEADER_SIZE 54
 
-enum	e_texture_atlases_id
-{
-	T_ATLAS_RAINDROP,
-	T_ATLAS_LEAVE,
-	T_ATLAS_MAGIC,
-	T_ATLAS_FLAMEDROP,
-	T_ATLAS_FLAME,
-	T_ATLAS_EXPLOSION,
-	T_ATLAS_MAX
-};
-
 enum 	e_block_texture_atlas_resolution
 {
 	RESOLUTION_BLOCK_ATLAS_16,
@@ -52,13 +41,6 @@ typedef struct	s_texture
 	GLenum		internalformat;
 	GLenum		format;
 }				t_texture;
-
-typedef struct 	s_texture_atlas
-{
-	unsigned	cols;
-	unsigned	lines;
-	GLuint		id;
-}				t_texture_atlas;
 
 typedef struct 	s_texture_format
 {
