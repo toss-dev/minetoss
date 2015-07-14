@@ -66,8 +66,6 @@ CLT_SRC	= main.c \
 CLT_SRCS	= $(addprefix ./src/client/, $(CLT_SRC))
 CLT_OBJ		= $(CLT_SRCS:.c=.o)
 
-
-
 SRV_SRC = main.c \
 		  game.c \
 		  network/network.c \
