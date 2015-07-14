@@ -115,8 +115,8 @@ typedef struct 	s_renderer
 	GLuint			textures[TEXTURES_MAX];
 	t_model			quad_model;
 	size_t			config;
-	t_view			views[VIEW_MAX];
-	t_view			*current_view;
+	t_view			views[VIEW_MAX]; //every views are store in this array, loaded on initialization
+	t_list 			views_list; //this list contains the ID of using views
 }				t_renderer;
 
 /**
@@ -155,7 +155,9 @@ enum e_thread_name
 
 enum e_game_state
 {
-	GAME_STATE_RUNNING = 1
+	GAME_RUNNING = 1,
+	GAME_MAIN_MENU = 2,
+	GAME_INGAME = 4 
 };
 
 typedef struct 	s_game
@@ -172,6 +174,15 @@ typedef struct 	s_game
 
 extern t_game	*g_game;
 
+/** core functions */
+t_game			*gameNew(void);
+void			gameLoop(t_game *game);
+void			gameStop(t_game *game);
+void			gameExit(t_game *game);
+int				isGameRunning(t_game *game);
+int				gameHasState(t_game *game, unsigned int state);
+void			gameSetState(t_game *game, unsigned int state);
+void			gameUnsetState(t_game *game, unsigned int state);
 
 /** network*/
 void			startNetwork(t_game *game);
@@ -196,13 +207,6 @@ void 			updateSound(t_sound_manager *sound_manager, t_camera *camera);
 void			keyCallback(GLFWwindow *window, int key, int scancode, int action, int mods);
 void			cursorMoveCallback(GLFWwindow *window, double x, double y);
 void			mouseButtonCallback(GLFWwindow* window, int button, int action, int mods);
-
-/** core functions */
-t_game			*gameNew(void);
-void			gameLoop(t_game *game);
-void			gameStop(t_game *game);
-void			gameExit(t_game *game);
-int				isGameRunning(t_game *game);
 
 /** thread mains */
 int				updateWorldGenerator(t_game *game);
@@ -240,6 +244,9 @@ void 			rendererActiveConfig(t_renderer *renderer, unsigned config);
 void 			rendererDisableConfig(t_renderer *renderer, unsigned config);
 int				rendererHasConfig(t_renderer *renderer, unsigned config);
 void 			rendererSwitchConfig(t_renderer *renderer, unsigned config);
+void			rendererAddView(t_renderer *renderer, unsigned int viewID);
+void			rendererRemoveView(t_renderer *renderer, unsigned int viewID);
+t_view			*rendererGetView(t_renderer *renderer, unsigned int viewID);
 
 /**	terrain functions
 **
@@ -283,6 +290,8 @@ void			updateMeshes(t_world *world, t_terrain *terrain, unsigned meshID);
 
 /** main render functions, will render the whole world to default framebuffers */
 void			render(t_game *game);
+void			renderMainMenu(t_game *game);
+void 			renderIngame(t_game *game);
 void			renderSky(t_world *world, t_renderer *renderer);
 void 			renderTerrains(t_world *world, t_renderer *renderer);
 void			renderUI(t_world *world, t_renderer *renderer);
@@ -290,8 +299,7 @@ void			renderUI(t_world *world, t_renderer *renderer);
 /** view functions */
 void			renderView(t_renderer *renderer, t_view *view);
 void 			loadViews(t_renderer *renderer);
-t_view			loadViewMainMenu(void);
-void 			rendererSetCurrentView(t_renderer *renderer, unsigned int viewID);
+void			loadViewMainMenu(t_view *view);
 
 /** opengl function wrapper */
 

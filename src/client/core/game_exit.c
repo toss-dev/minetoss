@@ -40,9 +40,10 @@ static void	cleanWorld(t_world *world)
 	htab_delete(&(world->terrains), deleteTerrain);
 }
 
-void		gameExit(t_game *game)
+void	gameExit(t_game *game)
 {
-	game->state = game->state & ~(GAME_STATE_RUNNING);
+	gameUnsetState(game, GAME_RUNNING);
+
 	stopNetwork(game);
 
 	unsigned	i;
@@ -50,7 +51,6 @@ void		gameExit(t_game *game)
 	{
 		pthread_join(game->threads[i], NULL);
 	}
-	puts("A");
 	cleanWindow(&(game->window));
 	cleanRenderer(&(game->renderer));
 	cleanWorld(&(game->world));

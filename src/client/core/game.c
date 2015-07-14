@@ -14,7 +14,22 @@
 
 int		isGameRunning(t_game *game)
 {
-	return (game->state & GAME_STATE_RUNNING);
+	return (gameHasState(game, GAME_RUNNING));
+}
+
+int		gameHasState(t_game *game, unsigned int state)
+{
+	return (game->state & state);
+}
+
+void	gameSetState(t_game *game, unsigned int state)
+{
+	game->state = game->state | state;
+}
+
+void	gameUnsetState(t_game *game, unsigned int state)
+{
+	game->state = game->state & ~(state);
 }
 
 t_game	*gameNew(void)
@@ -22,7 +37,7 @@ t_game	*gameNew(void)
 	t_game	*game;
 
 	logger_log(LOG_FINE, "Creating new game ...");
-	if ((game = malloc(sizeof(t_game))) == NULL)
+	if ((game = (t_game*)malloc(sizeof(t_game))) == NULL)
 	{
 		logger_log(LOG_FINE, "Not enough memory for game.");
 		return (NULL);

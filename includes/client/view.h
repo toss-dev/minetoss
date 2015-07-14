@@ -38,7 +38,6 @@ enum 	e_view_id
 	VIEW_MAX
 };
 
-
 typedef struct 	s_view
 {
 	t_vec2	pos;
@@ -46,26 +45,41 @@ typedef struct 	s_view
 	t_list	buttons;
 }				t_view;
 
+# define BUTTON_TEXT_MAX_LEN 16
+
+enum e_button_state
+{
+	BUTTON_PRESSED = 1,
+	BUTTON_HOVERED = 2
+};
+
 typedef struct 	s_button
 {
-	char			text[16];
+	t_view			*parent;
+	char			text[BUTTON_TEXT_MAX_LEN];
 	t_font_model	font_model;
 	t_vec2			gl_pos;
 	t_vec2			screen_pos;
 	t_vec2			size;
+	unsigned char 	state;
 	int 			textureID;
-	void			(*onClick)(t_view *, struct s_button *);
+	void			(*onPressed)(struct s_button *);
+	void			(*onReleased)(struct s_button *);
 }				t_button;
 
-t_view		viewNew(t_vec2 pos, t_vec2 size);
+void		viewNew(t_view *view, t_vec2 pos, t_vec2 size);
 void		viewDestroy(t_view *view);
 
 void		viewAddButton(t_view *view, t_button button);
 
-void		viewOnHover(t_view *view, float x, float y);
-void		viewOnClick(t_view *view, float x, float y);
+typedef void	(*t_view_event_funct)(t_view *, float , float);
 
-t_button	buttonNew(char const *text, t_vec2 pos, t_vec2 size, GLuint textureID);
+void		viewOnMouseHover(t_view *view, float x, float y);
+void		viewOnMouseReleased(t_view *view, float x, float y);
+void		viewOnMousePressed(t_view *view, float x, float y);
+
+t_button	buttonNew(t_view *view, t_vec2 pos, t_vec2 size, GLuint textureID);
+void		buttonSetText(t_button *button, char const *text);
 
 /******************* GRAPHIC USER INTERFACE END ************************/
 

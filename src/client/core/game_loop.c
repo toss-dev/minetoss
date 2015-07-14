@@ -12,17 +12,6 @@
 
 #include "client/main.h"
 
-static void	updateDebug(t_game *game)
-{
-	char	buffer[512];
-
-	sprintf(buffer, "x:%f | y:%f | z:%f ; x:%f | y:%f | z:%f",
-		game->renderer.camera.pos.x, game->renderer.camera.pos.y, game->renderer.camera.pos.z,
-		game->renderer.camera.look_vec.x, game->renderer.camera.look_vec.y, game->renderer.camera.look_vec.z);
-	glfwSetWindowTitle(game->window.ptr, buffer);
-	glhCheckError("main thread loop");
-}
-
 /**	update the timer, camera, sounds and render */
 static void	updateGame(t_game *game)
 {
@@ -43,7 +32,9 @@ void		gameLoop(t_game *game)
 {
 	double	prev;
 
-	game->state = game->state | GAME_STATE_RUNNING;
+	gameSetState(game, GAME_RUNNING);
+	gameSetState(game, GAME_INGAME);
+	rendererAddView(&(game->renderer), VIEW_MAIN_MENU);
 
 	startNetwork(game);
 	startTerrainMesher(game);
@@ -51,11 +42,9 @@ void		gameLoop(t_game *game)
 	while (!glfwWindowShouldClose(game->window.ptr))
 	{
 		prev = glfwGetTime();
-		usleep(1000000 / 120);
-
 		updateGame(game);
 		renderGame(game);
-		updateDebug(game);
 		game->renderer.fps = (unsigned int)(1 / (glfwGetTime() - prev));
+		usleep(1000000 / 120);
 	}
 }

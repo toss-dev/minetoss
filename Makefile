@@ -26,13 +26,12 @@ CLT_SRC	= main.c \
 		  event/mouse.c \
 		  event/camera_control.c \
 		  event/window.c \
-		  gui/view.c \
-		  gui/main_menu.c \
 		  network/client.c \
 		  network/network.c \
 		  network/packet/connection.c \
 		  render/camera.c \
 		  render/render.c \
+		  render/render_ingame.c \
 		  render/renderer/render_terrain.c \
 		  render/renderer/render_ui.c \
 		  render/renderer/render_sky.c \
@@ -51,6 +50,8 @@ CLT_SRC	= main.c \
 		  render/opengl/vertex.c \
 		  render/opengl/model.c \
 		  render/opengl/uniforms.c \
+		  render/gui/view.c \
+		  render/gui/main_menu.c \
 		  timer/timer.c \
 		  sound/sound.c \
 		  sound/sound_util.c \

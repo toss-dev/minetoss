@@ -45,7 +45,7 @@ typedef struct 	s_font_vertex
 	t_vec2	uv;
 }				t_font_vertex;
 
-t_font_model	generateFontModel(char const *str, t_vec3 color, t_vec3 pos, float step);
+t_font_model	generateFontModel(t_vec3 color, t_vec3 pos, float step);
 void 			deleteFontModel(t_font_model *model);
 void 			loadFont(void);
 void 			unloadFont(void);
@@ -54,6 +54,7 @@ void			renderFont(t_program *program, t_font_model *model);
 void 			setFontModelPosition(t_font_model *model, t_vec3 pos);
 void 			setFontModelRotation(t_font_model *model, t_vec3 rot);
 void 			setFontModelScaling(t_font_model *model, t_vec3 scale);
+void 			setFontModelText(t_font_model *model, char const *text);
 
 float 			getFontStringWidth(t_font_model *model, char const *str);
 
