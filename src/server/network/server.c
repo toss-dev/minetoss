@@ -54,7 +54,8 @@ static int  srvConnectClient(t_server *server, SOCKADDR_IN *sockaddr)
          packetCreate(&packet, (BYTE*)&clientID, sizeof(int), PACKET_ID_CONNECTION);
          packetSend(&packet, server->sock, sockaddr);
 
-         client->last_live = time(NULL);
+         client->last_live_received = time(NULL);
+         client->last_live_sent = client->last_live_received ;
          server->client_count = server->client_count + 1;
          srvClientSetState(client, CLIENT_CONNECTED);
 
@@ -66,32 +67,45 @@ static int  srvConnectClient(t_server *server, SOCKADDR_IN *sockaddr)
    return (WRONG_CLIENT_ID);
 }
 
-/** do a server tick */
+/**
+** do a server tick:
+**
+** for every clients:
+**    check when the last live ping was received
+**    if it was more than LIVE_PING_TIMER seconds ago, the server
+**    send a packet to the client, asking it if it is still connected
+**    after a LIVE_TIMEOUT seconds timeout, if the client didnt responsed,
+**    it is disconnected from the server
+*/
 void        srvTick(t_server *server)
 {
    t_client       *client;
    unsigned int   clientID;
-   unsigned int   diff;
+   time_t         now;
 
+   now = time(NULL);
    for (clientID = 0 ; clientID < SRV_MAX_CLIENT ; clientID++)
    {
       client = server->clients + clientID;
       if (srvClientHasState(client, CLIENT_CONNECTED))
       {
-         diff = time(NULL) - client->last_live;
+         size_t   diff;
+
+         diff = now - client->last_live_received;
          if (diff >= LIVE_TIMEOUT)
          {
             logger_log(LOG_WARNING, "Client with id: %u has been killed! (%u)", clientID, diff);
             srvClientUnsetState(client, CLIENT_CONNECTED);
             server->client_count = server->client_count - 1;
          }
-         else if (diff >= LIVE_PING_TIMER)
+         else if (diff >= LIVE_PING_TIMER && now - client->last_live_sent >= LIVE_PING_TIMER)
          {
             //send the ping live to the client
             t_packet packet;
 
             packetCreate(&(packet), NULL, 0, PACKET_ID_LIVE);
             srvSendPacket(server, &(packet), client);
+            client->last_live_sent = now;
          }
       }
    }
@@ -101,7 +115,7 @@ void        srvTick(t_server *server)
 /** tell the server that the given client is alive */
 void        srvCltLive(t_client *client)
 {
-   client->last_live = time(NULL);
+   client->last_live_received = time(NULL);
 }
 
 /** independant thread loop that queue packets into the server->packet_queue list */

@@ -50,12 +50,4 @@ typedef struct 	s_terrain_data
 	char		blocks[TERRAIN_SIZEX][TERRAIN_SIZEY][TERRAIN_SIZEZ];
 }				t_terrain_data;
 
-typedef struct 	s_world
-{
-	t_timer			*timer;
-	t_htab			terrains;
-	t_weather		weather;
-	t_array_list	terrain_garbage;	//array list of t_point3, remove chunks at these coordinates
-}				t_world;
-
 #endif

@@ -30,6 +30,14 @@ enum 			e_thread_id
 	THRD_MAX
 };
 
+typedef struct 	s_world
+{
+	t_htab		terrains;
+	t_list 		entities;
+	t_weather	weather;
+	t_timer		*timer;	//pointer to the main game timer
+}				t_world;
+
 enum 			e_game_state
 {
 	GAME_STATE_RUNNING = 1
@@ -40,6 +48,7 @@ typedef struct 	s_game
 	pthread_t	threads[THRD_MAX];
 	t_server	*server;
 	t_world		world;
+	t_timer		timer;	//main game timer
 	int 		state;
 }				t_game;
 

@@ -166,7 +166,7 @@ static void calculateSunPos(t_world *world, t_renderer *renderer, float tick_rat
 
 void        updateSky(t_world *world, t_renderer *renderer, t_timer *timer)
 {
-    calculateSunPos(world, renderer, timer->tick_ratio);
-    calculateSunColor(world, renderer, timer->tick_ratio);
+    calculateSunPos(world, renderer, timer->ratio);
+    calculateSunColor(world, renderer, timer->ratio);
     renderer->sky.rot.y += 0.0001f;
 }

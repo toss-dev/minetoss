@@ -19,7 +19,7 @@ int 	isGameRunning(t_game *game)
 
 void	gameInit(t_game *game)
 {
-	(void)game;
+	initTimer(&(game->timer));
 	logger_log(LOG_FINE, "Initializing game");
 }
 
@@ -29,6 +29,7 @@ void	gameLoop(t_game *game)
 	logger_log(LOG_FINE, "Starting loop");
 	while (isGameRunning(game))
 	{
+		updateTimer(&(game->timer));
 		srvTick(game->server);
 		usleep(1000000 / 60);
 	}

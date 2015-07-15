@@ -10,6 +10,8 @@
 #                                                                              #
 # **************************************************************************** #
 
+CC = gcc
+
 CLIENT 	= client
 SERVER 	= server
 
@@ -53,7 +55,6 @@ CLT_SRC	= main.c \
 		  render/opengl/uniforms.c \
 		  render/gui/view.c \
 		  render/gui/main_menu.c \
-		  timer/timer.c \
 		  sound/sound.c \
 		  sound/sound_util.c \
 		  world/setblock.c \
@@ -76,7 +77,8 @@ SRV_SRC = main.c \
 SRV_SRCS 	= $(addprefix ./src/server/, $(SRV_SRC))
 SRV_OBJ		= $(SRV_SRCS:.c=.o)
 
-COMMON_SRC 	= network/packet.c
+COMMON_SRC 	= network/packet.c timer/timer.c
+
 
 COMMON_SRCS	= $(addprefix ./src/common/, $(COMMON_SRC))
 COMMON_OBJ 	= $(COMMON_SRCS:.c=.o)

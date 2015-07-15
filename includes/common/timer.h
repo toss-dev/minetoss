@@ -11,27 +11,26 @@
 /* ************************************************************************** */
 
 
-#ifndef WORLD_TIME_H
-# define WORLD_TIME_H
+#ifndef TIMER_H
+# define TIMER_H
 
-# define TPS 20											//ticks per seconds (time unit)
-# define TIME_PER_CYCLE	2								//time in minute for a cycle (day + night)
-# define TICK_PER_CYCLE	(TIME_PER_CYCLE * TPS * 60)		//tick number in a fully day-night cycle
-# define SECOND_PER_TICK (1 / (double)TPS)
+# define MINUTES_PER_CYCLE	(2)	//time in minute for a cycle (day + night)
+# define TIME_PER_DAY 		((int)(MINUTES_PER_CYCLE * 60 * 1000000))
 
-# define NIGHT_END 		0
-# define DAY_START		0.1f
-# define DAY_END 		0.5f
-# define NIGHT_START	0.6f
+# define NIGHT_END 0.0f
+# define DAY_START 0.10f
+# define DAY_END 0.50f
+# define NIGHT_START 0.60f
 
 typedef struct 	s_timer
 {
-	float 		speed;
-	float 		tick_ratio;
-	unsigned	ticks;
+	size_t	last_time;
+	size_t	current_time;
+	float 	ratio;
 }				t_timer;
 
 void 	initTimer(t_timer *timer);
 void	updateTimer(t_timer *timer);
+float	getTimerDayRatio(t_timer *timer);
 
 #endif

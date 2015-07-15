@@ -132,12 +132,13 @@ typedef struct 	s_terrain	//16x256x16
 	int 		state;
 }				t_terrain;
 
-typedef struct 	s_world_renderer
+typedef struct 	s_world
 {
-	t_world 	*world;
-	t_renderer 	*renderer;
-	t_program	*program;
-}				t_world_renderer;
+	t_timer			*timer;
+	t_htab			terrains;
+	t_weather		weather;
+	t_array_list	terrain_garbage;	//array list of t_point3, remove chunks at these coordinates
+}				t_world;
 
 //main thread is for rendering ONLY
 enum e_thread_name

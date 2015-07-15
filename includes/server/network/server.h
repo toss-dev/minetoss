@@ -51,7 +51,8 @@ typedef struct 	s_client
 {
 	unsigned int 	state;
 	SOCKADDR_IN		sockaddr;
-	time_t			last_live;
+	time_t			last_live_received;
+	time_t			last_live_sent;
 }				t_client;
 
 typedef struct 	s_server_packet
