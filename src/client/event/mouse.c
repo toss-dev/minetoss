@@ -31,12 +31,10 @@ static void	mouseViewEvent(t_game *game, t_view_event_funct callback)
 	LIST_ITER_START(game->renderer.views_list, int, viewID)
 	{
 		view = rendererGetView(&(game->renderer), *viewID);
-		if (x >= view->pos.x && x <= view->pos.x + view->size.x)
+		if ((x >= view->pos.x && x <= view->pos.x + view->size.x)
+			&& (y >= view->pos.y && y <= view->pos.y + view->size.y))
 		{
-			if (y >= view->pos.y && y <= view->pos.y + view->size.y)
-			{
-				callback(view, x, y);
-			}
+			callback(view, x, y);
 		}
 	}
 	LIST_ITER_END(game->renderer.views_list, t_view, view);

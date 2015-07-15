@@ -29,7 +29,8 @@ void	gameLoop(t_game *game)
 	logger_log(LOG_FINE, "Starting loop");
 	while (isGameRunning(game))
 	{
-		sleep(1);
+		srvTick(game->server);
+		usleep(1000000 / 60);
 	}
 }
 

@@ -38,11 +38,14 @@ void	viewOnMouseHover(t_view *view, float x, float y)
 {
 	LIST_ITER_START(view->buttons, t_button, button);
 	{
-		if (x >= button->screen_pos.x && x <= button->screen_pos.x + button->size.x)
+		buttonUnsetState(button, BUTTON_HOVERED);
+		if ((x >= button->screen_pos.x && x <= button->screen_pos.x + button->size.x)
+			&& (y >= button->screen_pos.y && y <= button->screen_pos.y + button->size.y))
 		{
-			if (y >= button->screen_pos.y && y <= button->screen_pos.y + button->size.y)
+			buttonSetState(button, BUTTON_HOVERED);
+			if (button->onHovered)
 			{
-				logger_log(LOG_FINE, "Hovering a button!");
+				button->onHovered(button);
 			}
 		}
 	}
@@ -55,18 +58,18 @@ void	viewOnMousePressed(t_view *view, float x, float y)
 	logger_log(LOG_FINE, "User clicked on a view!");
 	LIST_ITER_START(view->buttons, t_button, button);
 	{
+		buttonSetState(button, BUTTON_RELEASED);
+		buttonUnsetState(button, BUTTON_PRESSED);
+
 		if ((x >= button->screen_pos.x && x <= button->screen_pos.x + button->size.x)
 			&& (y >= button->screen_pos.y && y <= button->screen_pos.y + button->size.y))
 		{
-			button->state = button->state | BUTTON_PRESSED;
+			buttonSetState(button, BUTTON_PRESSED);
+			buttonUnsetState(button, BUTTON_RELEASED);
 			if (button->onPressed)
 			{
 				button->onPressed(button);
 			}
-		}
-		else
-		{
-			button->state = button->state & ~(BUTTON_PRESSED);
 		}
 	}
 	LIST_ITER_END(view->buttons, t_button, button);
@@ -82,12 +85,13 @@ void	viewOnMouseReleased(t_view *view, float x, float y)
 		if ((x >= button->screen_pos.x && x <= button->screen_pos.x + button->size.x)
 			&& (y >= button->screen_pos.y && y <= button->screen_pos.y + button->size.y))
 		{
-			button->state = button->state & ~(BUTTON_PRESSED);
 			if (button->onReleased)
 			{
 				button->onReleased(button);
 			}
 		}
+		buttonUnsetState(button, BUTTON_PRESSED);
+		buttonSetState(button, BUTTON_RELEASED);
 	}
 	LIST_ITER_END(view->buttons, t_button, button);
 }
@@ -104,6 +108,21 @@ void	viewDestroy(t_view *view)
 
 
 /********************* BUTTON FUNCTIONS START ************************/
+
+int 		buttonHasState(t_button *button, unsigned int state)
+{
+	return (button->state & state);
+}
+
+void 		buttonSetState(t_button *button, unsigned int state)
+{
+	button->state = button->state | state;
+}
+
+void 		buttonUnsetState(t_button *button, unsigned int state)
+{
+	button->state = button->state & ~(state);
+}
 
 static void	buttonClickHandler(t_button *button)
 {
@@ -132,17 +151,23 @@ static void	buttonCenterTextModel(t_button *button)
 	setFontModelPosition(&(button->font_model), fontpos);
 }
 
-t_button	buttonNew(t_view *view, t_vec2 pos, t_vec2 size, GLuint textureID)
+t_button	buttonNew(t_view *view, t_vec2 pos, t_vec2 size,
+						GLuint press_texture,
+						GLuint release_textureID,
+						GLuint hovered_textureID)
 {
 	t_button	button;
 
 	button.parent = view;
 	button.onReleased = buttonClickHandler;
 	button.onPressed = NULL;
+	button.onHovered = NULL;
 	button.screen_pos = pos;
 	button.gl_pos = new_vec2(0, 0);
 	button.size = size;
-	button.textureID = textureID;
+	button.textureID[BUTTON_TEXTURE_PRESSED] 	= press_texture;
+	button.textureID[BUTTON_TEXTURE_RELEASED]	= release_textureID;
+	button.textureID[BUTTON_TEXTURE_HOVERED] 	= hovered_textureID;
 	button.state = 0;
 
 	button.font_model = generateFontModel(new_vec3(0, 0, 0), new_vec3(0, 0, 0), 0);
@@ -181,6 +206,29 @@ static void	bindButtonUniforms(t_program *program, t_button *button)
 	loadUniformMatrix(program->transf_matrix, m);
 }
 
+static void	renderButton(t_renderer *renderer, t_button *button)
+{
+	unsigned int 	textID;
+
+	printf("%d\n", button->state);
+	if (buttonHasState(button, BUTTON_PRESSED))
+	{
+		textID = BUTTON_TEXTURE_PRESSED;	
+	}
+	else if (buttonHasState(button, BUTTON_HOVERED))
+	{
+		textID = BUTTON_TEXTURE_HOVERED;	
+	}
+	else
+	{
+		textID = BUTTON_TEXTURE_RELEASED;
+	}
+	glhUseProgram(renderer->programs + PROGRAM_QUAD);
+	glBindTexture(GL_TEXTURE_2D, renderer->textures[button->textureID[textID]]);
+	bindButtonUniforms(renderer->programs + PROGRAM_QUAD, button);
+	renderModel(&(renderer->quad_model));
+}
+
 void		renderView(t_renderer *renderer, t_view *view)
 {
 	glEnable(GL_BLEND);
@@ -189,10 +237,7 @@ void		renderView(t_renderer *renderer, t_view *view)
 	glActiveTexture(GL_TEXTURE0);
 	LIST_ITER_START(view->buttons, t_button, button);
 	{
-		glhUseProgram(renderer->programs + PROGRAM_QUAD);
-		glBindTexture(GL_TEXTURE_2D, renderer->textures[button->textureID]);
-		bindButtonUniforms(renderer->programs + PROGRAM_QUAD, button);
-		renderModel(&(renderer->quad_model));
+		renderButton(renderer, button);
 		
 		renderFont(renderer->programs + PROGRAM_FONT, &(button->font_model));
 	}

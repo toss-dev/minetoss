@@ -30,7 +30,9 @@ static void loadQuadRenderer(t_renderer *renderer)
 /** load every game textures (except blocks texture) */
 static void	loadTextures(t_renderer *renderer)
 {
-	renderer->textures[TEXTURE_GUI_BUTTON] = glhLoadTexture("gui/button.png");
+	renderer->textures[T_GUI_BUTTON_PRESSED] = glhLoadTexture("gui/button_pressed.png");
+	renderer->textures[T_GUI_BUTTON_RELEASED] = glhLoadTexture("gui/button_released.png");
+	renderer->textures[T_GUI_BUTTON_HOVERED] = glhLoadTexture("gui/button_hovered.png");
 }
 
 /** enable the config */

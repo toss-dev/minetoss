@@ -97,12 +97,6 @@ enum e_renderer_config
 	RENDERER_CONFIG_DEBUG = 1
 };
 
-enum e_texture_id
-{
-	TEXTURE_GUI_BUTTON = 0,
-	TEXTURES_MAX = 1
-};
-
 typedef struct 	s_renderer
 {
 	t_timer			*timer;
@@ -112,7 +106,7 @@ typedef struct 	s_renderer
 	t_sky			sky;
 	t_block			blocks[BLOCK_MAX];
 	GLuint			block_atlas[RESOLUTION_BLOCK_ATLAS_MAX];
-	GLuint			textures[TEXTURES_MAX];
+	GLuint			textures[T_MAX];
 	t_model			quad_model;
 	size_t			config;
 	t_view			views[VIEW_MAX]; //every views are store in this array, loaded on initialization
@@ -132,9 +126,9 @@ enum e_terrain_state
 
 typedef struct 	s_terrain	//16x256x16
 {
-	char 		blocks[TERRAIN_SIZEX][TERRAIN_SIZEY][TERRAIN_SIZEZ];
+	t_point3	index;
+	char		blocks[TERRAIN_SIZEX][TERRAIN_SIZEY][TERRAIN_SIZEZ];
 	t_model		meshes[MESH_PER_TERRAIN];	//the index correspond to the y chunk component
-	t_point3	index;	//given x, y, z index (for hashtable)
 	int 		state;
 }				t_terrain;
 
@@ -148,7 +142,7 @@ typedef struct 	s_world_renderer
 //main thread is for rendering ONLY
 enum e_thread_name
 {
-	THRD_MESHER,
+	THRD_TERRAIN,
 	THRD_NETWORK,
 	THRD_MAX
 };
@@ -228,8 +222,8 @@ void			shaderDelete(GLuint program_id, GLuint shader_id);
 void			programDelete(t_program *program);
 
 /** main world update functions, will update the world and all it components */
+void 			startTerrainUpdate(t_game *game);
 void			updateWorld(t_world *world);
-void			updateTerrains(t_world *world);
 void			updateMesh(t_world *world, t_terrain *terrain, unsigned meshID);
 t_terrain		*createNewTerrain(t_world *world, t_point3 index);
 void 			removeTerrain(t_world *world, t_point3 index);
@@ -261,18 +255,6 @@ int				terrainHasState(t_terrain *terrain, unsigned state);
 t_terrain		*getTerrainAt(t_world *world, t_vec3 vec);
 t_terrain		*getTerrain(t_world *world, t_point3 index);
 void			generateTerrainKey(char *buffer, t_point3 index);
-
-/** world generator */
-void			updateWorld(t_world *world);
-void 			startTerrainMesher(t_game *game);
-
-void			startWorldGenerator(t_game *game);
-
-void   			generateTerrain(t_terrain *terrain);
-void            loadWorldGenerator(void);
-void 			prepareNoise(void);
-double			noise2(t_vec2 in);
-double			noise3(t_vec3 in);
 
 int				getTerrainHeightAt(t_terrain *terrain, float x, float z);
 t_point3		getTerrainRelativePos(t_vec3 vec);
@@ -322,8 +304,18 @@ void			updateWeather(t_world *world, t_renderer *renderer, t_timer *timer);
 /** blocks */
 void			createBlockTextures(t_renderer *renderer);
 
-/** packets handler */
-void			packetHandlerConnection(t_game *game, t_packet *packet);
 
+/** world generator */
+void 	startTerrainUpdate(t_game *game);
+void	startWorldGenerator(t_game *game);
+void   	generateTerrain(t_terrain *terrain);
+void	loadWorldGenerator(void);
+void	prepareNoise(void);
+double	noise2(t_vec2 in);
+double	noise3(t_vec3 in);
+
+
+/** packets handler */
+void			packetHandlerLive(t_game *game, t_packet *packet);
 
 #endif

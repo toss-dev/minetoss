@@ -40,6 +40,7 @@ enum 	e_view_id
 
 typedef struct 	s_view
 {
+	char	mouseIn;
 	t_vec2	pos;
 	t_vec2	size;
 	t_list	buttons;
@@ -50,7 +51,16 @@ typedef struct 	s_view
 enum e_button_state
 {
 	BUTTON_PRESSED = 1,
-	BUTTON_HOVERED = 2
+	BUTTON_HOVERED = 2,
+	BUTTON_RELEASED = 4
+};
+
+enum e_button_texture_id
+{
+	BUTTON_TEXTURE_RELEASED,
+	BUTTON_TEXTURE_PRESSED,
+	BUTTON_TEXTURE_HOVERED,
+	BUTTON_TEXTURE_MAX
 };
 
 typedef struct 	s_button
@@ -62,9 +72,10 @@ typedef struct 	s_button
 	t_vec2			screen_pos;
 	t_vec2			size;
 	unsigned char 	state;
-	int 			textureID;
+	unsigned int	textureID[BUTTON_TEXTURE_MAX];
 	void			(*onPressed)(struct s_button *);
 	void			(*onReleased)(struct s_button *);
+	void			(*onHovered)(struct s_button *);
 }				t_button;
 
 void		viewNew(t_view *view, t_vec2 pos, t_vec2 size);
@@ -78,7 +89,15 @@ void		viewOnMouseHover(t_view *view, float x, float y);
 void		viewOnMouseReleased(t_view *view, float x, float y);
 void		viewOnMousePressed(t_view *view, float x, float y);
 
-t_button	buttonNew(t_view *view, t_vec2 pos, t_vec2 size, GLuint textureID);
+int 		buttonHasState(t_button *button, unsigned int state);
+void 		buttonSetState(t_button *button, unsigned int state);
+void 		buttonUnsetState(t_button *button, unsigned int state);
+
+t_button	buttonNew(t_view *view, t_vec2 pos, t_vec2 size,
+						GLuint press_texture,
+						GLuint release_textureID,
+						GLuint hovered_textureID);
+
 void		buttonSetText(t_button *button, char const *text);
 
 /******************* GRAPHIC USER INTERFACE END ************************/

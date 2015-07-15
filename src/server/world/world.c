@@ -16,12 +16,7 @@ void	initWorld(t_world *world)
 {
 	world->terrains = htab_new(CHUNK_HASHTABLE_SIZE);
 	world->terrain_garbage = array_list_new(128, sizeof(t_point3));
-
-	logger_log(LOG_FINE, "Loading world terrains");
-	loadTerrains(world);
-	
-	logger_log(LOG_FINE, "Loading world weather");
-	loadWeather(&(world->weather));
+	world->weather = weatherCreate();
 }
 
 /******************************************************************************/
@@ -30,6 +25,7 @@ void	initWorld(t_world *world)
 
 void	updateWorld(t_world *world)
 {
+	//updateTerrains(world);
 	(void)world;
 }
 

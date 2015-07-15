@@ -27,14 +27,14 @@ int		packetReceive(t_packet *packet, SOCKET sock, SOCKADDR_IN *sockaddr, unsigne
 	if (select(sock + 1, &rdfs, NULL, NULL, &tv) == -1)
 	{
 		perror("select()");
-		return (-1);
+		return (PACKET_SELECT_ERROR);
 	}
 
 	if (FD_ISSET(sock, &rdfs))
 	{
 		return (packetRead(packet, sock, sockaddr));
 	}
-	return (-2);
+	return (PACKET_TIMEOUT);
 }
 
 /**

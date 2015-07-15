@@ -18,7 +18,7 @@ static void cltLoop(t_client *client)
 
    while (client->state & CLIENT_RUNNING)
    {
-      if (packetReceive(&packet, client->sock, &(client->sockaddr), 1, 0) > 0)
+      if (packetReceive(&packet, client->sock, &(client->sockaddr), 0, 10000) > 0)
       {
          if (packet.header.id >= PACKET_ID_MAX)
          {
@@ -33,10 +33,6 @@ static void cltLoop(t_client *client)
          }
 
          list_add(&(client->packet_queue), &(packet), sizeof(t_packet_header) + packet.header.size);
-      }
-      else
-      {
-         //logger_log(LOG_WARNING, "No packet received from server for 1 second!");
       }
    }
 }
@@ -65,11 +61,16 @@ static t_client   *cltNew(char const *hostname, PORT port)
       perror("malloc");
       exit(EXIT_FAILURE);
    }
+
    client->port = port;
    client->hostname = strdup(hostname);
    client->state = 0;
    client->clientID = -1;
    client->packet_queue = list_new();
+
+   client->ticks = 0;
+   client->last_live = time(NULL);
+
    return (client);
 }
 
@@ -107,6 +108,18 @@ static void cltConnect(t_client *client)
 
    cltPacketCreate(client, &packet, NULL, 0, PACKET_ID_CONNECTION);
    cltPacketSend(client, &packet);
+
+
+   t_packet response;
+
+   if (packetReceive(&response, client->sock, &(client->sockaddr), CONNEXION_TIMEOUT, 0) < 0)
+   {
+      logger_log(LOG_ERROR, "Couldn't connect to server! ;)");
+   }
+   else
+   {
+      packetHandlerConnection(client, &(response));
+   }
 }
 
 t_client *cltStart(char const *hostname, PORT port)
@@ -143,6 +156,29 @@ void	cltStop(t_client *client)
 	closesocket(client->sock);
 	free(client->hostname);
 	client->hostname = NULL;
+}
+
+/** tick the client once:
+**
+** send to the server that the client is still connected
+*/
+void     cltTick(t_client *client)
+{
+   if (client->last_live - time(NULL) >= LIVE_TIMEOUT)
+   {
+      logger_log(LOG_ERROR, "The server didnt send live packet for %d ticks\n", client->ticks - client->last_live);
+   }
+   ++client->ticks;
+}
+
+/** send to the server that the client is alive */
+void     cltLive(t_client *client)
+{
+   t_client_packet   packet;
+
+   client->last_live = client->ticks;
+   cltPacketCreate(client, &packet, NULL, 0, PACKET_ID_LIVE);
+   cltPacketSend(client, &packet);
 }
 
 /** return the first packet */

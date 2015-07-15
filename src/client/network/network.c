@@ -16,7 +16,8 @@
 static void	networkStartLoop(t_game *game)
 {
 	t_function	packet_handler[PACKET_ID_MAX] = {
-		packetHandlerConnection
+		packetHandlerConnection,
+		packetHandlerLive
 	};
 	t_packet 	*packet;
 

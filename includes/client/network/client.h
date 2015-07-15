@@ -14,18 +14,22 @@
 
 # define CLIENT_H
 
+# define CONNEXION_TIMEOUT 5 	//in seconds
+
 # include "common/network.h"
 
 typedef struct 	s_client
 {
-	int 			clientID;
-	SOCKET			sock;
-	SOCKADDR_IN		sockaddr;
-	char			*hostname;
-	PORT			port;
-	unsigned		state;
-	t_list 			packet_queue;
-	pthread_t		packet_queue_thread;
+	int 			clientID;	//clientID send by the server
+	SOCKET			sock;		//server socket
+	SOCKADDR_IN		sockaddr;	//server addr
+	char			*hostname;	//server hostname
+	PORT			port;		//server port in which it is listening
+	unsigned		state;		//client state (see enum below)
+	t_list 			packet_queue;	//a queue in which every received packet are put to
+	pthread_t		packet_queue_thread; //the thread which queue packets
+	time_t			last_live;
+	unsigned int	ticks;		//number of tick executed
 }				t_client;
 
 enum e_client_state
@@ -42,5 +46,11 @@ int 		cltPacketSend(t_client *client, t_client_packet *cp);
 
 t_packet 	*cltGetNextPacket(t_client *client);
 void 		cltPopPacket(t_client *client);
+
+void 		cltTick(t_client *client);
+void     	cltLive(t_client *client);
+
+/** packet handler */
+void		packetHandlerConnection(t_client *client, t_packet *packet);
 
 #endif

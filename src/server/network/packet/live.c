@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   connection.c                                       :+:      :+:    :+:   */
+/*   live.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: rpereira <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -10,17 +10,20 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "client/main.h"
+#include "server/main.h"
 
-void	packetHandlerConnection(t_client *client, t_packet *packet)
+/**
+**
+**	The server send to every client every 15 seconds that it is alive
+**
+**	each client has to answer that they are also alive, elseway, after another
+**  15 seconds timeout, the client is disconnected
+**
+*/
+
+/** called whenever the server received a live packet */
+void 	packetHandlerLive(t_game *game, t_server_packet *sp)
 {
-	client->clientID = *((int*)packet->data);
-	if (client->clientID == WRONG_CLIENT_ID)
-	{
-		logger_log(LOG_ERROR, "Couldnt connect to server, try later maybe!");
-	}
-	else
-	{
-		logger_log(LOG_FINE, "You are now connected, your id is: %d", client->clientID);
-	}
+	srvCltLive(sp->sender);
+	(void)game;
 }

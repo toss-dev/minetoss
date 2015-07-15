@@ -20,6 +20,8 @@
 # include "maths.h"
 # include "libft.h"
 
+# define TICK_PER_SEC 60	//number of world update per second
+
 typedef struct	s_entity
 {
 	t_vec3	rot;
@@ -41,6 +43,12 @@ typedef struct 	s_weather
 	float 	fog_density;
 	float 	fog_gradient;
 }				t_weather;
+
+typedef struct 	s_terrain_data
+{
+	t_point3	index;
+	char		blocks[TERRAIN_SIZEX][TERRAIN_SIZEY][TERRAIN_SIZEZ];
+}				t_terrain_data;
 
 typedef struct 	s_world
 {

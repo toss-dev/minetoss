@@ -29,6 +29,7 @@ CLT_SRC	= main.c \
 		  network/client.c \
 		  network/network.c \
 		  network/packet/connection.c \
+		  network/packet/live.c \
 		  render/camera.c \
 		  render/render.c \
 		  render/render_ingame.c \
@@ -57,7 +58,6 @@ CLT_SRC	= main.c \
 		  sound/sound_util.c \
 		  world/setblock.c \
 		  world/terrain.c \
-		  world/terrain_loader.c \
 		  world/terrain_utils.c \
 		  world/terrain_generator.c \
 		  world/noise.c \
@@ -69,7 +69,9 @@ CLT_OBJ		= $(CLT_SRCS:.c=.o)
 SRV_SRC = main.c \
 		  game.c \
 		  network/network.c \
-		  network/server.c
+		  network/server.c \
+		  network/packet/live.c
+
 
 SRV_SRCS 	= $(addprefix ./src/server/, $(SRV_SRC))
 SRV_OBJ		= $(SRV_SRCS:.c=.o)
@@ -93,25 +95,27 @@ FLAGS	= -Wall -Wextra -Werror -g3
 
 ifeq ($(OS),Darwin)
 	LIBGLFW = ./glfw/src/libglfw3.a
-	LIB = $(LIBGLFW) -framework Cocoa -framework OpenGL -framework IOKit -framework CoreVideo -lopenal
+	LIB_CLT = $(LIBGLFW) -framework Cocoa -framework OpenGL -framework IOKit -framework CoreVideo -lopenal
 	INC += -I ./glfw/include
 endif
 
 ifeq ($(OS),Windows_NT)
-	LIB = -L./lib/win/ -lglfw3 -lgdi32 -lglew32 -lopengl32 -lopenal
+	LIB_CLT = -L./lib/win/ -lglfw3 -lgdi32 -lglew32 -lopengl32 -lopenal
 	LIBGLFW = ./lib/win/libglw.a
 	DLLS_CLIENT = glew32.dll glew32mx.dll
 endif
 
-LIB += $(LIBFT) $(LIBMATH)
+LIB_CLT += $(LIBFT) $(LIBMATH)
+
+LIB_SRV = $(LIBFT) $(LIBMATH)
 
 all: $(DLLS_CLIENT) $(CLIENT) $(SERVER)
 
 $(CLIENT): $(LIBFT) $(LIBMATH) $(COMMON_OBJ) $(CLT_OBJ)
-	$(CC) $(FLAGS) -o $(CLIENT) $(CLT_OBJ) $(COMMON_OBJ) $(LIB)
+	$(CC) $(FLAGS) -o $(CLIENT) $(CLT_OBJ) $(COMMON_OBJ) $(LIB_CLT)
 
 $(SERVER): $(LIBFT) $(LIBMATH) $(COMMON_OBJ) $(SRV_OBJ)
-	$(CC) $(FLAGS) -o $(SERVER) $(SRV_OBJ) $(COMMON_OBJ) $(LIB)
+	$(CC) $(FLAGS) -o $(SERVER) $(SRV_OBJ) $(COMMON_OBJ) $(LIB_SRV)
 
 %.dll:
 	cp ./bin/$@ .

@@ -18,13 +18,15 @@
 
 typedef struct 	s_terrain	//16x256x16
 {
-	char 		blocks[TERRAIN_SIZEX][TERRAIN_SIZEY][TERRAIN_SIZEZ];
-	t_point3	index;	//given x, y, z index (for hashtable)
+	t_terrain_data	data;
+	unsigned int 	state;
 }				t_terrain;
 
 enum 			e_thread_id
 {
 	THRD_NETWORK,
+	THRD_TERRAIN_GENERATOR,
+	THRD_TERRAIN_SENDER,
 	THRD_MAX
 };
 
@@ -37,6 +39,7 @@ typedef struct 	s_game
 {
 	pthread_t	threads[THRD_MAX];
 	t_server	*server;
+	t_world		world;
 	int 		state;
 }				t_game;
 
@@ -52,5 +55,17 @@ void	gameStart(t_game *game);
 void	gameStop(t_game *game);
 
 int 	isGameRunning(t_game *game);
+
+/** world generator */
+void 	startTerrainUpdate(t_game *game);
+void	startWorldGenerator(t_game *game);
+void   	generateTerrain(t_terrain *terrain);
+void	loadWorldGenerator(void);
+void	prepareNoise(void);
+double	noise2(t_vec2 in);
+double	noise3(t_vec3 in);
+
+/** server packet handler */
+void	packetHandlerLive(t_game *game, t_server_packet *packet);
 
 #endif

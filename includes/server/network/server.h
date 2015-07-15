@@ -51,6 +51,7 @@ typedef struct 	s_client
 {
 	unsigned int 	state;
 	SOCKADDR_IN		sockaddr;
+	time_t			last_live;
 }				t_client;
 
 typedef struct 	s_server_packet
@@ -69,11 +70,15 @@ typedef struct 	s_server
 	unsigned		state;
 	pthread_t		packet_queue_thread;
 	t_list			packet_queue;
+	size_t			ticks;
 }				t_server;
 
 t_server			*srvStart(PORT port);
 void				srvStop(t_server *server);
 t_client 			*srvGetClient(t_server *server, int id);
+void        		srvTick(t_server *server);
+
+void				srvSendPacket(t_server *server, t_packet *packet, t_client *client);
 
 int      			srvPacketReceive(t_server *server, t_client_packet *packet, SOCKADDR_IN *sockaddr,
 								unsigned int sec, unsigned int usec);
@@ -81,8 +86,9 @@ int      			srvPacketReceive(t_server *server, t_client_packet *packet, SOCKADDR
 void              	srvPopPacket(t_server *server);
 t_server_packet   	*srvGetNextPacket(t_server *server);
 
-int        			srvClientHasState(t_server *server, unsigned int clientID, unsigned int state);
-void       			srvClientSetState(t_server *server, unsigned int clientID, unsigned int state);
-void        		srvClientUnsetState(t_server *server, unsigned int clientID, unsigned int state);
+int        			srvClientHasState(t_client *client, unsigned int state);
+void       			srvClientSetState(t_client *client, unsigned int state);
+void        		srvClientUnsetState(t_client *client, unsigned int state);
+void       			srvCltLive(t_client *client);
 
 #endif

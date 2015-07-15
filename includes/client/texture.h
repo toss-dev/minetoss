@@ -17,6 +17,14 @@
 
 # define BMP_HEADER_SIZE 54
 
+enum e_texture_id
+{
+	T_GUI_BUTTON_PRESSED,
+	T_GUI_BUTTON_RELEASED,
+	T_GUI_BUTTON_HOVERED,
+	T_MAX
+};
+
 enum 	e_block_texture_atlas_resolution
 {
 	RESOLUTION_BLOCK_ATLAS_16,

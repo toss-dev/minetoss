@@ -34,17 +34,20 @@ void		gameLoop(t_game *game)
 
 	gameSetState(game, GAME_RUNNING);
 	gameSetState(game, GAME_INGAME);
-	rendererAddView(&(game->renderer), VIEW_MAIN_MENU);
+	//rendererAddView(&(game->renderer), VIEW_MAIN_MENU);
 
 	startNetwork(game);
-	startTerrainMesher(game);
+	startTerrainUpdate(game);
 
 	while (!glfwWindowShouldClose(game->window.ptr))
 	{
 		prev = glfwGetTime();
 		updateGame(game);
 		renderGame(game);
+		cltTick(game->client);
+
 		game->renderer.fps = (unsigned int)(1 / (glfwGetTime() - prev));
+
 		usleep(1000000 / 120);
 	}
 }

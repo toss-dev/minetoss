@@ -12,53 +12,97 @@
 
 #include "server/network/server.h"
 
-int        srvClientHasState(t_server *server, unsigned int clientID, unsigned int state)
+int        srvClientHasState(t_client *client, unsigned int state)
 {
-   return (server->clients[clientID].state & state);
+   return (client->state & state);
 }
 
-void        srvClientSetState(t_server *server, unsigned int clientID, unsigned int state)
+void        srvClientSetState(t_client *client, unsigned int state)
 {
-   server->clients[clientID].state |= state;
+    client->state |= state;
 }
 
-void        srvClientUnsetState(t_server *server, unsigned int clientID, unsigned int state)
+void        srvClientUnsetState(t_client *client, unsigned int state)
 {
-   server->clients[clientID].state &= ~(state);
+   client->state &= ~(state);
 }
 
 /** add the client */
 static int  srvConnectClient(t_server *server, SOCKADDR_IN *sockaddr)
 {
-   t_packet packet;
+   t_client *client;
    int      clientID;
-
-   logger_log(LOG_FINE, "A client is connecting!");
 
    if (server->client_count >= SRV_MAX_CLIENT)
    {
-      clientID = WRONG_CLIENT_ID;
+      logger_log(LOG_WARNING, "Server is full!");
+      return (WRONG_CLIENT_ID);
    }
-   else
+
+   for (clientID = 0 ; clientID < SRV_MAX_CLIENT ; clientID++)
    {
-      for (clientID = 0 ; clientID < SRV_MAX_CLIENT ; clientID++)
+      client = server->clients + clientID;
+
+      if (srvClientHasState(client, CLIENT_CONNECTED) == 0)
       {
-         if (srvClientHasState(server, clientID, CLIENT_CONNECTED) == 0)
-         {
-            srvClientSetState(server, clientID, CLIENT_CONNECTED);
-            memcpy(&(server->clients[clientID].sockaddr), sockaddr, sizeof(SOCKADDR_IN));
-            server->client_count = server->client_count + 1;
-            break ;
-         }
+         memcpy(&(client->sockaddr), sockaddr, sizeof(SOCKADDR_IN));
+
+         logger_log(LOG_FINE, "A client has connected!");
+
+         t_packet packet;
+
+         packetCreate(&packet, (BYTE*)&clientID, sizeof(int), PACKET_ID_CONNECTION);
+         packetSend(&packet, server->sock, sockaddr);
+
+         client->last_live = time(NULL);
+         server->client_count = server->client_count + 1;
+         srvClientSetState(client, CLIENT_CONNECTED);
+
+         return (clientID);
       }
    }
 
-   packetCreate(&packet, (BYTE*)&clientID, sizeof(int), PACKET_ID_CONNECTION);
-   packetSend(&packet, server->sock, sockaddr);
-
-   return (clientID);
+   logger_log(LOG_WARNING, "Server is full!");
+   return (WRONG_CLIENT_ID);
 }
 
+/** do a server tick */
+void        srvTick(t_server *server)
+{
+   t_client       *client;
+   unsigned int   clientID;
+   unsigned int   diff;
+
+   for (clientID = 0 ; clientID < SRV_MAX_CLIENT ; clientID++)
+   {
+      client = server->clients + clientID;
+      if (srvClientHasState(client, CLIENT_CONNECTED))
+      {
+         diff = time(NULL) - client->last_live;
+         if (diff >= LIVE_TIMEOUT)
+         {
+            logger_log(LOG_WARNING, "Client with id: %u has been killed! (%u)", clientID, diff);
+            srvClientUnsetState(client, CLIENT_CONNECTED);
+            server->client_count = server->client_count - 1;
+         }
+         else if (diff >= LIVE_PING_TIMER)
+         {
+            //send the ping live to the client
+            t_packet packet;
+
+            packetCreate(&(packet), NULL, 0, PACKET_ID_LIVE);
+            srvSendPacket(server, &(packet), client);
+         }
+      }
+   }
+   ++server->ticks;
+}
+
+/** tell the server that the given client is alive */
+void        srvCltLive(t_client *client)
+{
+   client->last_live = time(NULL);
+}
 
 /** independant thread loop that queue packets into the server->packet_queue list */
 static void srvQueuePackets(t_server *server)
@@ -165,6 +209,12 @@ static void srvStartSocket(t_server *server)
    }
 }
 
+/**
+**    port: the port on which the server will listen to
+**
+**    max_client_live: the number of called to srvTick() before a client is
+**                 kick if it hasnt sent a live packet
+*/
 t_server *srvStart(PORT port)
 {
    t_server *server;
@@ -175,14 +225,14 @@ t_server *srvStart(PORT port)
 
    server->state = server->state | SERVER_RUNNING;
    server->state = server->state | SERVER_INITIALIZED;
+   server->ticks = 0;
+   memset(server->clients, 0, sizeof(server->clients));
 
    if (pthread_create(&(server->packet_queue_thread), NULL, (t_pthread_start)srvQueuePackets, server) != 0)
    {
       logger_log(LOG_ERROR, "Couldnt start network handler thread");
       exit(EXIT_FAILURE);
    }
-
-
    return (server);
 }
 
@@ -261,4 +311,10 @@ int      srvPacketReceive(t_server *server, t_client_packet *packet, SOCKADDR_IN
       return (srvPacketRead(server, packet, sockaddr));
    }
    return (-2);
+}
+
+/** send the given packet to the given client */
+void  srvSendPacket(t_server *server, t_packet *packet, t_client *client)
+{
+   packetSend(packet, server->sock, &(client->sockaddr));
 }

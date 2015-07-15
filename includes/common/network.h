@@ -20,14 +20,30 @@
 # define SESSION_ID_SIZE 	16	//nb of BYTE for the session ID
 # define WRONG_CLIENT_ID 	-1
 
+/**
+**	if the server didnt received any "pong" live packet from the client
+**	in LIVE_TIMEOUT seconds, it considers it has disconnected
+**
+**	if the server didnt received any "pong" live packet from the client
+**	for LIVE_PING_TIMER seconds, it send a "ping" live packet to the client
+*/
+# define LIVE_TIMEOUT 		5	//in seconds
+# define LIVE_PING_TIMER	1	//in seconds
+
 
 /** threads */
 typedef void	*(*t_pthread_start)(void *);
 
+enum e_packet_error
+{
+	PACKET_SELECT_ERROR = -1,
+	PACKET_TIMEOUT = -2
+};
+
 enum e_packet_id
 {
 	PACKET_ID_CONNECTION,
-	PACKET_ID_LOL_STUFF,
+	PACKET_ID_LIVE,
 	PACKET_ID_MAX
 };
 
