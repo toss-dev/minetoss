@@ -11,9 +11,10 @@
 # **************************************************************************** #
 
 CC = gcc
+FLAGS	= -Wall -Wextra -Werror -g3
 
-CLIENT 	= client
-SERVER 	= server
+CLIENT 			= client
+SERVER 			= server
 
 CLT_SRC	= main.c \
 		  blocks/block.c \
@@ -73,20 +74,18 @@ SRV_SRC = main.c \
 		  network/network.c \
 		  network/server.c \
 		  network/packet/live.c
-
-
 SRV_SRCS 	= $(addprefix ./src/server/, $(SRV_SRC))
 SRV_OBJ		= $(SRV_SRCS:.c=.o)
 
+
+
 COMMON_SRC 	= network/packet.c timer/timer.c
-
-
 COMMON_SRCS	= $(addprefix ./src/common/, $(COMMON_SRC))
 COMMON_OBJ 	= $(COMMON_SRCS:.c=.o)
 
+
 LIBFT_DIR 	= ./lib/libft
 LIBMATH_DIR = ./lib/maths
-
 LIBFT	= $(LIBFT_DIR)/libft.a
 LIBMATH	= $(LIBMATH_DIR)/libft_maths.a
 
@@ -94,7 +93,6 @@ INC		= -I ./includes \
 		  -I $(LIBFT_DIR) \
 		  -I $(LIBMATH_DIR)
 
-FLAGS	= -Wall -Wextra -Werror -g3
 
 ifeq ($(OS),Darwin)
 	LIBGLFW = ./glfw/src/libglfw3.a

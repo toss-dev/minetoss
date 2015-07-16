@@ -128,9 +128,6 @@ void 	renderModel(t_model *model)
 
 	glDrawArrays(GL_TRIANGLES, 0, model->vertex_count);
 
-	glEnableVertexAttribArray(ATTR_POSITION);
-	glEnableVertexAttribArray(ATTR_NORMAL);
-	glEnableVertexAttribArray(ATTR_UV);
 	glBindVertexArray(0);
 }
 

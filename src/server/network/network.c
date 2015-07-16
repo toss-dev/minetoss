@@ -30,6 +30,7 @@ void	networkHandlePackets(t_game *game)
 		}
 		usleep(1000);
 	}
+	pthread_exit(EXIT_SUCCESS);
 }
 
 /** one thread is created here and will loop reading packets, the other one exit the function */
