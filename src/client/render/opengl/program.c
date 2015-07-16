@@ -30,54 +30,55 @@ static void	bindUniforms(t_program *program)
 {
 	logger_log(LOG_FINE, "Creating uniform variables");
 	
-	program->transf_matrix = glGetUniformLocation(program->id, "transf_matrix");
-	program->view_matrix = glGetUniformLocation(program->id, "view_matrix");
-	program->proj_matrix = glGetUniformLocation(program->id, "proj_matrix");
+	program->uniforms[U_TRANSF_MATRIX] = glGetUniformLocation(program->id, "transf_matrix");
+	program->uniforms[U_VIEW_MATRIX] = glGetUniformLocation(program->id, "view_matrix");
+	program->uniforms[U_PROJ_MATRIX] = glGetUniformLocation(program->id, "proj_matrix");
 	
-	program->fog_color = glGetUniformLocation(program->id, "fog_color");
-	program->fog_density = glGetUniformLocation(program->id, "fog_density");
-	program->fog_gradient = glGetUniformLocation(program->id, "fog_gradient");
+	program->uniforms[U_FOG_COLOR] = glGetUniformLocation(program->id, "fog_color");
+	program->uniforms[U_FOG_DENSITY] = glGetUniformLocation(program->id, "fog_density");
+	program->uniforms[U_FOG_GRADIENT] = glGetUniformLocation(program->id, "fog_gradient");
 	
-	program->sun_color = glGetUniformLocation(program->id, "sun_color");
-	program->sun_position = glGetUniformLocation(program->id, "sun_position");
+	program->uniforms[U_SUN_COLOR] = glGetUniformLocation(program->id, "sun_color");
+	program->uniforms[U_SUN_POSITION] = glGetUniformLocation(program->id, "sun_position");
 
-	program->day_factor = glGetUniformLocation(program->id, "day_factor");
-	program->day_ratio = glGetUniformLocation(program->id, "day_ratio");
+	program->uniforms[U_DAY_FACTOR] = glGetUniformLocation(program->id, "day_factor");
+	program->uniforms[U_DAY_RATIO] = glGetUniformLocation(program->id, "day_ratio");
 
-	program->particle_color = glGetUniformLocation(program->id, "particle_color");
-	program->texture_atlas_cols = glGetUniformLocation(program->id, "texture_atlas_cols");
-	program->texture_atlas_lines = glGetUniformLocation(program->id, "texture_atlas_lines");
-	program->particle_texture_atlas_id = glGetUniformLocation(program->id, "particle_texture_atlas_id");
-
-	program->cubemap_day = glGetUniformLocation(program->id, "cubemap_day");
-	program->cubemap_night = glGetUniformLocation(program->id, "cubemap_night");
+	program->uniforms[U_CUBEMAP_DAY] = glGetUniformLocation(program->id, "cubemap_day");
+	program->uniforms[U_CUBEMAP_NIGHT] = glGetUniformLocation(program->id, "cubemap_night");
 	
-	program->font_color = glGetUniformLocation(program->id, "font_color");
+	program->uniforms[U_FONT_COLOR] = glGetUniformLocation(program->id, "font_color");
+	
+	program->uniforms[U_USE_ANIMATION] = glGetUniformLocation(program->id, "use_animation");
+	program->uniforms[U_ANIM_TRANSF_MATRIX] = glGetUniformLocation(program->id, "anim_transf_matrix");
 }
 
-static t_program	loadProgram(char const *vertex, char const *fragment)
+static void	loadProgram(t_program *program, char const *vertex, char const *fragment)
 {
-	t_program	program;
 	char		buffer[64];
 
-	program.id = glCreateProgram();
+	program->id = glCreateProgram();
 	sprintf(buffer, "./assets/shaders/%s", vertex);
-	program.vertex_shader = loadShader(buffer, GL_VERTEX_SHADER);
+	program->vertex_shader = loadShader(buffer, GL_VERTEX_SHADER);
 	sprintf(buffer, "./assets/shaders/%s", fragment);
-	program.fragment_shader = loadShader(buffer, GL_FRAGMENT_SHADER);
-	glAttachShader(program.id, program.vertex_shader);
-	glAttachShader(program.id, program.fragment_shader);
-	bindAttributes(program.id);
-	glLinkProgram(program.id);
-	glValidateProgram(program.id);
-	bindUniforms(&program);
-	return (program);
+	program->fragment_shader = loadShader(buffer, GL_FRAGMENT_SHADER);
+	glAttachShader(program->id, program->vertex_shader);
+	glAttachShader(program->id, program->fragment_shader);
+	bindAttributes(program->id);
+	glLinkProgram(program->id);
+	glValidateProgram(program->id);
+	bindUniforms(program);
 }
 
 void			loadPrograms(t_renderer *renderer)
 {
-	renderer->programs[PROGRAM_TERRAIN] = loadProgram("terrain.vertex", "terrain.fragment");
-	renderer->programs[PROGRAM_SKYBOX]	= loadProgram("skybox.vertex", "skybox.fragment");
-	renderer->programs[PROGRAM_FONT]	= loadProgram("font.vertex", "font.fragment");
-	renderer->programs[PROGRAM_QUAD]	= loadProgram("quad.vertex", "quad.fragment");
+	t_program	*program;
+
+	program = renderer->programs;
+
+	loadProgram(program + PROGRAM_TERRAIN, "terrain.vertex", "terrain.fragment");
+	loadProgram(program + PROGRAM_SKYBOX, "skybox.vertex", "skybox.fragment");
+	loadProgram(program + PROGRAM_FONT, "font.vertex", "font.fragment");
+	loadProgram(program + PROGRAM_QUAD, "quad.vertex", "quad.fragment");
+	loadProgram(program + PROGRAM_VOXEL_MODEL, "voxel_model.vertex", "voxel_model.fragment");
 }

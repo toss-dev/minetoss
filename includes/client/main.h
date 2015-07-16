@@ -21,6 +21,75 @@
 # include "client/sound.h"
 # include "client/view.h"
 
+
+/**
+**	A 't_voxel_model' is multiple objects parts
+**	e.g: a human has a head, a body, two legs, two arms...
+**		each part is a 't_voxel_part'. 
+**
+**	A 't_voxel_part' can be rotated, translated, scaled
+**	if the object voxels changes, the model has to be recalculated
+**
+*/
+
+typedef struct 	s_entity
+{
+	t_vec3			pos;
+	unsigned int 	modelID;
+}				t_entity;
+
+enum 	e_voxels
+{
+	VOXEL_BLUE,
+	VOXEL_RED,
+	VOXEL_GREEN,
+	VOXEL_YELLOW,
+	VOXEL_MAX
+};
+
+enum 	e_voxel_model
+{
+	VOXEL_MODEL_PIG,
+	VOXEL_MODEL_MAX
+};
+
+typedef struct 	s_voxel_vertex
+{
+	t_vec3	pos;
+	t_vec3	color;
+}				t_voxel_vertex;
+
+typedef struct 	s_animation_frame
+{
+	t_vec3	pos;
+	t_vec3	rot;
+	t_vec3	scale;
+}				t_animation_frame;
+
+typedef struct 	s_animation
+{
+	unsigned int 		frame_count;	//number of different {position, rotation and scaling}
+	t_animation_frame	*frames;
+}				t_animation;
+
+//relative to the voxel model
+typedef struct 	s_voxel_part
+{
+	GLuint			vaoID;
+	GLuint			vboID;
+	unsigned int 	vertex_count;
+	t_voxel_vertex 	*vertex;
+	unsigned int 	animation_count;
+	t_animation		*animations;
+}				t_voxel_part;
+
+//relative to world
+typedef struct 	s_voxel_model
+{
+	unsigned int	parts_count;
+	t_voxel_part	*parts;
+}				t_voxel_model;
+
 /** file has to be added in the same order as these enum are declared */
 enum e_sounds
 {
@@ -40,6 +109,7 @@ enum e_program_id
 	PROGRAM_SKYBOX,
 	PROGRAM_FONT,
 	PROGRAM_QUAD,
+	PROGRAM_VOXEL_MODEL,
 	PROGRAM_MAX
 };
 
@@ -99,18 +169,26 @@ enum e_renderer_config
 
 typedef struct 	s_renderer
 {
-	t_timer			*timer;
-	unsigned int 	fps;
-	t_camera		camera;
-	t_program		programs[PROGRAM_MAX];
-	t_sky			sky;
-	t_block			blocks[BLOCK_MAX];
-	GLuint			block_atlas[RESOLUTION_BLOCK_ATLAS_MAX];
-	GLuint			textures[T_MAX];
-	t_model			quad_model;
-	size_t			config;
-	t_view			views[VIEW_MAX]; //every views are store in this array, loaded on initialization
-	t_list 			views_list; //this list contains the ID of using views
+	t_block		blocks[BLOCK_MAX];
+	GLuint		block_atlas[RESOLUTION_BLOCK_ATLAS_MAX];
+
+	t_program	programs[PROGRAM_MAX];
+
+	t_vec3			voxels[VOXEL_MAX];
+	t_voxel_model	voxel_models[VOXEL_MODEL_MAX];
+
+	t_camera	camera;
+	GLuint		textures[T_MAX];
+
+	t_sky		sky;
+
+	t_view		views[VIEW_MAX]; //every views are store in this array, loaded on initialization
+	t_list 		views_list; //this list contains the ID of using views
+	t_model		quad_model;
+
+	t_timer		*timer;
+	size_t		config;
+	unsigned int fps;
 }				t_renderer;
 
 /**
@@ -284,13 +362,6 @@ void			renderView(t_renderer *renderer, t_view *view);
 void 			loadViews(t_renderer *renderer);
 void			loadViewMainMenu(t_view *view);
 
-/** opengl function wrapper */
-
-void			loadUniformMatrix(GLuint id, float *matrix);
-void			loadUniformFloat(GLuint id, float value);
-void			loadUniformVec(GLuint id, t_vec3 p);
-void			loadUniformInt(GLuint id, GLuint integer);
-
 /** camera related functions */
 int				isInCameraFrustum(t_camera *camera, t_vec3 point, float impresicion);
 void			cameraControlRelease(t_camera *camera, int key);
@@ -318,5 +389,9 @@ double	noise3(t_vec3 in);
 
 /** packets handler */
 void			packetHandlerLive(t_game *game, t_packet *packet);
+
+/** voxels 3D model */
+void			loadVoxelModels(t_renderer *renderer);
+void 			renderEntity(t_renderer *renderer, t_entity *entity);
 
 #endif

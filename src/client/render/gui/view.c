@@ -203,7 +203,7 @@ static void	bindButtonUniforms(t_program *program, t_button *button)
 	matrix_identity(m);
 	matrix_translate(m, new_vec3(button->gl_pos.x, button->gl_pos.y, 0));
 	matrix_scale(m, new_vec3(button->size.x, button->size.y, 1));
-	loadUniformMatrix(program->transf_matrix, m);
+	glhLoadUniformMatrix(program, U_TRANSF_MATRIX, m);
 }
 
 static void	renderButton(t_renderer *renderer, t_button *button)

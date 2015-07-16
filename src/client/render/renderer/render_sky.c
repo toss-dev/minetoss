@@ -12,7 +12,7 @@
 
 #include "client/main.h"
 
-static void	loadViewMatrix(t_renderer *renderer, t_program *program)
+static void	glhLoadViewMatrix(t_renderer *renderer, t_program *program)
 {
 	float 	m[16];
 
@@ -21,17 +21,17 @@ static void	loadViewMatrix(t_renderer *renderer, t_program *program)
 	matrix_rotate(m, new_vec3(1.0f, 0.0f, 0.0f), renderer->sky.rot.x);
 	matrix_rotate(m, new_vec3(0.0f, 1.0f, 0.0f), renderer->sky.rot.y);
 	matrix_rotate(m, new_vec3(0.0f, 0.0f, 1.0f), renderer->sky.rot.z);
-	loadUniformMatrix(program->view_matrix, m);
+	glhLoadUniformMatrix(program, U_VIEW_MATRIX, m);
 }
 
 static void prepareSkyUniform(t_world *world, t_renderer *renderer, t_program *program)
 {
-	loadViewMatrix(renderer, program);
-	loadUniformVec(program->fog_color, world->weather.fog_color);
-	loadUniformFloat(program->day_factor, 1);
-	loadUniformFloat(program->day_ratio, 0.5f);
-	loadUniformVec(program->sun_position, vec3_sub(world->weather.sun_pos, renderer->camera.pos));
-	loadUniformVec(program->sun_color, world->weather.sun_color);
+	glhLoadViewMatrix(renderer, program);
+	glhLoadUniformVec(program, U_FOG_COLOR, world->weather.fog_color);
+	glhLoadUniformFloat(program, U_DAY_FACTOR, 1);
+	glhLoadUniformFloat(program, U_DAY_RATIO, 0.5f);
+	glhLoadUniformVec(program, U_SUN_POSITION, vec3_sub(world->weather.sun_pos, renderer->camera.pos));
+	glhLoadUniformVec(program, U_SUN_COLOR, world->weather.sun_color);
 }
 
 static void	renderSkybox(t_world *world, t_renderer *renderer)

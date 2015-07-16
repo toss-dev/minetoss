@@ -14,7 +14,7 @@
 
 # define CLIENT_H
 
-# define CONNEXION_TIMEOUT 5 	//in seconds
+# define CONNEXION_TIMEOUT 1 	//in seconds
 
 # include "common/network.h"
 

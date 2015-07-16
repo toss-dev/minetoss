@@ -89,7 +89,7 @@ int			isInCameraFrustum(t_camera *camera, t_vec3 point, float impresicion)
 	return (angle < camera->fov / 2 + impresicion);
 }
 
-static void	bind_projection_matrix(t_camera camera, t_program program)
+static void	bind_projection_matrix(t_camera camera, t_program *program)
 {
 	float	*matrix;
 	float	aspect;
@@ -100,9 +100,9 @@ static void	bind_projection_matrix(t_camera camera, t_program program)
 	{
 		logger_log(LOG_ERROR, "Not enough memory (projection matrix)");
 	}
-	glUseProgram(program.id);
-	logger_log(LOG_FINE, "Binding projection matrix to program: %d", program.id);
-	loadUniformMatrix(program.proj_matrix, matrix);
+	glUseProgram(program->id);
+	logger_log(LOG_FINE, "Binding projection matrix to program: %d", program->id);
+	glhLoadUniformMatrix(program, U_PROJ_MATRIX, matrix);
 	glUseProgram(0);
 	free(matrix);
 }
@@ -120,7 +120,7 @@ void		loadCamera(t_renderer *renderer)
 	renderer->camera.far_dist = 2000;
 	for (i = 0; i < PROGRAM_MAX; i++)
 	{
-		bind_projection_matrix(renderer->camera, renderer->programs[i]);
+		bind_projection_matrix(renderer->camera, renderer->programs + i);
 	}
 	renderer->camera.state = 0;
 	renderer->camera.pitch = 0;

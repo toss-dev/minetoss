@@ -23,7 +23,8 @@ static void loadUniformFontMatrix(t_program *program, t_font_model *model)
 	matrix_rotate(matrix, new_vec3(0, 0, 1), model->rot.z);
 	matrix_scale(matrix, model->scale);
 
-	loadUniformMatrix(program->transf_matrix, matrix);
+	glhLoadUniformMatrix(program, U_TRANSF_MATRIX, matrix);
+	glhLoadUniformVec(program, U_FONT_COLOR, model->color);
 }
 
 static void	renderFontModel(t_program *program, t_font_model *model)
@@ -31,7 +32,6 @@ static void	renderFontModel(t_program *program, t_font_model *model)
 	glBindTexture(GL_TEXTURE_2D, model->textureID);
 
 	loadUniformFontMatrix(program, model);
-	loadUniformVec(program->font_color, model->color);
 
 	glBindVertexArray(model->vaoID);
 

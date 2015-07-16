@@ -48,7 +48,7 @@ static void	loadCubemap(GLuint *id, char *identifier)
     		logger_log(LOG_WARNING, "Couldnt get skybox face: %s", buffer);
     		continue ;
     	}
-        logger_log(LOG_FINE, "Skybox face loaded: %s", buffer);
+        logger_log(LOG_FINE, "Skybox face glhLoaded: %s", buffer);
         bmpReverseYs(&texture);
         glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB, texture.width, texture.height, 0, GL_BGR, GL_UNSIGNED_BYTE, texture.pixels);
         free(texture.pixels);
@@ -128,12 +128,12 @@ void        loadSky(t_renderer *renderer)
     loadCubemap(renderer->sky.cubemaps + CUBEMAP_DAY, "day");
     loadCubemap(renderer->sky.cubemaps + CUBEMAP_NIGHT, "night");
     glUseProgram(program->id);
-    loadUniformInt(program->cubemap_day, 0);
-    loadUniformInt(program->cubemap_night, 1);
+    glhLoadUniformInt(program, U_CUBEMAP_DAY, 0);
+    glhLoadUniformInt(program, U_CUBEMAP_NIGHT, 1);
     glUseProgram(0);
     renderer->sky.rot = new_vec3(0, 0, 0);
 }
-# include "maths.h"
+
 static void calculateSunPos(t_world *world, t_renderer *renderer, float tick_ratio)
 {
     float   x;

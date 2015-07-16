@@ -18,7 +18,7 @@ static void loadTerrainInstanceUniforms(t_renderer *renderer, t_terrain *terrain
 
 	matrix_identity(m);
 	matrix_translate(m, new_vec3(terrain->index.x * TERRAIN_SIZEX, terrain->index.y * TERRAIN_SIZEY, terrain->index.z * TERRAIN_SIZEZ));
-	loadUniformMatrix(renderer->programs[PROGRAM_TERRAIN].transf_matrix, m);
+	glhLoadUniformMatrix(renderer->programs + PROGRAM_TERRAIN, U_TRANSF_MATRIX, m);
 }
 
 
@@ -87,12 +87,12 @@ static void renderTerrain(t_renderer *renderer, t_terrain *terrain)
 
 static void loadTerrainUniforms(t_world *world, t_renderer *renderer, t_program *program)
 {
-	loadUniformMatrix(program->view_matrix, renderer->camera.view_matrix);
-	loadUniformVec(program->fog_color, world->weather.fog_color);
-	loadUniformFloat(program->fog_density, world->weather.fog_density);
-	loadUniformFloat(program->fog_gradient, world->weather.fog_gradient);
-	loadUniformVec(program->sun_color, world->weather.sun_color);
-	loadUniformVec(program->sun_position, world->weather.sun_pos);
+	glhLoadUniformMatrix(program, U_VIEW_MATRIX, renderer->camera.view_matrix);
+	glhLoadUniformVec(program, U_FOG_COLOR, world->weather.fog_color);
+	glhLoadUniformFloat(program, U_FOG_DENSITY, world->weather.fog_density);
+	glhLoadUniformFloat(program, U_FOG_GRADIENT, world->weather.fog_gradient);
+	glhLoadUniformVec(program, U_SUN_COLOR, world->weather.sun_color);
+	glhLoadUniformVec(program, U_SUN_POSITION, world->weather.sun_pos);
 }
 
 void 		renderTerrains(t_world *world, t_renderer *renderer)

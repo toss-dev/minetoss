@@ -52,9 +52,10 @@ CLT_SRC	= main.c \
 		  render/opengl/shader.c \
 		  render/opengl/vertex.c \
 		  render/opengl/model.c \
-		  render/opengl/uniforms.c \
 		  render/gui/view.c \
 		  render/gui/main_menu.c \
+		  render/voxel_model/voxel_model.c \
+		  render/voxel_model/render_voxel_model.c \
 		  sound/sound.c \
 		  sound/sound_util.c \
 		  world/setblock.c \

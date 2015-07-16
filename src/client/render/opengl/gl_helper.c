@@ -135,3 +135,24 @@ GLuint  glhCheckError(char const *str)
     }
     return (err);
 }
+
+/** uniform loader */
+void    glhLoadUniformMatrix(t_program *program, unsigned int id, float *matrix)
+{
+    glUniformMatrix4fv(program->uniforms[id], 1, GL_TRUE, matrix);
+}
+
+void    glhLoadUniformFloat(t_program *program, unsigned int id, float value)
+{
+    glUniform1f(program->uniforms[id], value);
+}
+
+void    glhLoadUniformVec(t_program *program, unsigned int id, t_vec3 p)
+{
+    glUniform3f(program->uniforms[id], p.x, p.y, p.z);
+}
+
+void    glhLoadUniformInt(t_program *program, unsigned int id, GLuint integer)
+{
+    glUniform1i(program->uniforms[id], integer);
+}

@@ -32,32 +32,32 @@ typedef struct 	s_window
 	GLFWwindow	*ptr;
 }				t_window;
 
+enum e_uniforms_variable
+{
+	U_PROJ_MATRIX,
+	U_VIEW_MATRIX,
+	U_TRANSF_MATRIX,
+	U_FOG_COLOR,
+	U_FOG_DENSITY,
+	U_FOG_GRADIENT,
+	U_SUN_POSITION,
+	U_SUN_COLOR,
+	U_CUBEMAP_DAY,
+	U_CUBEMAP_NIGHT,
+	U_DAY_RATIO,
+	U_DAY_FACTOR,
+	U_FONT_COLOR,
+	U_USE_ANIMATION,
+	U_ANIM_TRANSF_MATRIX,
+	U_MAX
+};
+
 typedef struct 	s_program
 {
 	GLuint	id;
 	GLuint	vertex_shader;
 	GLuint 	fragment_shader;
-
-//	GLuint	*uniforms;
-//	TODO: replace this bordel with an array
-
-	GLuint	proj_matrix;
-	GLuint	view_matrix;
-	GLuint	transf_matrix;
-	GLuint	fog_color;
-	GLuint 	fog_density;
-	GLuint 	fog_gradient;
-	GLuint	sun_position;
-	GLuint	sun_color;
-	GLuint	particle_color;
-	GLuint 	texture_atlas_cols;
-	GLuint 	texture_atlas_lines;
-	GLuint 	particle_texture_atlas_id;
-	GLuint	cubemap_day;
-	GLuint	cubemap_night;
-	GLuint	day_ratio;
-	GLuint	day_factor;
-	GLuint	font_color;
+	GLuint	uniforms[U_MAX];
 }				t_program;
 
 /** opengl helper functions (see gl_helper.c) */
@@ -71,6 +71,14 @@ void   			glhUseProgram(t_program *program);
 void    		glhStopUseProgram(void);
 GLuint			glhLoadTexture(char const *file);
 GLuint  		glhCheckError(char const *str);
+
+/** opengl function wrapper */
+
+void			glhLoadUniformMatrix(t_program *program, unsigned int id, float *matrix);
+void			glhLoadUniformFloat(t_program *program, unsigned int id, float value);
+void			glhLoadUniformVec(t_program *program, unsigned int id, t_vec3 p);
+void			glhLoadUniformInt(t_program *program, unsigned int id, GLuint integer);
+
 
 /** vertex*/
 typedef struct 	s_vertex

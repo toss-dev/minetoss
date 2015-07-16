@@ -84,7 +84,7 @@ int 	list_remove(t_list *lst, t_function free_funct, t_cmp_func cmpf, void *cmpd
 }
 
 /** the content of size content_size is stored just after the node, so only 1 malloc is used */
-void 	*list_add(t_list *lst, void const *content, size_t content_size)
+void 	*list_add(t_list *lst, void const *content, unsigned int content_size)
 {
 	t_list_node	*node;
 	t_list_node	*tmp;
@@ -95,6 +95,7 @@ void 	*list_add(t_list *lst, void const *content, size_t content_size)
 		return (NULL);
 	}
 	memcpy(node + 1, content, content_size);
+	node->content_size = content_size;
 
 	tmp = lst->head->next;
 
@@ -109,7 +110,7 @@ void 	*list_add(t_list *lst, void const *content, size_t content_size)
 	return (node + 1);
 }
 
-void 	*list_push(t_list *lst, void const *content, size_t content_size)
+void 	*list_push(t_list *lst, void const *content, unsigned int content_size)
 {
 	t_list_node	*node;
 	t_list_node	*tmp;
@@ -120,6 +121,7 @@ void 	*list_push(t_list *lst, void const *content, size_t content_size)
 		return (NULL);
 	}
 	memcpy(node + 1, content, content_size);
+	node->content_size = content_size;
 	
 	tmp = lst->head->previous;
 
@@ -170,4 +172,73 @@ void	list_delete(t_list *lst, void (*delete_content)(void *content))
 	free(lst->head);
 	lst->head = NULL;
 	lst->size = 0;
+}
+
+/** write the list to a file descriptor */
+//	[S] [S] [S] [S] [C] [C] [C] [C] [D] [D] ... [C] [C] [C] [C]
+//	S == list.size
+//	C == node.content_size
+//	D == node.content
+//	return -1 if an error occured, else way 0
+int		list_to_fd(t_list *list, int fd)
+{
+	t_list_node	*node;
+
+	if (write(fd, &(list->size), sizeof(list->size)) <= 0)
+	{
+		return (-1);
+	}
+	node = list->head->next;
+	while (node != list->head)
+	{
+		if (write(fd, &(node->content_size), sizeof(node->content_size)) <= 0)
+		{
+			return (-1);
+		}
+		if (write(fd, node + 1, node->content_size) <= 0)
+		{
+			return (-1);
+		}
+		node = node->next; 
+	}
+	return (0);
+}
+
+/* load a list from the given fildes */
+t_list 	list_from_fd(int fd)
+{
+	char 			*buffer;
+	size_t			buffer_size;
+	t_list 			lst;
+	unsigned int	i;
+	unsigned int 	node_content_size;
+
+	lst = list_new();
+	if (read(fd, &(lst.size), sizeof(lst.size)) <= 0)
+	{
+		return (lst);
+	}
+	buffer_size = 65536;
+	buffer = (char*)malloc(buffer_size);
+	i = 0;
+	while (i < lst.size)
+	{
+		if (read(fd, &(node_content_size), sizeof(node_content_size)) <= 0)
+		{
+			break ;
+		}
+		while (node_content_size >= buffer_size)
+		{
+			buffer_size = buffer_size * 2;
+			buffer = (char*)realloc(buffer, buffer_size);
+		}
+		if (read(fd, buffer, node_content_size) <= 0)
+		{
+			break ;
+		}
+		list_push(&lst, buffer, node_content_size);
+		++i;
+	}
+	free(buffer);
+	return (lst);
 }

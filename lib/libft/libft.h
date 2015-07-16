@@ -51,6 +51,7 @@ typedef int 		(*t_cmp_func) (void const *a, void const *b);
 
 typedef struct		s_list_node
 {
+	unsigned int 		content_size;
 	struct s_list_node	*next;
 	struct s_list_node	*previous;
 }					t_list_node;
@@ -58,11 +59,11 @@ typedef struct		s_list_node
 typedef struct		s_list
 {
 	t_list_node	*head;
-	size_t		size;
+	unsigned int size;
 }					t_list;
 
-void				*list_push(t_list *lst, void const *content, size_t content_size);
-void				*list_add(t_list *lst, void const *content, size_t content_size);
+void				*list_push(t_list *lst, void const *content, unsigned int content_size);
+void				*list_add(t_list *lst, void const *content, unsigned int content_size);
 void 				*list_get(t_list *lst, t_cmp_func cmpf, void *cmpd);
 t_list				list_new(void);
 int 				list_remove(t_list *lst, t_function free_funct, t_cmp_func cmpf, void *cmpd);
@@ -70,6 +71,9 @@ void				list_remove_node(t_list *lst, t_list_node *node, t_function free_funct);
 void				list_delete(t_list *lst, t_function free_funct);
 void				list_pop(t_list *lst, t_function free_funct);
 void				*list_head(t_list *lst);
+
+int					list_to_fd(t_list *list, int fd);
+t_list 				list_from_fd(int fd);
 
 //X should be the hashtable structure, and Y the element variable
 

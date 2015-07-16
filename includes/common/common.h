@@ -22,19 +22,6 @@
 
 # define TICK_PER_SEC 60	//number of world update per second
 
-typedef struct	s_entity
-{
-	t_vec3	rot;
-	t_vec3	scale;
-	t_vec3	pos;
-	t_vec3	rot_vec;
-	t_vec3	scale_vec;
-	t_vec3	pos_vec;
-	int		textureID;
-	float	health;
-	float 	speed;
-}				t_entity;
-
 typedef struct 	s_weather
 {
 	t_vec3	sun_pos;
