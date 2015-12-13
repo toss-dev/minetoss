@@ -1,5 +1,16 @@
 # minetoss
 
+
+
+
+THIS PROJECT IS DEAD
+AN UPDATED VERSION IN JAVA IS AVAILABLE HERE :
+https://github.com/toss-dev/VoxelEngine
+
+
+
+
+
 Minecraft like engine openGL / GLFW
 -----------------------------------------------
 
